@@ -14,20 +14,34 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import cafe.adriel.voyager.navigator.Navigator
-import cafe.adriel.voyager.transitions.SlideTransition
-import org.koin.compose.KoinContext
-import org.koin.compose.koinInject
-import pe.breaker.dkaviplay.presentation.screen.login.LoginScreen
-import pe.breaker.dkaviplay.presentation.screen.splashScreen.SplashScreen
+import org.jetbrains.compose.resources.painterResource
+
+import dkaviplay.composeapp.generated.resources.Res
+import dkaviplay.composeapp.generated.resources.compose_multiplatform
 
 @Composable
+@Preview
 fun App() {
-    KoinContext {
-        MaterialTheme {
-            Navigator(SplashScreen()) { navigator ->
-                SlideTransition(navigator) { screen ->
-                    screen.Content()
+    MaterialTheme {
+        var showContent by remember { mutableStateOf(false) }
+        Column(
+            modifier = Modifier
+                .background(MaterialTheme.colorScheme.primaryContainer)
+                .safeContentPadding()
+                .fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Button(onClick = { showContent = !showContent }) {
+                Text("Click me!")
+            }
+            AnimatedVisibility(showContent) {
+                val greeting = remember { Greeting().greet() }
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Image(painterResource(Res.drawable.compose_multiplatform), null)
+                    Text("Compose: $greeting")
                 }
             }
         }

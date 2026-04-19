@@ -1,8 +1,0 @@
-package pe.breaker.dkaviplay.domain.usecase.reserva
-
-import pe.breaker.dkaviplay.data.remote.reserva.RegisterReservaRequestDTO
-import pe.breaker.dkaviplay.domain.repository.ReservaRepository
-
-class RegisterReservationUseCase(private val reservaRepository : ReservaRepository) {
-    suspend operator fun invoke(reserva: RegisterReservaRequestDTO) = reservaRepository.registroReserva(reserva)
-}
