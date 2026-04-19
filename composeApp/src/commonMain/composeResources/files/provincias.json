@@ -1,0 +1,826 @@
+{
+    "2534": [
+        {
+            "id_ubigeo": "2557",
+            "nombre_ubigeo": "Bagua"
+        },
+        {
+            "id_ubigeo": "2563",
+            "nombre_ubigeo": "Bongara"
+        },
+        {
+            "id_ubigeo": "2535",
+            "nombre_ubigeo": "Chachapoyas"
+        },
+        {
+            "id_ubigeo": "2576",
+            "nombre_ubigeo": "Condorcanqui"
+        },
+        {
+            "id_ubigeo": "2580",
+            "nombre_ubigeo": "Luya"
+        },
+        {
+            "id_ubigeo": "2604",
+            "nombre_ubigeo": "Rodriguez de Mendoza"
+        },
+        {
+            "id_ubigeo": "2617",
+            "nombre_ubigeo": "Utcubamba"
+        }
+    ],
+    "2625": [
+        {
+            "id_ubigeo": "2639",
+            "nombre_ubigeo": "Aija"
+        },
+        {
+            "id_ubigeo": "2645",
+            "nombre_ubigeo": "Antonio Raymondi"
+        },
+        {
+            "id_ubigeo": "2652",
+            "nombre_ubigeo": "Asuncion"
+        },
+        {
+            "id_ubigeo": "2655",
+            "nombre_ubigeo": "Bolognesi"
+        },
+        {
+            "id_ubigeo": "2671",
+            "nombre_ubigeo": "Carhuaz"
+        },
+        {
+            "id_ubigeo": "2683",
+            "nombre_ubigeo": "Carlos Fermin Fitzcarrald"
+        },
+        {
+            "id_ubigeo": "2687",
+            "nombre_ubigeo": "Casma"
+        },
+        {
+            "id_ubigeo": "2692",
+            "nombre_ubigeo": "Corongo"
+        },
+        {
+            "id_ubigeo": "2626",
+            "nombre_ubigeo": "Huaraz"
+        },
+        {
+            "id_ubigeo": "2700",
+            "nombre_ubigeo": "Huari"
+        },
+        {
+            "id_ubigeo": "2717",
+            "nombre_ubigeo": "Huarmey"
+        },
+        {
+            "id_ubigeo": "2723",
+            "nombre_ubigeo": "Huaylas"
+        },
+        {
+            "id_ubigeo": "2734",
+            "nombre_ubigeo": "Mariscal Luzuriaga"
+        },
+        {
+            "id_ubigeo": "2743",
+            "nombre_ubigeo": "Ocros"
+        },
+        {
+            "id_ubigeo": "2754",
+            "nombre_ubigeo": "Pallasca"
+        },
+        {
+            "id_ubigeo": "2766",
+            "nombre_ubigeo": "Pomabamba"
+        },
+        {
+            "id_ubigeo": "2771",
+            "nombre_ubigeo": "Recuay"
+        },
+        {
+            "id_ubigeo": "2782",
+            "nombre_ubigeo": "Santa"
+        },
+        {
+            "id_ubigeo": "2792",
+            "nombre_ubigeo": "Sihuas"
+        },
+        {
+            "id_ubigeo": "2803",
+            "nombre_ubigeo": "Yungay"
+        }
+    ],
+    "2812": [
+        {
+            "id_ubigeo": "2813",
+            "nombre_ubigeo": "Abancay"
+        },
+        {
+            "id_ubigeo": "2823",
+            "nombre_ubigeo": "Andahuaylas"
+        },
+        {
+            "id_ubigeo": "2843",
+            "nombre_ubigeo": "Antabamba"
+        },
+        {
+            "id_ubigeo": "2851",
+            "nombre_ubigeo": "Aymaraes"
+        },
+        {
+            "id_ubigeo": "2876",
+            "nombre_ubigeo": "Chincheros"
+        },
+        {
+            "id_ubigeo": "2869",
+            "nombre_ubigeo": "Cotabambas"
+        },
+        {
+            "id_ubigeo": "2885",
+            "nombre_ubigeo": "Grau"
+        }
+    ],
+    "2900": [
+        {
+            "id_ubigeo": "2901",
+            "nombre_ubigeo": "Arequipa"
+        },
+        {
+            "id_ubigeo": "2931",
+            "nombre_ubigeo": "Camana"
+        },
+        {
+            "id_ubigeo": "2940",
+            "nombre_ubigeo": "Caraveli"
+        },
+        {
+            "id_ubigeo": "2954",
+            "nombre_ubigeo": "Castilla"
+        },
+        {
+            "id_ubigeo": "2971",
+            "nombre_ubigeo": "Caylloma"
+        },
+        {
+            "id_ubigeo": "2992",
+            "nombre_ubigeo": "Condesuyos"
+        },
+        {
+            "id_ubigeo": "3001",
+            "nombre_ubigeo": "Islay"
+        },
+        {
+            "id_ubigeo": "3008",
+            "nombre_ubigeo": "La Union"
+        }
+    ],
+    "3020": [
+        {
+            "id_ubigeo": "3037",
+            "nombre_ubigeo": "Cangallo"
+        },
+        {
+            "id_ubigeo": "3021",
+            "nombre_ubigeo": "Huamanga"
+        },
+        {
+            "id_ubigeo": "3044",
+            "nombre_ubigeo": "Huanca Sancos"
+        },
+        {
+            "id_ubigeo": "3049",
+            "nombre_ubigeo": "Huanta"
+        },
+        {
+            "id_ubigeo": "3058",
+            "nombre_ubigeo": "La Mar"
+        },
+        {
+            "id_ubigeo": "3067",
+            "nombre_ubigeo": "Lucanas"
+        },
+        {
+            "id_ubigeo": "3089",
+            "nombre_ubigeo": "Parinacochas"
+        },
+        {
+            "id_ubigeo": "3098",
+            "nombre_ubigeo": "Paucar del Sara Sara"
+        },
+        {
+            "id_ubigeo": "3109",
+            "nombre_ubigeo": "Sucre"
+        },
+        {
+            "id_ubigeo": "3121",
+            "nombre_ubigeo": "Victor Fajardo"
+        },
+        {
+            "id_ubigeo": "3134",
+            "nombre_ubigeo": "Vilcas Huaman"
+        }
+    ],
+    "3143": [
+        {
+            "id_ubigeo": "3157",
+            "nombre_ubigeo": "Cajabamba"
+        },
+        {
+            "id_ubigeo": "3144",
+            "nombre_ubigeo": "Cajamarca"
+        },
+        {
+            "id_ubigeo": "3162",
+            "nombre_ubigeo": "Celendin"
+        },
+        {
+            "id_ubigeo": "3175",
+            "nombre_ubigeo": "Chota"
+        },
+        {
+            "id_ubigeo": "3195",
+            "nombre_ubigeo": "Contumaza"
+        },
+        {
+            "id_ubigeo": "3204",
+            "nombre_ubigeo": "Cutervo"
+        },
+        {
+            "id_ubigeo": "3220",
+            "nombre_ubigeo": "Hualgayoc"
+        },
+        {
+            "id_ubigeo": "3224",
+            "nombre_ubigeo": "Jaen"
+        },
+        {
+            "id_ubigeo": "3237",
+            "nombre_ubigeo": "San Ignacio"
+        },
+        {
+            "id_ubigeo": "3245",
+            "nombre_ubigeo": "San Marcos"
+        },
+        {
+            "id_ubigeo": "3253",
+            "nombre_ubigeo": "San Miguel"
+        },
+        {
+            "id_ubigeo": "3267",
+            "nombre_ubigeo": "San Pablo"
+        },
+        {
+            "id_ubigeo": "3272",
+            "nombre_ubigeo": "Santa Cruz"
+        }
+    ],
+    "3292": [
+        {
+            "id_ubigeo": "3302",
+            "nombre_ubigeo": "Acomayo"
+        },
+        {
+            "id_ubigeo": "3310",
+            "nombre_ubigeo": "Anta"
+        },
+        {
+            "id_ubigeo": "3320",
+            "nombre_ubigeo": "Calca"
+        },
+        {
+            "id_ubigeo": "3329",
+            "nombre_ubigeo": "Canas"
+        },
+        {
+            "id_ubigeo": "3338",
+            "nombre_ubigeo": "Canchis"
+        },
+        {
+            "id_ubigeo": "3347",
+            "nombre_ubigeo": "Chumbivilcas"
+        },
+        {
+            "id_ubigeo": "3293",
+            "nombre_ubigeo": "Cusco"
+        },
+        {
+            "id_ubigeo": "3356",
+            "nombre_ubigeo": "Espinar"
+        },
+        {
+            "id_ubigeo": "3365",
+            "nombre_ubigeo": "La Convencion"
+        },
+        {
+            "id_ubigeo": "3376",
+            "nombre_ubigeo": "Paruro"
+        },
+        {
+            "id_ubigeo": "3386",
+            "nombre_ubigeo": "Paucartambo"
+        },
+        {
+            "id_ubigeo": "3393",
+            "nombre_ubigeo": "Quispicanchi"
+        },
+        {
+            "id_ubigeo": "3406",
+            "nombre_ubigeo": "Urubamba"
+        }
+    ],
+    "3414": [
+        {
+            "id_ubigeo": "3435",
+            "nombre_ubigeo": "Acobamba"
+        },
+        {
+            "id_ubigeo": "3444",
+            "nombre_ubigeo": "Angaraes"
+        },
+        {
+            "id_ubigeo": "3457",
+            "nombre_ubigeo": "Castrovirreyna"
+        },
+        {
+            "id_ubigeo": "3471",
+            "nombre_ubigeo": "Churcampa"
+        },
+        {
+            "id_ubigeo": "3415",
+            "nombre_ubigeo": "Huancavelica"
+        },
+        {
+            "id_ubigeo": "3482",
+            "nombre_ubigeo": "Huaytara"
+        },
+        {
+            "id_ubigeo": "3499",
+            "nombre_ubigeo": "Tayacaja"
+        }
+    ],
+    "3518": [
+        {
+            "id_ubigeo": "3531",
+            "nombre_ubigeo": "Ambo"
+        },
+        {
+            "id_ubigeo": "3540",
+            "nombre_ubigeo": "Dos de Mayo"
+        },
+        {
+            "id_ubigeo": "3550",
+            "nombre_ubigeo": "Huacaybamba"
+        },
+        {
+            "id_ubigeo": "3555",
+            "nombre_ubigeo": "Huamalies"
+        },
+        {
+            "id_ubigeo": "3519",
+            "nombre_ubigeo": "Huanuco"
+        },
+        {
+            "id_ubigeo": "3589",
+            "nombre_ubigeo": "Lauricocha"
+        },
+        {
+            "id_ubigeo": "3567",
+            "nombre_ubigeo": "Leoncio Prado"
+        },
+        {
+            "id_ubigeo": "3574",
+            "nombre_ubigeo": "Maraqon"
+        },
+        {
+            "id_ubigeo": "3578",
+            "nombre_ubigeo": "Pachitea"
+        },
+        {
+            "id_ubigeo": "3583",
+            "nombre_ubigeo": "Puerto Inca"
+        },
+        {
+            "id_ubigeo": "3597",
+            "nombre_ubigeo": "Yarowilca"
+        }
+    ],
+    "3606": [
+        {
+            "id_ubigeo": "3622",
+            "nombre_ubigeo": "Chincha"
+        },
+        {
+            "id_ubigeo": "3607",
+            "nombre_ubigeo": "Ica"
+        },
+        {
+            "id_ubigeo": "3634",
+            "nombre_ubigeo": "Nazca"
+        },
+        {
+            "id_ubigeo": "3640",
+            "nombre_ubigeo": "Palpa"
+        },
+        {
+            "id_ubigeo": "3646",
+            "nombre_ubigeo": "Pisco"
+        }
+    ],
+    "3655": [
+        {
+            "id_ubigeo": "3701",
+            "nombre_ubigeo": "Chanchamayo"
+        },
+        {
+            "id_ubigeo": "3778",
+            "nombre_ubigeo": "Chupaca"
+        },
+        {
+            "id_ubigeo": "3685",
+            "nombre_ubigeo": "Concepcion"
+        },
+        {
+            "id_ubigeo": "3656",
+            "nombre_ubigeo": "Huancayo"
+        },
+        {
+            "id_ubigeo": "3708",
+            "nombre_ubigeo": "Jauja"
+        },
+        {
+            "id_ubigeo": "3743",
+            "nombre_ubigeo": "Junin"
+        },
+        {
+            "id_ubigeo": "3748",
+            "nombre_ubigeo": "Satipo"
+        },
+        {
+            "id_ubigeo": "3757",
+            "nombre_ubigeo": "Tarma"
+        },
+        {
+            "id_ubigeo": "3767",
+            "nombre_ubigeo": "Yauli"
+        }
+    ],
+    "3788": [
+        {
+            "id_ubigeo": "3801",
+            "nombre_ubigeo": "Ascope"
+        },
+        {
+            "id_ubigeo": "3810",
+            "nombre_ubigeo": "Bolivar"
+        },
+        {
+            "id_ubigeo": "3817",
+            "nombre_ubigeo": "Chepen"
+        },
+        {
+            "id_ubigeo": "3875",
+            "nombre_ubigeo": "Gran Chimu"
+        },
+        {
+            "id_ubigeo": "3821",
+            "nombre_ubigeo": "Julcan"
+        },
+        {
+            "id_ubigeo": "3826",
+            "nombre_ubigeo": "Otuzco"
+        },
+        {
+            "id_ubigeo": "3837",
+            "nombre_ubigeo": "Pacasmayo"
+        },
+        {
+            "id_ubigeo": "3843",
+            "nombre_ubigeo": "Pataz"
+        },
+        {
+            "id_ubigeo": "3857",
+            "nombre_ubigeo": "Sanchez Carrion"
+        },
+        {
+            "id_ubigeo": "3866",
+            "nombre_ubigeo": "Santiago de Chuco"
+        },
+        {
+            "id_ubigeo": "3789",
+            "nombre_ubigeo": "Trujillo"
+        },
+        {
+            "id_ubigeo": "3880",
+            "nombre_ubigeo": "Viru"
+        }
+    ],
+    "3884": [
+        {
+            "id_ubigeo": "3885",
+            "nombre_ubigeo": "Chiclayo"
+        },
+        {
+            "id_ubigeo": "3906",
+            "nombre_ubigeo": "Ferreqafe"
+        },
+        {
+            "id_ubigeo": "3913",
+            "nombre_ubigeo": "Lambayeque"
+        }
+    ],
+    "3926": [
+        {
+            "id_ubigeo": "3971",
+            "nombre_ubigeo": "Barranca"
+        },
+        {
+            "id_ubigeo": "3977",
+            "nombre_ubigeo": "Cajatambo"
+        },
+        {
+            "id_ubigeo": "3285",
+            "nombre_ubigeo": "Callao"
+        },
+        {
+            "id_ubigeo": "3991",
+            "nombre_ubigeo": "Ca\u00f1ete"
+        },
+        {
+            "id_ubigeo": "3983",
+            "nombre_ubigeo": "Canta"
+        },
+        {
+            "id_ubigeo": "4008",
+            "nombre_ubigeo": "Huaral"
+        },
+        {
+            "id_ubigeo": "4021",
+            "nombre_ubigeo": "Huarochiri"
+        },
+        {
+            "id_ubigeo": "4054",
+            "nombre_ubigeo": "Huaura"
+        },
+        {
+            "id_ubigeo": "3927",
+            "nombre_ubigeo": "Lima"
+        },
+        {
+            "id_ubigeo": "4067",
+            "nombre_ubigeo": "Oyon"
+        },
+        {
+            "id_ubigeo": "4074",
+            "nombre_ubigeo": "Yauyos"
+        }
+    ],
+    "4108": [
+        {
+            "id_ubigeo": "4123",
+            "nombre_ubigeo": "Alto Amazonas"
+        },
+        {
+            "id_ubigeo": "4135",
+            "nombre_ubigeo": "Loreto"
+        },
+        {
+            "id_ubigeo": "4141",
+            "nombre_ubigeo": "Mariscal Ramon Castilla"
+        },
+        {
+            "id_ubigeo": "4109",
+            "nombre_ubigeo": "Maynas"
+        },
+        {
+            "id_ubigeo": "4146",
+            "nombre_ubigeo": "Requena"
+        },
+        {
+            "id_ubigeo": "4158",
+            "nombre_ubigeo": "Ucayali"
+        }
+    ],
+    "4165": [
+        {
+            "id_ubigeo": "4171",
+            "nombre_ubigeo": "Manu"
+        },
+        {
+            "id_ubigeo": "4176",
+            "nombre_ubigeo": "Tahuamanu"
+        },
+        {
+            "id_ubigeo": "4166",
+            "nombre_ubigeo": "Tambopata"
+        }
+    ],
+    "4180": [
+        {
+            "id_ubigeo": "4188",
+            "nombre_ubigeo": "General Sanchez Cerro"
+        },
+        {
+            "id_ubigeo": "4200",
+            "nombre_ubigeo": "Ilo"
+        },
+        {
+            "id_ubigeo": "4181",
+            "nombre_ubigeo": "Mariscal Nieto"
+        }
+    ],
+    "4204": [
+        {
+            "id_ubigeo": "4219",
+            "nombre_ubigeo": "Daniel Alcides Carrion"
+        },
+        {
+            "id_ubigeo": "4228",
+            "nombre_ubigeo": "Oxapampa"
+        },
+        {
+            "id_ubigeo": "4205",
+            "nombre_ubigeo": "Pasco"
+        }
+    ],
+    "4236": [
+        {
+            "id_ubigeo": "4247",
+            "nombre_ubigeo": "Ayabaca"
+        },
+        {
+            "id_ubigeo": "4258",
+            "nombre_ubigeo": "Huancabamba"
+        },
+        {
+            "id_ubigeo": "4267",
+            "nombre_ubigeo": "Morropon"
+        },
+        {
+            "id_ubigeo": "4278",
+            "nombre_ubigeo": "Paita"
+        },
+        {
+            "id_ubigeo": "4237",
+            "nombre_ubigeo": "Piura"
+        },
+        {
+            "id_ubigeo": "4302",
+            "nombre_ubigeo": "Sechura"
+        },
+        {
+            "id_ubigeo": "4286",
+            "nombre_ubigeo": "Sullana"
+        },
+        {
+            "id_ubigeo": "4295",
+            "nombre_ubigeo": "Talara"
+        }
+    ],
+    "4309": [
+        {
+            "id_ubigeo": "4326",
+            "nombre_ubigeo": "Azangaro"
+        },
+        {
+            "id_ubigeo": "4342",
+            "nombre_ubigeo": "Carabaya"
+        },
+        {
+            "id_ubigeo": "4353",
+            "nombre_ubigeo": "Chucuito"
+        },
+        {
+            "id_ubigeo": "4361",
+            "nombre_ubigeo": "El Collao"
+        },
+        {
+            "id_ubigeo": "4367",
+            "nombre_ubigeo": "Huancane"
+        },
+        {
+            "id_ubigeo": "4376",
+            "nombre_ubigeo": "Lampa"
+        },
+        {
+            "id_ubigeo": "4387",
+            "nombre_ubigeo": "Melgar"
+        },
+        {
+            "id_ubigeo": "4397",
+            "nombre_ubigeo": "Moho"
+        },
+        {
+            "id_ubigeo": "4310",
+            "nombre_ubigeo": "Puno"
+        },
+        {
+            "id_ubigeo": "4402",
+            "nombre_ubigeo": "San Antonio de Putina"
+        },
+        {
+            "id_ubigeo": "4408",
+            "nombre_ubigeo": "San Roman"
+        },
+        {
+            "id_ubigeo": "4413",
+            "nombre_ubigeo": "Sandia"
+        },
+        {
+            "id_ubigeo": "4423",
+            "nombre_ubigeo": "Yunguyo"
+        }
+    ],
+    "4431": [
+        {
+            "id_ubigeo": "4439",
+            "nombre_ubigeo": "Bellavista"
+        },
+        {
+            "id_ubigeo": "4446",
+            "nombre_ubigeo": "El Dorado"
+        },
+        {
+            "id_ubigeo": "4452",
+            "nombre_ubigeo": "Huallaga"
+        },
+        {
+            "id_ubigeo": "4459",
+            "nombre_ubigeo": "Lamas"
+        },
+        {
+            "id_ubigeo": "4471",
+            "nombre_ubigeo": "Mariscal Caceres"
+        },
+        {
+            "id_ubigeo": "4432",
+            "nombre_ubigeo": "Moyobamba"
+        },
+        {
+            "id_ubigeo": "4477",
+            "nombre_ubigeo": "Picota"
+        },
+        {
+            "id_ubigeo": "4488",
+            "nombre_ubigeo": "Rioja"
+        },
+        {
+            "id_ubigeo": "4498",
+            "nombre_ubigeo": "San Martin"
+        },
+        {
+            "id_ubigeo": "4513",
+            "nombre_ubigeo": "Tocache"
+        }
+    ],
+    "4519": [
+        {
+            "id_ubigeo": "4531",
+            "nombre_ubigeo": "Candarave"
+        },
+        {
+            "id_ubigeo": "4538",
+            "nombre_ubigeo": "Jorge Basadre"
+        },
+        {
+            "id_ubigeo": "4520",
+            "nombre_ubigeo": "Tacna"
+        },
+        {
+            "id_ubigeo": "4542",
+            "nombre_ubigeo": "Tarata"
+        }
+    ],
+    "4551": [
+        {
+            "id_ubigeo": "4559",
+            "nombre_ubigeo": "Contralmirante Villar"
+        },
+        {
+            "id_ubigeo": "4552",
+            "nombre_ubigeo": "Tumbes"
+        },
+        {
+            "id_ubigeo": "4562",
+            "nombre_ubigeo": "Zarumilla"
+        }
+    ],
+    "4567": [
+        {
+            "id_ubigeo": "4575",
+            "nombre_ubigeo": "Atalaya"
+        },
+        {
+            "id_ubigeo": "4568",
+            "nombre_ubigeo": "Coronel Portillo"
+        },
+        {
+            "id_ubigeo": "4580",
+            "nombre_ubigeo": "Padre Abad"
+        },
+        {
+            "id_ubigeo": "4584",
+            "nombre_ubigeo": "Purus"
+        }
+    ]
+}
