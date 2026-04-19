@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.cocoapods)
 }
 
 kotlin {
@@ -14,21 +15,45 @@ kotlin {
             jvmTarget.set(JvmTarget.JVM_11)
         }
     }
-    
-    listOf(
-        iosArm64(),
-        iosSimulatorArm64()
-    ).forEach { iosTarget ->
-        iosTarget.binaries.framework {
+
+    iosX64()
+    iosArm64()
+    iosSimulatorArm64()
+
+    cocoapods{
+        summary = "Some description for the Shared Module"
+        homepage = "Link to the Shared Module homepage"
+        version = "1.0"
+        ios.deploymentTarget = "15.4"
+
+        framework {
             baseName = "ComposeApp"
             isStatic = true
         }
+
+        pod("GoogleMaps") {
+            version = "8.4.0"
+            extraOpts += listOf("-compiler-option", "-fmodules")
+        }
     }
-    
+
     sourceSets {
         androidMain.dependencies {
             implementation(libs.compose.uiToolingPreview)
             implementation(libs.androidx.activity.compose)
+
+            implementation(libs.ktor.client.okhttp)
+
+            implementation(libs.android.driver)
+
+            implementation(libs.koin.android)
+
+            implementation(project.dependencies.platform(libs.firebase.bom))
+            implementation(libs.firebase.auth)
+
+            implementation(libs.maps.compose)
+            implementation(libs.maps.compose.utils)
+            implementation(libs.play.services.maps)
         }
         commonMain.dependencies {
             implementation(libs.compose.runtime)
@@ -39,9 +64,33 @@ kotlin {
             implementation(libs.compose.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
+
+            implementation(libs.ktor.client.core)
+            implementation(libs.ktor.client.content.negotiation)
+            implementation(libs.ktor.serialization.json)
+            implementation(libs.ktor.client.auth)
+            implementation(libs.ktor.logging)
+
+            implementation(libs.sqldelight.coroutines)
+
+            implementation(libs.koin.core)
+            implementation(libs.koin.compose)
+
+            implementation(libs.russhwolf.multiplatform.settings)
+
+            implementation(libs.voyager.navigator)
+            implementation(libs.voyager.screenmodel)
+            implementation(libs.voyager.koin)
+            implementation(libs.voyager.transitions)
+            implementation(libs.voyager.tab)
+
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
+        }
+        iosMain.dependencies {
+            implementation(libs.ktor.client.darwin)
+            implementation(libs.native.driver)
         }
     }
 }
