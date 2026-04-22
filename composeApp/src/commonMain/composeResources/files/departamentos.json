@@ -1,0 +1,122 @@
+[
+    {
+        "id_ubigeo": "2534",
+        "nombre_ubigeo": "Amazonas",
+        "codigo_ubigeo": "01"
+    },
+    {
+        "id_ubigeo": "2625",
+        "nombre_ubigeo": "Ancash",
+        "codigo_ubigeo": "02"
+    },
+    {
+        "id_ubigeo": "2812",
+        "nombre_ubigeo": "Apurimac",
+        "codigo_ubigeo": "03"
+    },
+    {
+        "id_ubigeo": "2900",
+        "nombre_ubigeo": "Arequipa",
+        "codigo_ubigeo": "04"
+    },
+    {
+        "id_ubigeo": "3020",
+        "nombre_ubigeo": "Ayacucho",
+        "codigo_ubigeo": "05"
+    },
+    {
+        "id_ubigeo": "3143",
+        "nombre_ubigeo": "Cajamarca",
+        "codigo_ubigeo": "06"
+    },
+    {
+        "id_ubigeo": "3292",
+        "nombre_ubigeo": "Cusco",
+        "codigo_ubigeo": "08"
+    },
+    {
+        "id_ubigeo": "3414",
+        "nombre_ubigeo": "Huancavelica",
+        "codigo_ubigeo": "09"
+    },
+    {
+        "id_ubigeo": "3518",
+        "nombre_ubigeo": "Huanuco",
+        "codigo_ubigeo": "10"
+    },
+    {
+        "id_ubigeo": "3606",
+        "nombre_ubigeo": "Ica",
+        "codigo_ubigeo": "11"
+    },
+    {
+        "id_ubigeo": "3655",
+        "nombre_ubigeo": "Junin",
+        "codigo_ubigeo": "12"
+    },
+    {
+        "id_ubigeo": "3788",
+        "nombre_ubigeo": "La Libertad",
+        "codigo_ubigeo": "13"
+    },
+    {
+        "id_ubigeo": "3884",
+        "nombre_ubigeo": "Lambayeque",
+        "codigo_ubigeo": "14"
+    },
+    {
+        "id_ubigeo": "3926",
+        "nombre_ubigeo": "Lima",
+        "codigo_ubigeo": "15"
+    },
+    {
+        "id_ubigeo": "4108",
+        "nombre_ubigeo": "Loreto",
+        "codigo_ubigeo": "16"
+    },
+    {
+        "id_ubigeo": "4165",
+        "nombre_ubigeo": "Madre de Dios",
+        "codigo_ubigeo": "17"
+    },
+    {
+        "id_ubigeo": "4180",
+        "nombre_ubigeo": "Moquegua",
+        "codigo_ubigeo": "18"
+    },
+    {
+        "id_ubigeo": "4204",
+        "nombre_ubigeo": "Pasco",
+        "codigo_ubigeo": "19"
+    },
+    {
+        "id_ubigeo": "4236",
+        "nombre_ubigeo": "Piura",
+        "codigo_ubigeo": "20"
+    },
+    {
+        "id_ubigeo": "4309",
+        "nombre_ubigeo": "Puno",
+        "codigo_ubigeo": "21"
+    },
+    {
+        "id_ubigeo": "4431",
+        "nombre_ubigeo": "San Martin",
+        "codigo_ubigeo": "22"
+    },
+    {
+        "id_ubigeo": "4519",
+        "nombre_ubigeo": "Tacna",
+        "codigo_ubigeo": "23"
+    },
+    {
+        "id_ubigeo": "4551",
+        "nombre_ubigeo": "Tumbes",
+        "codigo_ubigeo": "24"
+    },
+    {
+        "id_ubigeo": "4567",
+        "nombre_ubigeo": "Ucayali",
+        "codigo_ubigeo": "25"
+    }
+]

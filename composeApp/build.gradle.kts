@@ -7,18 +7,31 @@ plugins {
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.cocoapods)
+    alias(libs.plugins.sqldelight)
+    alias(libs.plugins.serialization)
 }
 
 kotlin {
     androidTarget {
-        compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_11)
+        compilations.all {
+            kotlinOptions {
+                jvmTarget = "17"
+            }
         }
     }
 
-    iosX64()
-    iosArm64()
-    iosSimulatorArm64()
+    val iosTargets = listOf(iosX64(), iosArm64(), iosSimulatorArm64())
+    iosTargets.forEach { target ->
+        target.binaries.framework {
+            baseName = "ComposeApp"
+            isStatic = true
+            linkerOpts("-lsqlite3")
+        }
+    }
+
+//    iosX64()
+//    iosArm64()
+//    iosSimulatorArm64()
 
     cocoapods{
         summary = "Some description for the Shared Module"
@@ -31,29 +44,40 @@ kotlin {
             isStatic = true
         }
 
+        extraSpecAttributes["libraries"] = "'sqlite3'"
+        extraSpecAttributes["pod_target_xcconfig"] = "{ 'OTHER_LDFLAGS' => '-lsqlite3' }"
+
         pod("GoogleMaps") {
             version = "8.4.0"
             extraOpts += listOf("-compiler-option", "-fmodules")
         }
+        pod("FirebaseCore")
+        pod("FirebaseAuth")
+        pod("FirebaseFirestore")
     }
 
     sourceSets {
+        all {
+            languageSettings.optIn("kotlin.time.ExperimentalTime")
+            languageSettings.optIn("androidx.compose.material3.ExperimentalMaterial3Api")
+            languageSettings.optIn("org.jetbrains.compose.resources.ExperimentalResourceApi")
+        }
         androidMain.dependencies {
             implementation(libs.compose.uiToolingPreview)
             implementation(libs.androidx.activity.compose)
 
             implementation(libs.ktor.client.okhttp)
+            implementation(libs.ktor.client.android)
 
             implementation(libs.android.driver)
 
             implementation(libs.koin.android)
 
-            implementation(project.dependencies.platform(libs.firebase.bom))
-            implementation(libs.firebase.auth)
-
             implementation(libs.maps.compose)
             implementation(libs.maps.compose.utils)
             implementation(libs.play.services.maps)
+
+            implementation(libs.coil.network.okhttp)
         }
         commonMain.dependencies {
             implementation(libs.compose.runtime)
@@ -76,7 +100,8 @@ kotlin {
             implementation(libs.koin.core)
             implementation(libs.koin.compose)
 
-            implementation(libs.russhwolf.multiplatform.settings)
+            implementation(libs.ksafe)
+            implementation(libs.ksafe.compose)
 
             implementation(libs.voyager.navigator)
             implementation(libs.voyager.screenmodel)
@@ -84,6 +109,24 @@ kotlin {
             implementation(libs.voyager.transitions)
             implementation(libs.voyager.tab)
 
+            implementation(libs.firebase.auth)
+            implementation(libs.firebase.firestore)
+            implementation(libs.firebase.common)
+
+            implementation(libs.material.icons.extended)
+
+            implementation("dev.icerock.moko:permissions:0.20.1")
+            implementation("dev.icerock.moko:permissions-notifications:0.20.1")
+            implementation("dev.icerock.moko:permissions-compose:0.20.1")
+
+            implementation(libs.imagepickerkmp)
+
+            implementation(libs.coil.compose)
+            implementation(libs.coil.network.ktor3)
+
+            implementation(libs.qr.kit)
+
+            implementation(libs.kotlinx.datetime)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
@@ -117,8 +160,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 }
 
@@ -126,3 +169,10 @@ dependencies {
     debugImplementation(libs.compose.uiTooling)
 }
 
+sqldelight {
+    databases {
+        create("AppDatabase") {
+            packageName.set("pe.breaker.dkaviplay.cache")
+        }
+    }
+}

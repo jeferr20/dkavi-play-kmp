@@ -11,11 +11,19 @@ struct ComposeView: UIViewControllerRepresentable {
 }
 
 struct ContentView: View {
+    @State private var isKoinReady = false
+    
     var body: some View {
-        ComposeView()
-            .ignoresSafeArea()
+        Group{
+            if isKoinReady{
+                ComposeView()
+                    .ignoresSafeArea()
+            }else{
+                ProgressView("Cargando...")
+            }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("KoinReady"))) { _ in
+                    self.isKoinReady = true
+                }
     }
 }
-
-
-
