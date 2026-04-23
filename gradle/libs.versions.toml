@@ -96,6 +96,8 @@ voyager-transitions = { module = "cafe.adriel.voyager:voyager-transitions", vers
 firebase-auth = { module = "dev.gitlive:firebase-auth", version.ref = "firebaseCommon" }
 firebase-common = { module = "dev.gitlive:firebase-common", version.ref = "firebaseCommon" }
 firebase-firestore = { module = "dev.gitlive:firebase-firestore", version.ref = "firebaseCommon" }
+firebase-config = { module = "dev.gitlive:firebase-config", version.ref = "firebaseCommon" }
+firebase-storage = { module = "dev.gitlive:firebase-storage", version.ref = "firebaseCommon" }
 
 #MAPS
 maps-compose = { module = "com.google.maps.android:maps-compose", version.ref = "mapsCompose" }

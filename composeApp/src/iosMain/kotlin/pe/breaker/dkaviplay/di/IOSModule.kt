@@ -12,4 +12,5 @@ val iosModule = module {
     single<DatabaseDriverFactory> { IOSDatabaseDriverFactory() }
     single<ToastHandler> { IosToastHandler() }
     single<ImageResizer> { IosImageResizer() }
+    single<PlatformContext> { IosPlatformContext() }
 }

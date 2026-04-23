@@ -11,6 +11,8 @@ Pod::Spec.new do |spec|
     spec.dependency 'FirebaseAuth'
     spec.dependency 'FirebaseCore'
     spec.dependency 'FirebaseFirestore'
+    spec.dependency 'FirebaseRemoteConfig'
+    spec.dependency 'FirebaseStorage'
     spec.dependency 'GoogleMaps', '8.4.0'
     if !Dir.exist?('build/cocoapods/framework/ComposeApp.framework') || Dir.empty?('build/cocoapods/framework/ComposeApp.framework')
         raise "

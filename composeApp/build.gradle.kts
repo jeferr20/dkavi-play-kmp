@@ -25,7 +25,7 @@ kotlin {
         target.binaries.framework {
             baseName = "ComposeApp"
             isStatic = true
-            linkerOpts("-lsqlite3")
+            linkerOpts("-lsqlite3", "-ObjC")
         }
     }
 
@@ -54,6 +54,8 @@ kotlin {
         pod("FirebaseCore")
         pod("FirebaseAuth")
         pod("FirebaseFirestore")
+        pod("FirebaseRemoteConfig")
+        pod("FirebaseStorage")
     }
 
     sourceSets {
@@ -78,6 +80,12 @@ kotlin {
             implementation(libs.play.services.maps)
 
             implementation(libs.coil.network.okhttp)
+
+            implementation("com.google.zxing:core:3.5.3")
+            implementation("androidx.camera:camera-camera2:1.2.3")
+            implementation("androidx.camera:camera-lifecycle:1.2.3")
+            implementation("androidx.camera:camera-view:1.2.3")
+            implementation("com.google.mlkit:barcode-scanning:17.3.0")
         }
         commonMain.dependencies {
             implementation(libs.compose.runtime)
@@ -112,6 +120,8 @@ kotlin {
             implementation(libs.firebase.auth)
             implementation(libs.firebase.firestore)
             implementation(libs.firebase.common)
+            implementation(libs.firebase.storage)
+            implementation(libs.firebase.config)
 
             implementation(libs.material.icons.extended)
 

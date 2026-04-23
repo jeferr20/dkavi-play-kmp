@@ -27,15 +27,21 @@ import dev.icerock.moko.permissions.notifications.REMOTE_NOTIFICATION
 import pe.breaker.dkaviplay.presentation.screen.mainContainer.components.FloatingBottomBar
 import pe.breaker.dkaviplay.presentation.navigation.GlobalNavigationBus
 import pe.breaker.dkaviplay.presentation.navigation.NavigationEvent
+import pe.breaker.dkaviplay.presentation.screen.aceptarReto.AceptarRetoScreen
+import pe.breaker.dkaviplay.presentation.screen.acuerdoMutuo.AcuerdoMutuoScreen
+import pe.breaker.dkaviplay.presentation.screen.map.MapTab
 import pe.breaker.dkaviplay.presentation.screen.perfil.ProfileTab
+import pe.breaker.dkaviplay.presentation.screen.reservas.ReservasTab
+import pe.breaker.dkaviplay.presentation.screen.resultadosPartida.ResultadoPartidaScreen
 
 class MainContainerScreen : Screen {
     @Composable
     override fun Content() {
         val rootNavigator = LocalNavigator.currentOrThrow.parent ?: LocalNavigator.currentOrThrow
 //        val model = koinScreenModel<MainContainerModel>()
-        
-        val permissionsController = rememberPermissionsControllerFactory().createPermissionsController()
+
+        val permissionsController =
+            rememberPermissionsControllerFactory().createPermissionsController()
         BindEffect(permissionsController)
 
         LaunchedEffect(Unit) {
@@ -50,24 +56,24 @@ class MainContainerScreen : Screen {
 //            model.syncNotificationToken()
         }
 
-        TabNavigator(/*MapTab*/ ProfileTab) { tabNavigator ->
+        TabNavigator(MapTab) { tabNavigator ->
             val navigationEvent by GlobalNavigationBus.currentTabTarget.collectAsState()
 
             LaunchedEffect(navigationEvent) {
                 navigationEvent?.let { event ->
                     when (event) {
                         is NavigationEvent.GoToAceptarReto -> {
-//                            rootNavigator.push(AceptarRetoScreen(event.reservaId))
+                            rootNavigator.push(AceptarRetoScreen(event.reservaId))
                             GlobalNavigationBus.clear()
                         }
 
                         is NavigationEvent.GoToVerificarResultados -> {
-//                            rootNavigator.push(AcuerdoMutuoScreen(event.reservaId))
+                            rootNavigator.push(AcuerdoMutuoScreen(event.reservaId))
                             GlobalNavigationBus.clear()
                         }
 
                         is NavigationEvent.GoToReservations -> {
-//                            tabNavigator.current = ReservasTab
+                            tabNavigator.current = ReservasTab
                             GlobalNavigationBus.clear()
                         }
 
@@ -77,7 +83,7 @@ class MainContainerScreen : Screen {
                         }
 
                         is NavigationEvent.GoToResultadoPartida -> {
-//                            rootNavigator.push(ResultadoPartidaScreen(event.reservaId))
+                            rootNavigator.push(ResultadoPartidaScreen(event.reservaId))
                             GlobalNavigationBus.clear()
                         }
                     }
@@ -87,20 +93,15 @@ class MainContainerScreen : Screen {
             Scaffold(
                 modifier = Modifier.fillMaxSize(),
                 containerColor = Color.Black,
-                contentWindowInsets = WindowInsets.safeDrawing,
                 bottomBar = {
                     FloatingBottomBar(
-//                        tabs = listOf(MapTab, ReservasTab, ProfileTab)
-                        tabs = listOf(ProfileTab)
+                        tabs = listOf(MapTab, ReservasTab, ProfileTab)
                     )
                 }
-            ) { innerPadding ->
-
+            ) {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(innerPadding)
-//                        .padding(bottom = innerPadding.calculateBottomPadding())
                 ) {
                     CurrentTab()
                 }
