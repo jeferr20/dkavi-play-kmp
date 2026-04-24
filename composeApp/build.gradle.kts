@@ -9,6 +9,7 @@ plugins {
     alias(libs.plugins.cocoapods)
     alias(libs.plugins.sqldelight)
     alias(libs.plugins.serialization)
+    alias(libs.plugins.google.services)
 }
 
 kotlin {
@@ -20,11 +21,14 @@ kotlin {
         }
     }
 
-    val iosTargets = listOf(iosX64(), iosArm64(), iosSimulatorArm64())
-    iosTargets.forEach { target ->
-        target.binaries.framework {
+    listOf(
+        iosX64(),
+        iosArm64(),
+        iosSimulatorArm64()
+    ).forEach { iosTarget ->
+        iosTarget.binaries.framework {
             baseName = "ComposeApp"
-            isStatic = true
+            isStatic = true // Si vas a subir a la App Store, recuerda que FALSE es más seguro para evitar duplicados
             linkerOpts("-lsqlite3", "-ObjC")
         }
     }
@@ -127,6 +131,7 @@ kotlin {
 
             implementation("dev.icerock.moko:permissions:0.20.1")
             implementation("dev.icerock.moko:permissions-notifications:0.20.1")
+            implementation("dev.icerock.moko:permissions-camera:0.20.1")
             implementation("dev.icerock.moko:permissions-compose:0.20.1")
 
             implementation(libs.imagepickerkmp)

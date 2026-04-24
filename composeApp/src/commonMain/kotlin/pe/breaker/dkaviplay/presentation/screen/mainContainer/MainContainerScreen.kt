@@ -1,11 +1,7 @@
 package pe.breaker.dkaviplay.presentation.screen.mainContainer
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -24,11 +20,11 @@ import dev.icerock.moko.permissions.Permission
 import dev.icerock.moko.permissions.compose.BindEffect
 import dev.icerock.moko.permissions.compose.rememberPermissionsControllerFactory
 import dev.icerock.moko.permissions.notifications.REMOTE_NOTIFICATION
-import pe.breaker.dkaviplay.presentation.screen.mainContainer.components.FloatingBottomBar
 import pe.breaker.dkaviplay.presentation.navigation.GlobalNavigationBus
 import pe.breaker.dkaviplay.presentation.navigation.NavigationEvent
 import pe.breaker.dkaviplay.presentation.screen.aceptarReto.AceptarRetoScreen
 import pe.breaker.dkaviplay.presentation.screen.acuerdoMutuo.AcuerdoMutuoScreen
+import pe.breaker.dkaviplay.presentation.screen.mainContainer.components.FloatingBottomBar
 import pe.breaker.dkaviplay.presentation.screen.map.MapTab
 import pe.breaker.dkaviplay.presentation.screen.perfil.ProfileTab
 import pe.breaker.dkaviplay.presentation.screen.reservas.ReservasTab

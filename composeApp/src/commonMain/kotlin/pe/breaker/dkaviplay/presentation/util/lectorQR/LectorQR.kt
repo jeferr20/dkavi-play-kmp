@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -26,12 +27,21 @@ import androidx.compose.ui.graphics.PathOperation
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
+import dev.icerock.moko.permissions.DeniedAlwaysException
+import dev.icerock.moko.permissions.DeniedException
+import dev.icerock.moko.permissions.Permission
+import dev.icerock.moko.permissions.camera.CAMERA
+import dev.icerock.moko.permissions.compose.BindEffect
+import dev.icerock.moko.permissions.compose.rememberPermissionsControllerFactory
+import dev.icerock.moko.permissions.notifications.REMOTE_NOTIFICATION
 import io.github.ismoy.imagepickerkmp.presentation.ui.components.GalleryPickerLauncher
 import kotlinx.coroutines.launch
+import pe.breaker.dkaviplay.presentation.components.PermissionErrorUI
 import pe.breaker.dkaviplay.presentation.components.dialog.LoadingDialog
 import pe.breaker.dkaviplay.presentation.util.lectorQR.components.GalleryFrame
 import pe.breaker.dkaviplay.presentation.util.lectorQR.components.ScannerFrame
 import pe.breaker.dkaviplay.presentation.util.lectorQR.components.TextFrame
+import pe.breaker.dkaviplay.util.PermissionStatus
 
 @Composable
 fun LectorQR(
@@ -40,94 +50,134 @@ fun LectorQR(
     label: String? = null,
     context: Any? = null
 ) {
+    var permissionStatus by remember { mutableStateOf(PermissionStatus.Checking) }
     var isCameraReady by remember { mutableStateOf(false) }
     var showGallery by remember { mutableStateOf(false) }
+
     val haptic = LocalHapticFeedback.current
     val scope = rememberCoroutineScope()
+
+    val permissionsController = rememberPermissionsControllerFactory().createPermissionsController()
+    BindEffect(permissionsController)
+
+    val requestCameraPermission = suspend {
+        try {
+            permissionsController.providePermission(Permission.CAMERA)
+            permissionStatus = PermissionStatus.Granted
+        } catch (e: DeniedAlwaysException) {
+            permissionStatus = PermissionStatus.PermanentlyDenied
+        } catch (e: DeniedException) {
+            permissionStatus = PermissionStatus.Denied
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        requestCameraPermission()
+    }
 
     Box(
         modifier = modifier
             .fillMaxSize()
             .background(Color.Black)
     ) {
-        // 1. LLAMADA AL COMPONENTE NATIVO (Expect/Actual)
-        // Usamos fillMaxSize para que el PreviewView nativo controle su AspectRatio
-        QrScannerNative(
-            modifier = Modifier.fillMaxSize(),
-            onQrDetected = { qrCode ->
-                if (qrCode.isNotEmpty()) {
-                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                    onQrDetected(qrCode)
-                }
-            },
-            onReady = { isCameraReady = true },
-            onFailure = { error ->
-                println("Error nativo de cámara: $error")
-            }
-        )
+        when(permissionStatus){
+            PermissionStatus.Checking -> LoadingDialog(message = "Verificando permisos...")
 
-        // 2. MÁSCARA DE ENFOQUE (HUD)
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .drawBehind {
-                    val scanBoxSize = size.width * 0.7f
-                    val left = (size.width - scanBoxSize) / 2
-                    val top = (size.height - scanBoxSize) / 2
-                    val rect = Rect(left, top, left + scanBoxSize, top + scanBoxSize)
-
-                    val rectPath = Path().apply { addRect(Rect(0f, 0f, size.width, size.height)) }
-                    val holePath = Path().apply {
-                        addRoundRect(RoundRect(rect, CornerRadius(24.dp.toPx())))
-                    }
-                    val finalPath = Path.combine(PathOperation.Difference, rectPath, holePath)
-
-                    drawPath(finalPath, color = Color.Black.copy(alpha = 0.75f))
-                },
-            contentAlignment = Alignment.Center
-        ) {
-            // El visor (ScannerFrame) coincidiendo al 100% con el hueco
-            ScannerFrame(
-                modifier = Modifier
-                    .fillMaxWidth(0.7f)
-                    .aspectRatio(1f)
-            )
-        }
-
-        GalleryFrame(
-            onGalleryClick = { showGallery = true }
-        )
-
-        if(showGallery){
-            GalleryPickerLauncher(
-                includeExif = true,
-                onPhotosSelected = { photos ->
-                    photos.firstOrNull()?.let { photo ->
-                        scope.launch {
-                            val qrCode = decodeQrFromPhoto(photo, context)
-                            if(qrCode != null){
-                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                onQrDetected(qrCode)
-                            }else {
-                                println("No se encontró un QR válido en la imagen")
-                            }
+            PermissionStatus.Granted -> {
+                // 1. LLAMADA AL COMPONENTE NATIVO (Expect/Actual)
+                // Usamos fillMaxSize para que el PreviewView nativo controle su AspectRatio
+                QrScannerNative(
+                    modifier = Modifier.fillMaxSize(),
+                    onQrDetected = { qrCode ->
+                        if (qrCode.isNotEmpty()) {
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            onQrDetected(qrCode)
                         }
+                    },
+                    onReady = { isCameraReady = true },
+                    onFailure = { error ->
+                        println("Error nativo de cámara: $error")
                     }
-                    showGallery = false
-                },
-                onError = { showGallery = false },
-                onDismiss = { showGallery = false },
-                allowMultiple = false
-            )
-        }
+                )
 
-        // 3. INDICACIONES
-        label?.let {
-            TextFrame(label = label)
-        }
+                // 2. MÁSCARA DE ENFOQUE (HUD)
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .drawBehind {
+                            val scanBoxSize = size.width * 0.7f
+                            val left = (size.width - scanBoxSize) / 2
+                            val top = (size.height - scanBoxSize) / 2
+                            val rect = Rect(left, top, left + scanBoxSize, top + scanBoxSize)
 
-        AnimatedVisibility(visible = !isCameraReady, exit = fadeOut(tween(500))) {
-            LoadingDialog()
+                            val rectPath = Path().apply { addRect(Rect(0f, 0f, size.width, size.height)) }
+                            val holePath = Path().apply {
+                                addRoundRect(RoundRect(rect, CornerRadius(24.dp.toPx())))
+                            }
+                            val finalPath = Path.combine(PathOperation.Difference, rectPath, holePath)
+
+                            drawPath(finalPath, color = Color.Black.copy(alpha = 0.75f))
+                        },
+                    contentAlignment = Alignment.Center
+                ) {
+                    // El visor (ScannerFrame) coincidiendo al 100% con el hueco
+                    ScannerFrame(
+                        modifier = Modifier
+                            .fillMaxWidth(0.7f)
+                            .aspectRatio(1f)
+                    )
+                }
+
+                GalleryFrame(
+                    onGalleryClick = { showGallery = true }
+                )
+
+                if(showGallery){
+                    GalleryPickerLauncher(
+                        includeExif = true,
+                        onPhotosSelected = { photos ->
+                            photos.firstOrNull()?.let { photo ->
+                                scope.launch {
+                                    val qrCode = decodeQrFromPhoto(photo, context)
+                                    if(qrCode != null){
+                                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                        onQrDetected(qrCode)
+                                    }else {
+                                        println("No se encontró un QR válido en la imagen")
+                                    }
+                                }
+                            }
+                            showGallery = false
+                        },
+                        onError = { showGallery = false },
+                        onDismiss = { showGallery = false },
+                        allowMultiple = false
+                    )
+                }
+
+                // 3. INDICACIONES
+                label?.let {
+                    TextFrame(label = label)
+                }
+
+                AnimatedVisibility(visible = !isCameraReady, exit = fadeOut(tween(500))) {
+                    LoadingDialog()
+                }
+            }
+            PermissionStatus.Denied -> {
+                PermissionErrorUI(
+                    message = "Necesitamos la cámara para escanear el QR de la mesa o jugador.",
+                    actionText = "Permitir acceso",
+                    onAction = { scope.launch { requestCameraPermission() } }
+                )
+            }
+            PermissionStatus.PermanentlyDenied -> {
+                PermissionErrorUI(
+                    message = "El acceso a la cámara está bloqueado. Por favor, habilítalo en los ajustes del sistema.",
+                    actionText = "Abrir Ajustes",
+                    onAction = { permissionsController.openAppSettings() }
+                )
+            }
         }
     }
 }
