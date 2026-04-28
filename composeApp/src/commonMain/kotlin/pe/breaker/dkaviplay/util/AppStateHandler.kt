@@ -16,6 +16,7 @@ import pe.breaker.dkaviplay.presentation.components.dialog.LoadingDialog
 import pe.breaker.dkaviplay.presentation.components.dialog.NewItemDialog
 import pe.breaker.dkaviplay.presentation.components.dialog.StatusDialog
 import pe.breaker.dkaviplay.presentation.util.StatusUiType
+import pe.breaker.poolstreet.AppConfigGlobal
 
 @Composable
 fun AppStateHandler(
@@ -27,7 +28,7 @@ fun AppStateHandler(
     val config by appConfigManager.config.collectAsState()
 
     val appEnabled = config.activeServiceMovil
-    val currentVersion = "1.0.0"//AppConfigGlobal.VERSION_NAME
+    val currentVersion = AppConfigGlobal.VERSION_NAME
     val remoteVersion = config.versionMovil
     val needsUpdate = isVersionOlder(currentVersion, remoteVersion)
 

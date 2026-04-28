@@ -1,6 +1,7 @@
 package pe.breaker.dkaviplay.data.repository
 
 import dev.gitlive.firebase.auth.FirebaseAuth
+import dev.gitlive.firebase.auth.FirebaseUser
 import dev.gitlive.firebase.firestore.FirebaseFirestore
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -176,5 +177,9 @@ class AuthRepositoryImpl(
         }catch (e: Exception) {
             Result.failure(e)
         }
+    }
+
+    override suspend fun getFirebaseUser(): FirebaseUser? {
+        return firebaseAuth.currentUser
     }
 }

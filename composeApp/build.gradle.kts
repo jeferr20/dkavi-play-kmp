@@ -1,5 +1,6 @@
-import org.jetbrains.compose.desktop.application.dsl.TargetFormat
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.util.Properties
+import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING
+import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.INT
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -10,6 +11,28 @@ plugins {
     alias(libs.plugins.sqldelight)
     alias(libs.plugins.serialization)
     alias(libs.plugins.google.services)
+    alias(libs.plugins.buildkonfig)
+}
+
+val secretsFile = rootProject.file("secrets.properties")
+val secrets = Properties().apply {
+    if (secretsFile.exists()) load(secretsFile.inputStream())
+}
+val mapsApiKey = secrets.getProperty("MAPS_API_KEY", "")
+val versionName = libs.versions.app.version.name.get()
+val versionCode = libs.versions.app.version.code.get()
+
+buildkonfig {
+    packageName = "pe.breaker.poolstreet"
+    objectName = "AppConfigGlobal"
+    exposeObjectWithName = "AppConfigGlobal"
+
+//        ./gradlew :composeApp:generateBuildKonfig
+    defaultConfigs {
+        buildConfigField(STRING, "MAPS_API_KEY", mapsApiKey)
+        buildConfigField(STRING, "VERSION_NAME", versionName)
+        buildConfigField(INT, "VERSION_CODE", versionCode)
+    }
 }
 
 kotlin {
@@ -21,17 +44,9 @@ kotlin {
         }
     }
 
-    listOf(
-        iosX64(),
-        iosArm64(),
-        iosSimulatorArm64()
-    ).forEach { iosTarget ->
-        iosTarget.binaries.framework {
-            baseName = "ComposeApp"
-            isStatic = true // Si vas a subir a la App Store, recuerda que FALSE es más seguro para evitar duplicados
-            linkerOpts("-lsqlite3", "-ObjC")
-        }
-    }
+    iosX64()
+    iosArm64()
+    iosSimulatorArm64()
 
 //    iosX64()
 //    iosArm64()
@@ -42,6 +57,9 @@ kotlin {
         homepage = "Link to the Shared Module homepage"
         version = "1.0"
         ios.deploymentTarget = "15.4"
+        name = "composeApp"
+
+        podfile = project.file("../iosApp/Podfile")
 
         framework {
             baseName = "ComposeApp"
@@ -55,11 +73,11 @@ kotlin {
             version = "8.4.0"
             extraOpts += listOf("-compiler-option", "-fmodules")
         }
-        pod("FirebaseCore")
-        pod("FirebaseAuth")
-        pod("FirebaseFirestore")
-        pod("FirebaseRemoteConfig")
-        pod("FirebaseStorage")
+        pod("FirebaseCore"){ linkOnly = true }
+        pod("FirebaseAuth"){ linkOnly = true }
+        pod("FirebaseFirestore"){ linkOnly = true }
+        pod("FirebaseRemoteConfig"){ linkOnly = true }
+        pod("FirebaseStorage"){ linkOnly = true }
     }
 
     sourceSets {
@@ -161,8 +179,9 @@ android {
         applicationId = "pe.breaker.dkaviplay"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = versionCode
+        versionName = versionName
+        manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
     }
     packaging {
         resources {
@@ -190,4 +209,5 @@ sqldelight {
             packageName.set("pe.breaker.dkaviplay.cache")
         }
     }
+    linkSqlite.set(true)
 }

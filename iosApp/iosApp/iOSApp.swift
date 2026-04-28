@@ -12,7 +12,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         FirebaseApp.configure()
         
         // Inicializa Google Maps
-        GMSServices.provideAPIKey("AIzaSyDuMztyZFLE6KDC5U_-mE0BmGMcO8UDln8")
+        GMSServices.provideAPIKey(AppConfigGlobal.shared.MAPS_API_KEY)
         
         // 2. Ejecutar Koin con un pequeño retraso
                 // Esto permite que el SDK nativo de Firebase termine de inicializar sus hilos internos

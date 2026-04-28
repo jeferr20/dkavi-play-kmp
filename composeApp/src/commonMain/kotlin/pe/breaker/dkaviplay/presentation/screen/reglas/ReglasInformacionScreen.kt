@@ -14,6 +14,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Gavel
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Layers
+import androidx.compose.material.icons.filled.SportsCricket
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -22,25 +24,17 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import pe.breaker.dkaviplay.domain.model.TipoJuego
 import pe.breaker.dkaviplay.presentation.components.CustomAppbar
 import pe.breaker.dkaviplay.presentation.screen.reglas.components.CardClubDKAVI
 import pe.breaker.dkaviplay.presentation.screen.reglas.components.CardItem
 import pe.breaker.dkaviplay.presentation.screen.reglas.components.SectionHeader
-import pe.breaker.dkaviplay.presentation.screen.reglas.model.ReglaItem
 
 class ReglasInformacionScreen : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val scrollState = rememberScrollState()
-
-        val reglasPoolStreet = listOf(
-            ReglaItem("Pool", "Se rige estrictamente por el REGLAMENTO PANAMERICANO DE POOL.",Icons.Default.Gavel),
-            ReglaItem("Billas", "Se rige por el REGLAMENTO DE BILLAS CLUB DKAVI.",Icons.Default.Gavel),
-//            ReglaItem("Revancha Automática", "El perdedor tiene derecho a revancha inmediata (solo por puntos y honor).",Icons.Default.Gavel),
-//            ReglaItem("Desafío Final", "No se permiten atributos de ningún tipo durante el desafío final.",Icons.Default.Gavel),
-//            ReglaItem("Límite de Atributos", "Se permite únicamente el uso de un atributo por cada desafío.",Icons.Default.Gavel)
-        )
 
         Scaffold(
             containerColor = Color.Black,
@@ -84,11 +78,14 @@ class ReglasInformacionScreen : Screen {
                             icon = Icons.Default.Gavel
                         )
 
-                        reglasPoolStreet.forEach { regla ->
+                        TipoJuego.entries.forEach { tipo ->
                             CardItem(
-                                title = regla.title,
-                                descripcion = regla.descripcion,
-                                icon = regla.icon,
+                                title = tipo.nombre,
+                                descripcion = tipo.descripcion,
+                                icon = when (tipo) {
+                                    TipoJuego.BILLAR -> Icons.Default.SportsCricket
+                                    TipoJuego.POOL -> Icons.Default.Layers
+                                },
                                 modifier = Modifier.fillMaxWidth()
                             )
                         }

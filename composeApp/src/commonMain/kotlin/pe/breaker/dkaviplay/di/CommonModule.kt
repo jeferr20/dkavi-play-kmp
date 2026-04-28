@@ -73,6 +73,7 @@ import pe.breaker.dkaviplay.presentation.screen.registerUsuario.RegisterUsuarioM
 import pe.breaker.dkaviplay.presentation.screen.reservas.ReservasModel
 import pe.breaker.dkaviplay.presentation.screen.resultadosPartida.ResultadoPartidaModel
 import pe.breaker.dkaviplay.presentation.screen.retoIniciado.RetoIniciadoModel
+import pe.breaker.dkaviplay.presentation.screen.splash.SplashModel
 import pe.breaker.dkaviplay.util.GlobalUiManager
 import pe.breaker.dkaviplay.util.SecureStorage
 
@@ -155,6 +156,7 @@ val commonModule = module {
     }
 
     //MODEL
+    factory{ SplashModel(get(),get()) }
     factory { (reservaId: String) ->
         AceptarRetoModel(reservaId, get(), get(),get(),get())
     }

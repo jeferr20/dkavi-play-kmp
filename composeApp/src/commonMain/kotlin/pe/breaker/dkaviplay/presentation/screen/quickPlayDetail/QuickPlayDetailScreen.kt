@@ -100,7 +100,7 @@ class QuickPlayDetailScreen(private val sede: Sede, private val usuario: UserQui
                     Spacer(modifier = Modifier.weight(1f))
 
                     CustomButtonFilled(
-                        modifier = Modifier.fillMaxWidth().height(56.dp).padding(bottom = 16.dp),
+                        modifier = Modifier.fillMaxWidth().height(56.dp),
                         enabled = true,
                         onClick = { navigator.push(RegisterReservationScreen(sede , usuario))},
                         text = "Retar a partida"
