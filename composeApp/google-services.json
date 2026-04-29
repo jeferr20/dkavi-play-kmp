@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "652502928409",
+    "project_id": "poolstreet-100jj001",
+    "storage_bucket": "poolstreet-100jj001.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:652502928409:android:78059d7a557a3b978e6e88",
+        "android_client_info": {
+          "package_name": "pe.breaker.dkaviplay"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC-uWVZ9HP6nvvCLf5vt32Mk_N9ieATVjk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:652502928409:android:b93393e81915b1b58e6e88",
+        "android_client_info": {
+          "package_name": "pe.breaker.poolstreet"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC-uWVZ9HP6nvvCLf5vt32Mk_N9ieATVjk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

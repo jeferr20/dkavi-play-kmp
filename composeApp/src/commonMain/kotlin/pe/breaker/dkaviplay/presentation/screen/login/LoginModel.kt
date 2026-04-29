@@ -4,11 +4,12 @@ import cafe.adriel.voyager.core.model.StateScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import pe.breaker.dkaviplay.domain.repository.NotificationRepository
 import pe.breaker.dkaviplay.domain.usecase.LoginUseCase
 
 class LoginModel(
     private val loginUseCase: LoginUseCase,
-//    private val notificationRepository: NotificationRepository
+    private val notificationRepository: NotificationRepository
 ) : StateScreenModel<LoginState>(LoginState()) {
 
     fun onFieldChanged(newValue: String, update: (LoginState, String) -> LoginState) {
@@ -36,14 +37,11 @@ class LoginModel(
             mutableState.update { it.copy(isLoading = true) }
             val result = loginUseCase(usuario, pass)
             result.onSuccess {
-//                try {
-//                    val token = Firebase.messaging.getToken()
-//                    notificationRepository.saveToken(token)
-//                } catch (e: Exception) {
-//                    // Logueamos pero no bloqueamos el login por un error de push
-//                    println("Error guardando token en login: ${e.message}")
-//                }
-
+                try {
+                    notificationRepository.saveToken()
+                } catch (e: Exception) {
+                    println("Error guardando token en login: ${e.message}")
+                }
                 mutableState.update { it.copy(isLoading = false, isSuccess = true) }
             }.onFailure { error ->
                 mutableState.update { it.copy(isLoading = false, errorMessage = error.message) }

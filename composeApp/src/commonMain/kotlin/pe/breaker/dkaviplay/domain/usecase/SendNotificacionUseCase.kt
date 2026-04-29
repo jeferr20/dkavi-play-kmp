@@ -11,6 +11,6 @@ class SendNotificacionUseCase(
         message: String,
         accion: String
     ): Result<String> {
-        return repository.sendNotificacion(user, title, message, accion)
+        return repository.sendNotification(user, title, message, accion)
     }
 }

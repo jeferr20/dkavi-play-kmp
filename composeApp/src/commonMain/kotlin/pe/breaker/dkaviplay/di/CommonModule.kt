@@ -3,6 +3,7 @@ package pe.breaker.dkaviplay.di
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.auth.auth
 import dev.gitlive.firebase.firestore.firestore
+import dev.gitlive.firebase.messaging.messaging
 import dev.gitlive.firebase.remoteconfig.remoteConfig
 import dev.gitlive.firebase.storage.storage
 import kotlinx.serialization.json.Json
@@ -80,8 +81,9 @@ import pe.breaker.dkaviplay.util.SecureStorage
 val commonModule = module {
     factory { Firebase.auth }
     factory { Firebase.firestore }
-    factory {Firebase.remoteConfig}
-    factory {Firebase.storage}
+    factory { Firebase.remoteConfig }
+    factory { Firebase.storage }
+    factory { Firebase.messaging }
 
     single {
         SecureStorage(
@@ -97,7 +99,7 @@ val commonModule = module {
     }
     single { Database(get<DatabaseDriverFactory>()) }
 
-    single { UserSessionManager(get(), get(), get(), get()) }
+    single { UserSessionManager(get(), get(), get(), get(),get()) }
     single { GlobalNavigationBus }
     single {
         Json {
@@ -108,7 +110,7 @@ val commonModule = module {
     }
 
     //Repository
-    single<AuthRepository> { AuthRepositoryImpl(get(), get(), get(), get()) }
+    single<AuthRepository> { AuthRepositoryImpl(get(), get(), get(), get(), get()) }
     single<UsuarioRepository> { UsuarioRepositoryImpl(get(), inject(), get()) }
     single<PersonaRepository> { PersonaRepositoryImpl(inject(), get()) }
     single<SedeRepository> { SedeRepositoryImpl(get(), get()) }
@@ -120,12 +122,13 @@ val commonModule = module {
     single<NotificationRepository> {
         NotificationRepositoryImpl(
             firestore = get(),
+            firebaseMessaging = get(),
             getUserUid = { get<UserSessionManager>().getUserUid() },
             get()
         )
     }
-    single<AppConfigRepository> { AppConfigRepositoryImpl(get(),get()) }
-    single<MesaRepository>{ MesaRepositoryImpl(get()) }
+    single<AppConfigRepository> { AppConfigRepositoryImpl(get(), get()) }
+    single<MesaRepository> { MesaRepositoryImpl(get()) }
 
     //UseCase
     factory { LoginUseCase(get()) }
@@ -138,7 +141,7 @@ val commonModule = module {
 //    factory { GetTorneosUseCase(get()) }
 //    factory { InscripcionTorneoUseCase(get()) }
     factory { GetReservasUseCase(get()) }
-   factory { EliminarReservaUseCase(get()) }
+    factory { EliminarReservaUseCase(get()) }
     factory { GetMesaUseCase(get()) }
     factory { UploadProfileImageUseCase(get()) }
     factory { SearchUsersQuickPlayUseCase(get()) }
@@ -156,9 +159,9 @@ val commonModule = module {
     }
 
     //MODEL
-    factory{ SplashModel(get(),get()) }
+    factory { SplashModel(get(), get(), get()) }
     factory { (reservaId: String) ->
-        AceptarRetoModel(reservaId, get(), get(),get(),get())
+        AceptarRetoModel(reservaId, get(), get(), get(), get())
     }
     factory { (reservaUid: String) ->
         AcuerdoMutuoModel(reservaUid, get(), get())
@@ -168,8 +171,8 @@ val commonModule = module {
     factory { (tipoItem: TipoPremio) ->
         InventarioModel(tipoItem, get(), get())
     }
-    factory { LoginModel(get()) }
-    factory { MainContainerModel(get(), get()) }
+    factory { LoginModel(get(),get()) }
+    factory { MainContainerModel(get()) }
     factory { MapTabModel(get()) }
     factory { ProfileScreenModel(get(), get(), get(), get()) }
     factory { QuickPlayModel(get()) }

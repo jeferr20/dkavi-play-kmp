@@ -27,13 +27,14 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import coil3.PlatformContext
 import org.koin.compose.koinInject
+import pe.breaker.dkaviplay.di.PlatformContext
 import pe.breaker.dkaviplay.presentation.components.CustomAppbar
 import pe.breaker.dkaviplay.presentation.components.dialog.LoadingDialog
 import pe.breaker.dkaviplay.presentation.components.dialog.StatusDialog
 import pe.breaker.dkaviplay.presentation.screen.arbitro.components.ScoreInputSection
 import pe.breaker.dkaviplay.presentation.util.StatusUiType
+import pe.breaker.dkaviplay.presentation.util.lectorQR.LectorQR
 
 class ArbitroScreen : Screen {
     @Composable
@@ -56,14 +57,13 @@ class ArbitroScreen : Screen {
         ) { innerPadding ->
             Box(modifier = Modifier.fillMaxSize()) {
                 if (state.step == ArbitroStep.SCANNING && state.errorEscaneoMessage == null) {
-                    //TODO()
-//                    key(state.step) {
-//                        LectorQR(
-//                            modifier = Modifier.padding(innerPadding),
-//                            context = platformContext.androidContext,
-//                            onQrDetected = { screenModel.buscarReserva(it) }
-//                        )
-//                    }
+                    key(state.step) {
+                        LectorQR(
+                            modifier = Modifier.padding(innerPadding),
+                            context = platformContext.androidContext,
+                            onQrDetected = { screenModel.buscarReserva(it) }
+                        )
+                    }
                 }
 
                 Column(
@@ -73,7 +73,7 @@ class ArbitroScreen : Screen {
                         .padding(horizontal = 16.dp)
                 ) {
                     CustomAppbar(
-                        text = if (state.step == ArbitroStep.SCANNING) "Escanear Mesa" else "Registrar Score",
+                        text = if (state.step == ArbitroStep.SCANNING) "Escanear Juego" else "Registrar Score",
                         onClick = { navigator.pop() }
                     )
 

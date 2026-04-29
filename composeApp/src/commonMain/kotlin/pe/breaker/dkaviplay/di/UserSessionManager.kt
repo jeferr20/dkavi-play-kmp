@@ -24,6 +24,7 @@ import pe.breaker.dkaviplay.data.remote.firebase.InventarioFirebase
 import pe.breaker.dkaviplay.domain.model.GlobalEvent
 import pe.breaker.dkaviplay.domain.model.inventory.PremiosRegistry
 import pe.breaker.dkaviplay.domain.model.rango.RangoRegistry
+import pe.breaker.dkaviplay.domain.repository.NotificationRepository
 import pe.breaker.dkaviplay.domain.repository.PersonaRepository
 import pe.breaker.dkaviplay.domain.repository.UsuarioRepository
 import pe.breaker.dkaviplay.util.SecureKeys
@@ -32,7 +33,7 @@ import pe.breaker.dkaviplay.util.SecureStorage
 class UserSessionManager(
     private val personaRepository: PersonaRepository,
     private val usuarioRepository: UsuarioRepository,
-//    private val notificationRepository: NotificationRepository,
+    private val notificationRepository: NotificationRepository,
     private val secureStorage: SecureStorage,
     private val database: Database
 ) {
@@ -61,12 +62,11 @@ class UserSessionManager(
     fun getCurrentUsuarioFlow(): Flow<UsuarioTable?> = database.getCurrentUsuarioFlow()
 
     suspend fun clearSession() {
-        //TODO
-//        try {
-//            notificationRepository.deleteToken()
-//        } catch (e: Exception) {
-//            println("Error al eliminar token en servidor: ${e.message}")
-//        }
+        try {
+            notificationRepository.deleteToken()
+        } catch (e: Exception) {
+            println("Error al eliminar token en servidor: ${e.message}")
+        }
         stopSync(clearLocalData = true)
         cachedToken = null
         cachedUid = null

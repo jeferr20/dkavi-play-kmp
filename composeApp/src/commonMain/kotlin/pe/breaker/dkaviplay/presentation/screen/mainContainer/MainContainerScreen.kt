@@ -10,6 +10,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.navigator.tab.CurrentTab
@@ -34,7 +35,7 @@ class MainContainerScreen : Screen {
     @Composable
     override fun Content() {
         val rootNavigator = LocalNavigator.currentOrThrow.parent ?: LocalNavigator.currentOrThrow
-//        val model = koinScreenModel<MainContainerModel>()
+        val model = koinScreenModel<MainContainerModel>()
 
         val permissionsController =
             rememberPermissionsControllerFactory().createPermissionsController()
@@ -43,13 +44,13 @@ class MainContainerScreen : Screen {
         LaunchedEffect(Unit) {
             try {
                 permissionsController.providePermission(Permission.REMOTE_NOTIFICATION)
-//                model.syncNotificationToken()
+                model.syncNotificationToken()
             } catch (e: DeniedAlwaysException) {
                 println("Permiso denegado permanentemente: ${e.message}")
             } catch (e: DeniedException) {
                 println("Permiso denegado: ${e.message}")
             }
-//            model.syncNotificationToken()
+            model.syncNotificationToken()
         }
 
         TabNavigator(MapTab) { tabNavigator ->

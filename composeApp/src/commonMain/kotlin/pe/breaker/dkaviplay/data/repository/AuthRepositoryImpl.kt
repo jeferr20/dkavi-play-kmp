@@ -3,6 +3,7 @@ package pe.breaker.dkaviplay.data.repository
 import dev.gitlive.firebase.auth.FirebaseAuth
 import dev.gitlive.firebase.auth.FirebaseUser
 import dev.gitlive.firebase.firestore.FirebaseFirestore
+import dev.gitlive.firebase.storage.FirebaseStorage
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
@@ -27,12 +28,14 @@ import pe.breaker.dkaviplay.data.util.handleResponse
 import pe.breaker.dkaviplay.di.UserSessionManager
 import pe.breaker.dkaviplay.domain.model.UserSession
 import pe.breaker.dkaviplay.domain.repository.AuthRepository
+import pe.breaker.dkaviplay.util.toFirebaseData
 
 class AuthRepositoryImpl(
     private val httpClient: HttpClient,
     private val sessionManager: UserSessionManager,
     private val firebaseAuth: FirebaseAuth,
     private val firestore: FirebaseFirestore,
+    private val fireStorage: FirebaseStorage
     ) : AuthRepository {
     override suspend fun login(
         usuario: String,
@@ -44,7 +47,7 @@ class AuthRepositoryImpl(
         }
 
         return handleResponse<LoginResponseDTO, UserSession>(response) { data ->
-            firebaseAuth.signInWithCustomToken(data.firebaseToken)
+            data.firebaseToken?.let { firebaseAuth.signInWithCustomToken(it) }
             val session = decodeJwt(data.token, data.cripKey)
             sessionManager.saveSession(session.token, session.uid)
             Result.success(session)
@@ -103,17 +106,17 @@ class AuthRepositoryImpl(
             val uid = sessionManager.getUserUid()
                 ?: return Result.failure(Exception("No User UID"))
 
-//            val storageRef = Firebase.storage.reference.child("Perfiles/$uid.webp")
-//            val data = byteArray.toFirebaseData()
-//            storageRef.putData(data)
-//
-//            val url = storageRef.getDownloadUrl()
-//
-//            firestore.collection("UserMovil")
-//                .document(uid)
-//                .update(mapOf("urlImagen" to url))
+            val storageRef = fireStorage.reference.child("Perfiles/$uid.webp")
+            val data = byteArray.toFirebaseData()
+            storageRef.putData(data)
 
-            Result.success("url")
+            val url = storageRef.getDownloadUrl()
+
+            firestore.collection("UserMovil")
+                .document(uid)
+                .update(mapOf("urlImagen" to url))
+
+            Result.success(url)
         } catch (e: Exception) {
             println("Error en uploadProfileImage: ${e.message}")
             Result.failure(e)

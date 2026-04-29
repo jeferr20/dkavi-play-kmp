@@ -1,6 +1,7 @@
 package pe.breaker.dkaviplay.data.repository
 
 import dev.gitlive.firebase.firestore.FirebaseFirestore
+import dev.gitlive.firebase.messaging.FirebaseMessaging
 import io.ktor.client.HttpClient
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
@@ -14,15 +15,17 @@ import pe.breaker.dkaviplay.domain.repository.NotificationRepository
 
 class NotificationRepositoryImpl(
     private val firestore: FirebaseFirestore,
+    private val firebaseMessaging: FirebaseMessaging,
     private val getUserUid: () -> String?,
     private val httpClient: HttpClient,
 ) : NotificationRepository {
 
-    override suspend fun saveToken(token: String): Result<Unit> {
+    override suspend fun saveToken(token: String?): Result<Unit> {
+        val finalToken = if (token.isNullOrEmpty()) firebaseMessaging.getToken() else token
         val userUid = getUserUid() ?: return Result.failure(Exception("No user"))
         return try {
             firestore.collection("UserMovil").document(userUid)
-                .update(mapOf("fcmToken" to token))
+                .update(mapOf("fcmToken" to finalToken))
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)
@@ -40,17 +43,14 @@ class NotificationRepositoryImpl(
         }
     }
 
-    override suspend fun sendNotificacion(
-        user: String,
-        title: String,
-        message: String,
-        accion: String
+    override suspend fun sendNotification(
+        user: String, title: String, message: String, action: String
     ): Result<String> {
         val requestBody = SendNotificationRequestDTO(
             uid = user,
             title = title,
             message = message,
-            data = DataNotificacionDTO(action = accion)
+            data = DataNotificacionDTO(action = action)
         )
         val response =
             httpClient.post("${ConstatesCloud.URLBASE}apiPublic/public/notificaciones") {

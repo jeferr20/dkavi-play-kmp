@@ -12,9 +12,11 @@ import pe.breaker.dkaviplay.data.remote.AutoLoginResult
 import pe.breaker.dkaviplay.data.util.isTokenExpired
 import pe.breaker.dkaviplay.di.UserSessionManager
 import pe.breaker.dkaviplay.domain.repository.AuthRepository
+import pe.breaker.dkaviplay.domain.repository.NotificationRepository
 
 class SplashModel(
     private val authRepository: AuthRepository,
+    private val notificationRepository: NotificationRepository,
     private val sessionManager: UserSessionManager
 ) : ScreenModel {
     val state = MutableStateFlow<SplashState>(SplashState.Loading)
@@ -55,6 +57,14 @@ class SplashModel(
                 }
 
                 sessionManager.startSync()
+
+                launch {
+                    try{
+                        notificationRepository.saveToken()
+                    } catch (e: Exception) {
+                        println("Error actualizando token en Splash : ${e.message}")
+                    }
+                }
 
                 val persona = withTimeoutOrNull(10000) {
                     sessionManager.personaFlow().filterNotNull().first()

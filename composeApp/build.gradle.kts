@@ -103,11 +103,13 @@ kotlin {
 
             implementation(libs.coil.network.okhttp)
 
+            implementation("com.google.firebase:firebase-messaging-ktx:23.4.1")
             implementation("com.google.zxing:core:3.5.3")
             implementation("androidx.camera:camera-camera2:1.2.3")
             implementation("androidx.camera:camera-lifecycle:1.2.3")
             implementation("androidx.camera:camera-view:1.2.3")
             implementation("com.google.mlkit:barcode-scanning:17.3.0")
+            implementation("com.google.guava:guava:33.5.0-jre")
         }
         commonMain.dependencies {
             implementation(libs.compose.runtime)
@@ -144,6 +146,7 @@ kotlin {
             implementation(libs.firebase.common)
             implementation(libs.firebase.storage)
             implementation(libs.firebase.config)
+            implementation(libs.firebase.messaging)
 
             implementation(libs.material.icons.extended)
 

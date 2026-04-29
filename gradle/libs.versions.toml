@@ -100,6 +100,7 @@ firebase-common = { module = "dev.gitlive:firebase-common", version.ref = "fireb
 firebase-firestore = { module = "dev.gitlive:firebase-firestore", version.ref = "firebaseCommon" }
 firebase-config = { module = "dev.gitlive:firebase-config", version.ref = "firebaseCommon" }
 firebase-storage = { module = "dev.gitlive:firebase-storage", version.ref = "firebaseCommon" }
+firebase-messaging = { module = "dev.gitlive:firebase-messaging", version.ref = "firebaseCommon" }
 
 #MAPS
 maps-compose = { module = "com.google.maps.android:maps-compose", version.ref = "mapsCompose" }
