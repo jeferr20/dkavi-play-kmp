@@ -1,7 +1,11 @@
 package pe.breaker.dkaviplay
 
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.transitions.SlideTransition
@@ -18,13 +22,17 @@ fun App() {
     val sessionManager = koinInject<UserSessionManager>()
 
     MaterialTheme {
-        AppStateHandler(appConfigManager,sessionManager){
-            Navigator(screen = SplashScreen()) { navigator ->
-                SlideTransition(navigator) { screen ->
-                    screen.Content()
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color =  Color.Black
+        ){
+            AppStateHandler(appConfigManager,sessionManager){
+                Navigator(screen = SplashScreen()) { navigator ->
+                    SlideTransition(navigator) { screen ->
+                        screen.Content()
+                    }
                 }
             }
         }
-
     }
 }

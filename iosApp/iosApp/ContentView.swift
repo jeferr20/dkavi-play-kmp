@@ -18,12 +18,11 @@ struct ContentView: View {
             if isKoinReady{
                 ComposeView()
                     .ignoresSafeArea()
-            }else{
-                ProgressView("Cargando...")
+                    .transition(.opacity)
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("KoinReady"))) { _ in
-                    self.isKoinReady = true
-                }
+            self.isKoinReady = true
+        }
     }
 }

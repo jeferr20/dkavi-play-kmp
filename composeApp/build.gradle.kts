@@ -78,6 +78,7 @@ kotlin {
         pod("FirebaseFirestore"){ linkOnly = true }
         pod("FirebaseRemoteConfig"){ linkOnly = true }
         pod("FirebaseStorage"){ linkOnly = true }
+        pod("FirebaseMessaging"){ linkOnly = true }
     }
 
     sourceSets {
