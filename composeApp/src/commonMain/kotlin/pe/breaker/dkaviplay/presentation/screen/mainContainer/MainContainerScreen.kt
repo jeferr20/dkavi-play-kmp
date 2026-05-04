@@ -2,6 +2,7 @@ package pe.breaker.dkaviplay.presentation.screen.mainContainer
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -91,14 +92,18 @@ class MainContainerScreen : Screen {
                 modifier = Modifier.fillMaxSize(),
                 containerColor = Color.Black,
                 bottomBar = {
-                    FloatingBottomBar(
-                        tabs = listOf(MapTab, ReservasTab, ProfileTab)
-                    )
+                    Box(
+                        modifier = Modifier.navigationBarsPadding() // 👈 aquí va
+                    ) {
+                        FloatingBottomBar(
+                            tabs = listOf(MapTab, ReservasTab, ProfileTab)
+                        )
+                    }
                 }
             ) {
                 Box(
                     modifier = Modifier
-                        .fillMaxSize()
+                        .fillMaxSize().navigationBarsPadding()
                 ) {
                     CurrentTab()
                 }

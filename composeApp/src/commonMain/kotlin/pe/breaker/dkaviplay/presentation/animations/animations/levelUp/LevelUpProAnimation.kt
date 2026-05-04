@@ -15,9 +15,11 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -27,6 +29,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
@@ -52,6 +56,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -62,6 +67,7 @@ import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 import pe.breaker.dkaviplay.presentation.animations.audio.AudioFactory
+import pe.breaker.dkaviplay.presentation.components.button.ActionIconButton
 import kotlin.random.Random
 
 @Composable
@@ -71,7 +77,8 @@ fun LevelUpProAnimation(
     userImageUrl: String,
     oldRankRes: DrawableResource,
     newRankRes: DrawableResource,
-    onClose: () -> Unit
+    onClose: () -> Unit,
+    onShare: () -> Unit = {}
 ) {
     val audioFactory: AudioFactory = koinInject()
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -252,17 +259,39 @@ fun LevelUpProAnimation(
         if (transitionState.targetState == 2) {
             PremiumConfetti(modifier = Modifier.fillMaxSize())
 
-            Button(
-                onClick = onClose,
+            Row(
                 modifier = Modifier
+                    .padding(bottom = 24.dp)
                     .align(Alignment.BottomCenter)
-                    .padding(bottom = height * 0.08f)
-                    .fillMaxWidth(0.7f)
-                    .height(58.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2D5FB4)),
-                shape = RoundedCornerShape(14.dp)
+                    .fillMaxWidth(0.85f)
+                    .zIndex(6f),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Text("RECLAMAR RECOMPENSA", fontWeight = FontWeight.Black, color = Color.White)
+
+                Button(
+                    onClick = onClose,
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(58.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2D5FB4)),
+                    shape = RoundedCornerShape(14.dp)
+                ) {
+                    Text(
+                        "RECLAMAR RECOMPENSA",
+                        fontWeight = FontWeight.Black,
+                        color = Color.White
+                    )
+                }
+
+                ActionIconButton(
+                    modifier = Modifier.size(58.dp),
+                    icon = Icons.Default.Share,
+                    contentDescription = "Compartir",
+                    onClick = onShare,
+                    colorBackground = Color.Black,
+                    colorIcon = Color.White,
+                )
             }
         }
 

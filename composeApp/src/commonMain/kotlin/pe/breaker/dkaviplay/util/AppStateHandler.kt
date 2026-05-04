@@ -1,13 +1,13 @@
 package pe.breaker.dkaviplay.util
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import kotlinx.coroutines.delay
+import androidx.compose.ui.Modifier
 import org.koin.compose.koinInject
+import pe.breaker.dkaviplay.AppConfigGlobal
 import pe.breaker.dkaviplay.di.AppConfigManager
 import pe.breaker.dkaviplay.di.UserSessionManager
 import pe.breaker.dkaviplay.domain.model.rango.RangoRegistry
@@ -16,7 +16,6 @@ import pe.breaker.dkaviplay.presentation.components.dialog.LoadingDialog
 import pe.breaker.dkaviplay.presentation.components.dialog.NewItemDialog
 import pe.breaker.dkaviplay.presentation.components.dialog.StatusDialog
 import pe.breaker.dkaviplay.presentation.util.StatusUiType
-import pe.breaker.poolstreet.AppConfigGlobal
 
 @Composable
 fun AppStateHandler(
@@ -32,64 +31,69 @@ fun AppStateHandler(
     val remoteVersion = config.versionMovil
     val needsUpdate = isVersionOlder(currentVersion, remoteVersion)
 
-    LaunchedEffect(uiManager.esperandoPremioPorSubida) {
-        if (uiManager.esperandoPremioPorSubida) {
-            delay(10000)
-            uiManager.timeoutEsperandoPremio()
+    val uiState = uiManager.uiState
+
+    Box(Modifier.fillMaxSize()) {
+        when{
+            !appEnabled ->{
+                StatusDialog(
+                    status = StatusUiType.ERROR,
+                    message = "Dkavi Play se encuentra en mantenimiento. Estamos mejorando la mesa para ti.",
+                    onDismiss = {},
+                    confirmButtonText = "Entiendo",
+                    onConfirm = { closeApp() },
+                    hideCancelar = true
+                )
+            }
+
+            needsUpdate ->{
+                StatusDialog(
+                    status = StatusUiType.WARNING,
+                    message = "¡Nueva versión disponible! Es necesario actualizar para seguir usando Dkavi Play.",
+                    onDismiss = {},
+                    confirmButtonText = "Actualizar",
+                    onConfirm = {
+                        val url = if (getPlatform().name.contains("Android")) {
+                            config.urlMovilAndroid
+                        } else {
+                            config.urlMovilIOS
+                        }
+                        openUrl(url)
+                    },
+                    hideCancelar = true
+                )
+            }
+
+            else -> { content()}
         }
-    }
+        when(uiState){
+            is UiFlowState.ShowingLevelUp -> {
+                val rango = uiState.rango
+                val previo = RangoRegistry.obtenerRangoAnterior(rango.nivel)
 
-    Box {
-        if (appEnabled && !needsUpdate) {
-            content()
-        }
+                LevelUpDialog(
+                    userName = sessionManager.getCurrentUsuario()?.usuario ?: "",
+                    categoriaAnterior = previo?.categoria,
+                    categoria = rango.categoria,
+                    userImageUrl = sessionManager.getCurrentUsuario()?.urlImagen ?: "",
+                    onDismiss = { uiManager.onLevelUpDismiss() }
+                )
+            }
 
-        if (!appEnabled) {
-            StatusDialog(
-                status = StatusUiType.ERROR,
-                message = "Dkavi Play se encuentra en mantenimiento. Estamos mejorando la mesa para ti.",
-                onDismiss = {},
-                confirmButtonText = "Entiendo",
-                onConfirm = { closeApp() },
-                hideCancelar = true
-            )
-        }
+            is UiFlowState.ShowingReward -> {
+                NewItemDialog(
+                    userName = sessionManager.getCurrentUsuario()?.usuario ?: "",
+                    userImageUrl = sessionManager.getCurrentUsuario()?.urlImagen ?: "",
+                    premio = uiState.premio,
+                    onDismiss = { uiManager.dismissReward() }
+                )
+            }
 
-        if (needsUpdate) {
-            StatusDialog(
-                status = StatusUiType.WARNING,
-                message = "¡Nueva versión disponible! Es necesario actualizar para seguir usando Dkavi Play.",
-                onDismiss = {},
-                confirmButtonText = "Actualizar",
-                onConfirm = {
-                    val url = if (getPlatform().name.contains("Android")) {
-                        config.urlMovilAndroid
-                    } else {
-                        config.urlMovilIOS
-                    }
-                    openUrl(url)
-                },
-                hideCancelar = true
-            )
-        }
+            is UiFlowState.WaitingReward -> {
+                LoadingDialog()
+            }
 
-        if (uiManager.esperandoPremioPorSubida) LoadingDialog()
-
-        uiManager.levelUpData?.let { rango ->
-            val rangoPrevio = remember(rango.nivel) { RangoRegistry.obtenerRangoAnterior(rango.nivel) }
-            LevelUpDialog(
-                categoriaAnterior = rangoPrevio?.categoria,
-                categoria = rango.categoria,
-                userImageUrl = sessionManager.getCurrentUsuario()?.urlImagen ?: "",
-                onDismiss = { uiManager.handleLevelUpDismiss() }
-            )
-        }
-
-        uiManager.premioGanadoGeneral?.let { premio ->
-            NewItemDialog(
-                premio = premio,
-                onDismiss = { uiManager.dismissPremio() }
-            )
+            else -> Unit
         }
     }
 }

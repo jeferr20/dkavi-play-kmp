@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.scan
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import pe.breaker.dkaviplay.cache.PersonaTable
@@ -39,7 +38,10 @@ class UserSessionManager(
 ) {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
-    private val _globalEvent = MutableSharedFlow<GlobalEvent>(replay = 0)
+    private val _globalEvent = MutableSharedFlow<GlobalEvent>(
+        replay = 1,
+        extraBufferCapacity = 10
+    )
     val globalEvent = _globalEvent.asSharedFlow()
 
     private var personaJob: Job? = null
@@ -87,27 +89,21 @@ class UserSessionManager(
     fun startSync() {
         val userId = cachedUid ?: return
 
-        if (personaJob?.isActive == true && usuarioJob?.isActive == true) return
+        if (usuarioJob?.isActive == true) return
+        var lastUsuario: UsuarioEntity? = null
 
         usuarioJob = usuarioRepository.getUsuarioStream(userId)
             .filterNotNull()
             .distinctUntilChanged()
-            .scan(null as UsuarioEntity?) { anterior, nuevo ->
-                if (anterior != null) {
-                    val rangoAnterior = RangoRegistry.obtenerRangoPorPuntos(anterior.puntos)
-                    val rangoNuevo = RangoRegistry.obtenerRangoPorPuntos(nuevo.puntos)
+            .onEach { nuevo ->
+                val anterior = lastUsuario
 
-                    // SOLO disparamos si el NIVEL cambió (ej. de 1 a 2)
-                    if (rangoNuevo.nivel > rangoAnterior.nivel) {
-                        emitLevelUpEvent(nuevo.puntos)
-                    }
+                if (anterior != null) {
+                    handleLevelChange(anterior, nuevo)
+                    handleInventoryChange(anterior, nuevo)
                 }
 
-                val oldInv = anterior?.parseInventario() ?: emptyList()
-                val newInv = nuevo.parseInventario()
-                detectNewItems(oldInv, newInv)
-
-                nuevo
+                lastUsuario = nuevo
             }
             .launchIn(scope)
 
@@ -116,6 +112,22 @@ class UserSessionManager(
                 println("Persona sincronizada: ${persona?.nombres}")
             }
             .launchIn(scope)
+    }
+
+    private fun handleLevelChange(old: UsuarioEntity, new: UsuarioEntity) {
+        val rangoOld = RangoRegistry.obtenerRangoPorPuntos(old.puntos)
+        val rangoNew = RangoRegistry.obtenerRangoPorPuntos(new.puntos)
+
+        if (rangoNew.nivel > rangoOld.nivel) {
+            emitLevelUpEvent(new.puntos)
+        }
+    }
+
+    private fun handleInventoryChange(old: UsuarioEntity, new: UsuarioEntity) {
+        val oldInv = old.parseInventario()
+        val newInv = new.parseInventario()
+
+        detectNewItems(oldInv, newInv)
     }
 
     fun personaFlow(): Flow<PersonaEntity?> {

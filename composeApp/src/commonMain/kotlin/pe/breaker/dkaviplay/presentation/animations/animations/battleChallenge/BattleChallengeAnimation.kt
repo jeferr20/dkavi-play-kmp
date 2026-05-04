@@ -12,12 +12,15 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Surface
@@ -54,6 +57,7 @@ import pe.breaker.dkaviplay.presentation.animations.animations.battleChallenge.c
 import pe.breaker.dkaviplay.presentation.animations.animations.battleChallenge.components.ChallengePlayerCard
 import pe.breaker.dkaviplay.presentation.animations.animations.battleChallenge.components.ItemSheet
 import pe.breaker.dkaviplay.presentation.animations.audio.AudioFactory
+import pe.breaker.dkaviplay.presentation.components.button.ActionIconButton
 import pe.breaker.dkaviplay.presentation.components.button.CustomButtonFilled
 import pe.breaker.dkaviplay.presentation.theme.colorBlackSurface
 import pe.breaker.dkaviplay.presentation.theme.colorPrimary
@@ -72,7 +76,8 @@ fun BattleChallengeAnimation(
     typeGame: String,
     onArbitro : () -> Unit,
     onAcuerdoMutuo : () -> Unit,
-    hideButtonTerminar: Boolean
+    hideButtonTerminar: Boolean,
+    onShare: () -> Unit = {}
 ) {
     val audioFactory: AudioFactory = koinInject()
 
@@ -317,16 +322,31 @@ fun BattleChallengeAnimation(
         )
 
         if(showButton && !hideButtonTerminar){
-            CustomButtonFilled(
+            Row(
                 modifier = Modifier
-                    .align(Alignment.BottomCenter)
                     .padding(bottom = 24.dp)
-                    .fillMaxWidth(0.7f)
+                    .align(Alignment.BottomCenter)
+                    .fillMaxWidth(0.85f)
                     .zIndex(6f),
-                enabled = showButton,
-                onClick = {showSheet = true},
-                text = "FINALIZAR PARTIDA"
-            )
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+
+                CustomButtonFilled(
+                    modifier = Modifier.weight(1f),
+                    enabled = showButton,
+                    onClick = { showSheet = true },
+                    text = "FINALIZAR PARTIDA"
+                )
+
+                ActionIconButton(
+                    icon = Icons.Default.Share,
+                    contentDescription = "Compartir",
+                    onClick = onShare,
+                    colorBackground = Color.Black,
+                    colorIcon = Color.White,
+                )
+            }
         }
 
         if (showSheet) {

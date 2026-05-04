@@ -12,6 +12,7 @@ plugins {
     alias(libs.plugins.serialization)
     alias(libs.plugins.google.services)
     alias(libs.plugins.buildkonfig)
+    alias(libs.plugins.iconsGenerator)
 }
 
 val secretsFile = rootProject.file("secrets.properties")
@@ -23,7 +24,7 @@ val versionName = libs.versions.app.version.name.get()
 val versionCode = libs.versions.app.version.code.get()
 
 buildkonfig {
-    packageName = "pe.breaker.poolstreet"
+    packageName = "pe.breaker.dkaviplay"
     objectName = "AppConfigGlobal"
     exposeObjectWithName = "AppConfigGlobal"
 
@@ -87,30 +88,35 @@ kotlin {
             languageSettings.optIn("androidx.compose.material3.ExperimentalMaterial3Api")
             languageSettings.optIn("org.jetbrains.compose.resources.ExperimentalResourceApi")
         }
-        androidMain.dependencies {
-            implementation(libs.compose.uiToolingPreview)
-            implementation(libs.androidx.activity.compose)
+        val androidMain by getting{
+            resources.srcDirs("src/androidMain/res")
+            dependencies {
+                implementation(libs.compose.uiToolingPreview)
+                implementation(libs.androidx.activity.compose)
 
-            implementation(libs.ktor.client.okhttp)
-            implementation(libs.ktor.client.android)
+                implementation(libs.ktor.client.okhttp)
+                implementation(libs.ktor.client.android)
 
-            implementation(libs.android.driver)
+                implementation(libs.android.driver)
 
-            implementation(libs.koin.android)
+                implementation(libs.koin.android)
 
-            implementation(libs.maps.compose)
-            implementation(libs.maps.compose.utils)
-            implementation(libs.play.services.maps)
+                implementation(libs.maps.compose)
+                implementation(libs.maps.compose.utils)
+                implementation(libs.play.services.maps)
 
-            implementation(libs.coil.network.okhttp)
+                implementation(libs.coil.network.okhttp)
 
-            implementation("com.google.firebase:firebase-messaging-ktx:23.4.1")
-            implementation("com.google.zxing:core:3.5.3")
-            implementation("androidx.camera:camera-camera2:1.2.3")
-            implementation("androidx.camera:camera-lifecycle:1.2.3")
-            implementation("androidx.camera:camera-view:1.2.3")
-            implementation("com.google.mlkit:barcode-scanning:17.3.0")
-            implementation("com.google.guava:guava:33.5.0-jre")
+                implementation(libs.androidx.core.splashscreen)
+
+                implementation("com.google.firebase:firebase-messaging-ktx:23.4.1")
+                implementation("com.google.zxing:core:3.5.3")
+                implementation("androidx.camera:camera-camera2:1.2.3")
+                implementation("androidx.camera:camera-lifecycle:1.2.3")
+                implementation("androidx.camera:camera-view:1.2.3")
+                implementation("com.google.mlkit:barcode-scanning:17.3.0")
+                implementation("com.google.guava:guava:33.5.0-jre")
+            }
         }
         commonMain.dependencies {
             implementation(libs.compose.runtime)

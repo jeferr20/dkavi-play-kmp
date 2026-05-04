@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -28,6 +29,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -63,6 +66,7 @@ import pe.breaker.dkaviplay.presentation.animations.animations.battleWinner.comp
 import pe.breaker.dkaviplay.presentation.animations.animations.battleWinner.components.ConfettiCanvas
 import pe.breaker.dkaviplay.presentation.animations.animations.battleWinner.components.PlayerAvatar
 import pe.breaker.dkaviplay.presentation.animations.audio.AudioFactory
+import pe.breaker.dkaviplay.presentation.components.button.ActionIconButton
 import pe.breaker.dkaviplay.presentation.components.button.CustomButtonFilled
 
 @Composable
@@ -276,12 +280,29 @@ fun BattleWinnerAnimation(
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    AnimatedPreButton(delay = 250) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth(0.85f)
+                            .height(54.dp),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+
+                        // 🔘 Botón principal
                         CustomButtonFilled(
-                            modifier = Modifier.fillMaxWidth(0.8f).height(54.dp),
+                            modifier = Modifier.weight(1f),
                             enabled = true,
                             onClick = onContinue,
                             text = "CONTINUAR"
+                        )
+
+                        // 🔗 Botón compartir (icono)
+                        ActionIconButton(
+                            icon = Icons.Default.Share,
+                            contentDescription = "Compartir",
+                            onClick = onShare,
+                            colorBackground = Color.Black,
+                            colorIcon = Color.White,
                         )
                     }
                 }

@@ -18,13 +18,16 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import org.koin.compose.koinInject
 import org.koin.core.parameter.parametersOf
 import pe.breaker.dkaviplay.presentation.animations.animations.battleChallenge.BattleChallengeAnimation
 import pe.breaker.dkaviplay.presentation.components.CustomAppbar
 import pe.breaker.dkaviplay.presentation.components.dialog.LoadingDialog
 import pe.breaker.dkaviplay.presentation.screen.acuerdoMutuo.AcuerdoMutuoScreen
 import pe.breaker.dkaviplay.presentation.screen.retoIniciado.components.PartidaQrDialog
+import pe.breaker.dkaviplay.presentation.shareable.battleShareable.CaptureBattleShareable
 import pe.breaker.dkaviplay.presentation.util.RankResourceMapper
+import pe.breaker.dkaviplay.presentation.util.ShareHandler
 
 class RetoIniciadoScreen(val reservaId: String) : Screen {
     @Composable
@@ -36,6 +39,19 @@ class RetoIniciadoScreen(val reservaId: String) : Screen {
         val state by model.state.collectAsState()
         val isReady = state.retador != null && state.retado != null
         var showQr by remember { mutableStateOf(false) }
+
+        val shareHandler = koinInject<ShareHandler>()
+        var triggerCapture by remember { mutableStateOf(false) }
+
+        if (triggerCapture) {
+            CaptureBattleShareable(
+                state = state,
+                onCaptured = { bitmap ->
+                    shareHandler.shareBitmap(bitmap)
+                    triggerCapture = false
+                }
+            )
+        }
 
         Scaffold(
             containerColor = Color.Black,
@@ -62,11 +78,14 @@ class RetoIniciadoScreen(val reservaId: String) : Screen {
                         typeGame = state.reserva?.tipoJuego ?: "POOL",
                         onArbitro = { showQr = true },
                         onAcuerdoMutuo = {
-                            state.reserva?.reservaUid?.let{
+                            state.reserva?.reservaUid?.let {
                                 navigator.push(AcuerdoMutuoScreen(it))
                             }
                         },
-                        hideButtonTerminar = state.reserva?.esperandoConfirmacion == true
+                        hideButtonTerminar = state.reserva?.esperandoConfirmacion == true,
+                        onShare = {
+                            triggerCapture = true
+                        }
                     )
                 }
             }

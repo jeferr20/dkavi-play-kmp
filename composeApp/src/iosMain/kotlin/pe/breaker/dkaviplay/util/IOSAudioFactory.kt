@@ -26,4 +26,12 @@ class IOSAudioFactory : AudioFactory {
         audioPlayer?.stop()
         audioPlayer = null
     }
+
+    override fun pauseBattleMusic() {
+        TODO("Not yet implemented")
+    }
+
+    override fun resumeBattleMusic() {
+        TODO("Not yet implemented")
+    }
 }

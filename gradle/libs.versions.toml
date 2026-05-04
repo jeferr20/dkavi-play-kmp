@@ -45,6 +45,10 @@ kotlinxDatetime = "0.7.1"
 
 buildkonfig = "0.15.1"
 
+coreSplashscreen = "1.0.1"
+
+iconsGenerator = "1.2.6"
+
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlin-testJunit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
@@ -131,6 +135,7 @@ kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.
 # For native map (Apple Maps on iOS, Google Maps on Android)
 #swmansion-kmpMaps-core = { module = "com.swmansion.kmpmaps:core", version.ref = "kmpMaps" }
 
+androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "coreSplashscreen" }
 ##
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
@@ -143,3 +148,4 @@ sqldelight = { id = "app.cash.sqldelight", version.ref = "sqlDelight" }
 serialization = {id = "org.jetbrains.kotlin.plugin.serialization" , version.ref = "serialization"}
 google-services = { id = "com.google.gms.google-services", version.ref = "gradlePlugins-google-services" }
 buildkonfig = { id = "com.codingfeline.buildkonfig", version.ref = "buildkonfig" }
+iconsGenerator = { id = "io.github.qamarelsafadi.kmp.app.icon.generator", version.ref = "iconsGenerator" }

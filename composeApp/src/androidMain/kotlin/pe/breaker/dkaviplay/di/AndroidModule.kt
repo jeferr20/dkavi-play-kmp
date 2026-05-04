@@ -9,7 +9,9 @@ import pe.breaker.dkaviplay.presentation.util.AndroidAudioFactory
 import pe.breaker.dkaviplay.presentation.util.AndroidImageResizer
 import pe.breaker.dkaviplay.presentation.util.AndroidToastHandler
 import pe.breaker.dkaviplay.presentation.util.ImageResizer
+import pe.breaker.dkaviplay.presentation.util.ShareHandler
 import pe.breaker.dkaviplay.presentation.util.ToastHandler
+import pe.breaker.dkaviplay.util.AndroidShareHandler
 
 val androidModule = module{
     single<DatabaseDriverFactory> { AndroidDatabaseDriverFactory(get()) }
@@ -17,4 +19,5 @@ val androidModule = module{
     single<ImageResizer> { AndroidImageResizer(get()) }
     single<AudioFactory> { AndroidAudioFactory(get()) }
     single<PlatformContext> { AndroidPlatformContext(androidContext()) }
+    single<ShareHandler> { AndroidShareHandler(androidContext()) }
 }

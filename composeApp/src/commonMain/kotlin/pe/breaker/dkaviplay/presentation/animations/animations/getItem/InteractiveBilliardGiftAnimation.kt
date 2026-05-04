@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -60,6 +61,10 @@ fun InteractiveBilliardGiftAnimation(
     val audioFactory: AudioFactory = koinInject()
     val scope = rememberCoroutineScope()
 
+    LaunchedEffect(Unit) {
+        audioFactory.playBattleMusic()
+    }
+
     // --- ESTADOS DE CONTROL ---
     var taps by remember { mutableStateOf(0) }
     var opened by remember { mutableStateOf(false) }
@@ -80,13 +85,21 @@ fun InteractiveBilliardGiftAnimation(
         animationSpec = infiniteRepeatable(tween(1500), RepeatMode.Reverse)
     )
 
-    // --- CICLO DE VIDA (AUDIO) ---
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_PAUSE) audioFactory.stopBattleMusic()
-            if (event == Lifecycle.Event.ON_RESUME) audioFactory.playBattleMusic()
+            when (event) {
+                Lifecycle.Event.ON_RESUME -> {
+                    audioFactory.resumeBattleMusic()
+                }
+                Lifecycle.Event.ON_PAUSE -> {
+                    audioFactory.pauseBattleMusic()
+                }
+                else -> Unit
+            }
         }
+
         lifecycleOwner.lifecycle.addObserver(observer)
+
         onDispose {
             lifecycleOwner.lifecycle.removeObserver(observer)
             audioFactory.stopBattleMusic()
