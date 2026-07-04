@@ -6,6 +6,7 @@ val colorPrimary = Color(0xFF2D5fb4)
 val colorBlackSurface = Color(0xFF1B1C1E)
 val colorRedError = Color(0xFFFB2C36)
 val colorGrey400 = Color(0xFF9CA3AF)
+val colorAculOscuro = Color(0xFF0F172A)
 
 val colorSurfaceDialog = Color(0xFF232529) // Color sólido para el contenedor
 val colorWarning = Color(0xFFFFB74D) // Naranja suave para advertencias

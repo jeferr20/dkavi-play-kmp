@@ -130,7 +130,8 @@ class RegisterReservationScreenModel(
                 }
 
                 val horas = diferenciaSegundos.toDouble() / 3600.0
-                val costoHoras = horas * (s.precioPorHora ?: 0.0)
+//                val costoHoras = horas * (s.precioPorHora ?: 0.0)
+                val costoHoras = 0//temporal
                 val comisionTotal = 5.0 * 2
                 val totalFinal = costoHoras + comisionTotal
 

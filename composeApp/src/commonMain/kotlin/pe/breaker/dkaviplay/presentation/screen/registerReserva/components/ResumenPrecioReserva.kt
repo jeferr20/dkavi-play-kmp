@@ -63,11 +63,11 @@ fun ResumenPrecioReserva(
                 value = duracion
             )
 
-            ResumenRow(
-                icon = Icons.Filled.Payments,
-                label = "Costo por Hora",
-                value = costoHora
-            )
+//            ResumenRow(
+//                icon = Icons.Filled.Payments,
+//                label = "Costo por Hora",
+//                value = costoHora
+//            )
 
             ResumenRow(
                 icon = Icons.Filled.ConfirmationNumber,

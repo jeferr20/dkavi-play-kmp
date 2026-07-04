@@ -1,4 +1,4 @@
-package pe.breaker.dkaviplay.presentation.shareable.battleShareable
+package pe.breaker.dkaviplay.presentation.shareable.shareQRShareable
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
@@ -11,11 +11,12 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.rememberGraphicsLayer
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
-import pe.breaker.dkaviplay.presentation.screen.retoIniciado.RetoIniciadoState
 
 @Composable
-fun CaptureBattleShareable(
-    state: RetoIniciadoState,
+fun CaptureShareQRShareable(
+    qrText: String,
+    user1: String,
+    user2: String,
     onCaptured: (ImageBitmap) -> Unit
 ) {
     val graphicsLayer = rememberGraphicsLayer()
@@ -25,21 +26,16 @@ fun CaptureBattleShareable(
             .size(width = 350.dp, height = 550.dp)
             .alpha(0f)
             .drawWithContent {
-                // 🔥 renderizamos el contenido en el layer
                 graphicsLayer.record {
                     this@drawWithContent.drawContent()
                 }
-                // dibujamos normalmente también
                 drawContent()
             }
-    ) {
-        BattleShareable(
-            user1Name = state.retador?.usuario ?: "",
-            user2Name = state.retado?.usuario ?: "",
-            user1Rank = state.retador?.rango ?: "",
-            user2Rank = state.retado?.rango ?: "",
-            user1UrlImage = state.retador?.imagen ?: "",
-            user2UrlImage = state.retado?.imagen ?: ""
+    ){
+        ShareQRShareable(
+            qrText = qrText,
+            user1 = user1,
+            user2 = user2
         )
     }
 

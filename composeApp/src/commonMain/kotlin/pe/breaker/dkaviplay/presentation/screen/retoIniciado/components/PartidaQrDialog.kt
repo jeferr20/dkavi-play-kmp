@@ -35,13 +35,12 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import kotlinx.coroutines.launch
-//import org.koin.compose.koinInject
-//import pe.breaker.dkaviplay.domain.repository.ImageShareRepository
-//import pe.breaker.dkaviplay.presentation.component.button.CustomButtonFilled
-//import pe.breaker.dkaviplay.presentation.component.button.CustomOutlineButtonTextIcon
+import org.koin.compose.koinInject
 import pe.breaker.dkaviplay.presentation.components.button.CustomButtonFilled
 import pe.breaker.dkaviplay.presentation.components.button.CustomOutlineButtonTextIcon
+import pe.breaker.dkaviplay.presentation.shareable.shareQRShareable.CaptureShareQRShareable
 import pe.breaker.dkaviplay.presentation.theme.colorPrimary
+import pe.breaker.dkaviplay.presentation.util.ShareHandler
 import qrgenerator.QRCodeImage
 
 @Composable
@@ -50,10 +49,21 @@ fun PartidaQrDialog(
     player2: String,
     qrText: String?,
     onDismiss: () -> Unit,
-//    imageShareRepository: ImageShareRepository = koinInject()
 ){
-    val scope = rememberCoroutineScope()
-    var isSharing by remember { mutableStateOf(false) }
+    val shareHandler = koinInject<ShareHandler>()
+    var triggerCapture by remember { mutableStateOf(false) }
+
+    if (triggerCapture){
+        CaptureShareQRShareable(
+            qrText = qrText ?: "",
+            user1 = player1,
+            user2 = player2,
+            onCaptured = { bitmap ->
+                shareHandler.shareBitmap(bitmap)
+                triggerCapture = false
+            }
+        )
+    }
 
     Dialog(
         onDismissRequest = onDismiss,
@@ -130,12 +140,12 @@ fun PartidaQrDialog(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(12.dp))
 
                 // Pasos de Instrucción
                 InstructionSteps()
 
-                Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(12.dp))
 
                 // Actions
                 Column(
@@ -145,18 +155,10 @@ fun PartidaQrDialog(
                         modifier = Modifier.fillMaxWidth().height(50.dp),
                         colorOutline = colorPrimary,
                         icon = Icons.Default.Share,
-                        enabled = !qrText.isNullOrEmpty() && !isSharing,
+                        enabled = !qrText.isNullOrEmpty() && !triggerCapture,
                         onClick = {
-                            if (!qrText.isNullOrEmpty() && !isSharing) {
-                                scope.launch {
-                                    isSharing = true
-//                                    imageShareRepository.shareMatchQrImage(
-//                                        qrText = qrText,
-//                                        player1 = player1,
-//                                        player2 = player2
-//                                    )
-                                    isSharing = false
-                                }
+                            if (!qrText.isNullOrEmpty() && !triggerCapture) {
+                                triggerCapture = true
                             }
                         },
                         text = "COMPARTIR QR"
