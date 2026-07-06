@@ -14,7 +14,7 @@ import cocoapods.GoogleMaps.GMSMarker
 import cocoapods.GoogleMaps.animateToCameraPosition
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.readValue
-import pe.breaker.dkaviplay.domain.model.Sede
+import pe.breaker.dkaviplay.core.domain.model.Sede
 import pe.breaker.dkaviplay.presentation.theme.colorPrimary
 import platform.CoreGraphics.CGRectZero
 import platform.CoreLocation.CLLocationCoordinate2DMake

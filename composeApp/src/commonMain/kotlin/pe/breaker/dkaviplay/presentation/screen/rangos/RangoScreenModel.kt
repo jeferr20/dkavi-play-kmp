@@ -5,8 +5,8 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import pe.breaker.dkaviplay.di.UserSessionManager
-import pe.breaker.dkaviplay.domain.model.rango.Rango
-import pe.breaker.dkaviplay.domain.model.rango.RangoRegistry
+import pe.breaker.dkaviplay.core.domain.model.rango.Rango
+import pe.breaker.dkaviplay.core.domain.model.rango.RangoRegistry
 
 class RangoScreenModel(
     private val sessionManager: UserSessionManager,

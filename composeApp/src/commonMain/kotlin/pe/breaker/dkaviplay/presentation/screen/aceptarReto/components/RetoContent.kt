@@ -18,8 +18,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import pe.breaker.dkaviplay.domain.model.Reserva
-import pe.breaker.dkaviplay.domain.model.UserQuick
+import pe.breaker.dkaviplay.core.domain.model.Reserva
+import pe.breaker.dkaviplay.core.domain.model.UserQuick
 import pe.breaker.dkaviplay.presentation.components.dialog.QRPagoDialog
 
 @Composable

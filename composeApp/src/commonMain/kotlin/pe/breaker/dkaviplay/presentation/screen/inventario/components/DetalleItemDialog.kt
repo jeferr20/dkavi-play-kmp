@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import org.jetbrains.compose.resources.painterResource
-import pe.breaker.dkaviplay.domain.model.inventory.DetallePremio
+import pe.breaker.dkaviplay.core.domain.model.inventory.DetallePremio
 import pe.breaker.dkaviplay.presentation.theme.colorPrimary
 import pe.breaker.dkaviplay.presentation.util.ItemResourceMapper
 

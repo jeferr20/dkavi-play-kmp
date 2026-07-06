@@ -4,13 +4,13 @@ import cafe.adriel.voyager.core.model.StateScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import pe.breaker.dkaviplay.data.remote.dto.ResultadosPartidasDTO
-import pe.breaker.dkaviplay.di.UserSessionManager
-import pe.breaker.dkaviplay.domain.model.Reserva
-import pe.breaker.dkaviplay.domain.model.ReservaEstado
-import pe.breaker.dkaviplay.domain.model.TipoJuego
-import pe.breaker.dkaviplay.domain.repository.JuegoRepository
-import pe.breaker.dkaviplay.domain.repository.ReservaRepository
+import pe.breaker.dkaviplay.core.data.remote.dto.ResultadosPartidasDTO
+import pe.breaker.dkaviplay.core.data.util.UserSessionManager
+import pe.breaker.dkaviplay.core.domain.model.Reserva
+import pe.breaker.dkaviplay.core.domain.model.ReservaEstado
+import pe.breaker.dkaviplay.core.domain.model.TipoJuego
+import pe.breaker.dkaviplay.core.domain.repository.JuegoRepository
+import pe.breaker.dkaviplay.core.domain.repository.ReservaRepository
 
 class ArbitroModel(
     private val reservasRepository: ReservaRepository,

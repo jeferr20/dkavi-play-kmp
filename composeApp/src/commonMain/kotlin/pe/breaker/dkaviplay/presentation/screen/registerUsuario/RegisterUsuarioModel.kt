@@ -4,7 +4,7 @@ import cafe.adriel.voyager.core.model.StateScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import pe.breaker.dkaviplay.domain.usecase.RegisterUseCase
+import pe.breaker.dkaviplay.core.domain.usecase.RegisterUseCase
 
 class RegisterUsuarioModel(
     private val registerUseCase: RegisterUseCase,

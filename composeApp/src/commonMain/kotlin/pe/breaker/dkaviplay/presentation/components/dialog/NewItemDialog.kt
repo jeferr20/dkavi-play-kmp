@@ -21,7 +21,7 @@ import dkaviplay.composeapp.generated.resources.BolaBillar
 import dkaviplay.composeapp.generated.resources.Res
 import kotlinx.coroutines.delay
 import org.koin.compose.koinInject
-import pe.breaker.dkaviplay.domain.model.inventory.DetallePremio
+import pe.breaker.dkaviplay.core.domain.model.inventory.DetallePremio
 import pe.breaker.dkaviplay.presentation.animations.animations.getItem.InteractiveBilliardGiftAnimation
 import pe.breaker.dkaviplay.presentation.shareable.ItemObtainedShareable
 import pe.breaker.dkaviplay.presentation.util.ShareHandler

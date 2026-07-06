@@ -28,7 +28,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
-import pe.breaker.dkaviplay.domain.model.UserQuick
+import pe.breaker.dkaviplay.core.domain.model.UserQuick
 import pe.breaker.dkaviplay.presentation.theme.colorBlackSurface
 import pe.breaker.dkaviplay.presentation.theme.colorPrimary
 

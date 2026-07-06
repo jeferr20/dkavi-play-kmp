@@ -16,7 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import pe.breaker.dkaviplay.domain.model.Reserva
+import pe.breaker.dkaviplay.core.domain.model.Reserva
 import kotlin.text.ifEmpty
 
 @Composable

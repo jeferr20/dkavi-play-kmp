@@ -21,7 +21,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
-import pe.breaker.dkaviplay.domain.model.Sede
+import pe.breaker.dkaviplay.core.domain.model.Sede
 
 @Composable
 fun CardEmpresa(

@@ -5,7 +5,7 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import pe.breaker.dkaviplay.domain.model.Reserva
+import pe.breaker.dkaviplay.core.domain.model.Reserva
 import pe.breaker.dkaviplay.presentation.components.dialog.LoadingDialog
 import pe.breaker.dkaviplay.presentation.components.dialog.StatusDialog
 import pe.breaker.dkaviplay.presentation.screen.inventario.InventarioModel

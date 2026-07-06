@@ -36,8 +36,8 @@ import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import kotlinx.coroutines.launch
 import org.koin.core.parameter.parametersOf
-import pe.breaker.dkaviplay.domain.model.Reserva
-import pe.breaker.dkaviplay.domain.model.inventory.TipoPremio
+import pe.breaker.dkaviplay.core.domain.model.Reserva
+import pe.breaker.dkaviplay.core.domain.model.inventory.TipoPremio
 import pe.breaker.dkaviplay.presentation.components.dialog.LoadingDialog
 import pe.breaker.dkaviplay.presentation.components.dialog.QRPagoDialog
 import pe.breaker.dkaviplay.presentation.components.dialog.StatusDialog

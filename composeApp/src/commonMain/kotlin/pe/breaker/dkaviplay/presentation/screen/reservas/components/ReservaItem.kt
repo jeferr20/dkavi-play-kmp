@@ -35,8 +35,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
-import pe.breaker.dkaviplay.domain.model.Reserva
-import pe.breaker.dkaviplay.domain.model.ReservaEstado
+import pe.breaker.dkaviplay.core.domain.model.Reserva
+import pe.breaker.dkaviplay.core.domain.model.ReservaEstado
 import pe.breaker.dkaviplay.presentation.components.button.CustomButtonFilled
 import pe.breaker.dkaviplay.presentation.components.button.CustomOutlineButtonTextIcon
 import pe.breaker.dkaviplay.presentation.theme.colorBlackSurface

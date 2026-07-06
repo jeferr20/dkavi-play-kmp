@@ -10,7 +10,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import pe.breaker.dkaviplay.domain.model.Reserva
+import pe.breaker.dkaviplay.core.domain.model.Reserva
 import pe.breaker.dkaviplay.presentation.util.toColor
 
 @Composable

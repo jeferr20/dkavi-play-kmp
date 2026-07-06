@@ -1,6 +1,6 @@
 package pe.breaker.dkaviplay.presentation.screen.acuerdoMutuo
 
-import pe.breaker.dkaviplay.domain.model.Reserva
+import pe.breaker.dkaviplay.core.domain.model.Reserva
 
 data class AcuerdoMutuoState(
     val reserva: Reserva? = null,

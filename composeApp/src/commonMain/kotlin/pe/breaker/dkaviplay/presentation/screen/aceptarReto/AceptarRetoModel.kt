@@ -5,9 +5,9 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import pe.breaker.dkaviplay.di.UserSessionManager
-import pe.breaker.dkaviplay.domain.repository.QuickPlayRepository
-import pe.breaker.dkaviplay.domain.repository.ReservaRepository
-import pe.breaker.dkaviplay.domain.usecase.SendNotificacionUseCase
+import pe.breaker.dkaviplay.core.domain.repository.QuickPlayRepository
+import pe.breaker.dkaviplay.core.domain.repository.ReservaRepository
+import pe.breaker.dkaviplay.core.domain.usecase.SendNotificacionUseCase
 
 class AceptarRetoModel(
     private val reservaId: String,

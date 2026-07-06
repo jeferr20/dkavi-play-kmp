@@ -33,7 +33,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import org.koin.compose.koinInject
 import pe.breaker.dkaviplay.di.PlatformContext
-import pe.breaker.dkaviplay.domain.model.Sede
+import pe.breaker.dkaviplay.core.domain.model.Sede
 import pe.breaker.dkaviplay.presentation.components.CustomAppbar
 import pe.breaker.dkaviplay.presentation.components.EditText
 import pe.breaker.dkaviplay.presentation.components.button.ActionIconButton

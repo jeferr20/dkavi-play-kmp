@@ -1,7 +1,7 @@
 package pe.breaker.dkaviplay.util
 
-import pe.breaker.dkaviplay.domain.model.inventory.DetallePremio
-import pe.breaker.dkaviplay.domain.model.rango.Rango
+import pe.breaker.dkaviplay.core.domain.model.inventory.DetallePremio
+import pe.breaker.dkaviplay.core.domain.model.rango.Rango
 
 sealed class UiFlowState {
     object Idle : UiFlowState()

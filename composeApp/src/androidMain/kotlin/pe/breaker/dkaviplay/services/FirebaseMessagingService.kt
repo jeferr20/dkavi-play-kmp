@@ -18,7 +18,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import androidx.core.net.toUri
 import kotlinx.coroutines.cancel
-import pe.breaker.dkaviplay.domain.repository.NotificationRepository
+import pe.breaker.dkaviplay.core.domain.repository.NotificationRepository
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import pe.breaker.dkaviplay.R

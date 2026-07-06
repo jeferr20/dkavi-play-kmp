@@ -8,11 +8,11 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
-import pe.breaker.dkaviplay.data.remote.AutoLoginResult
-import pe.breaker.dkaviplay.data.util.isTokenExpired
-import pe.breaker.dkaviplay.di.UserSessionManager
-import pe.breaker.dkaviplay.domain.repository.AuthRepository
-import pe.breaker.dkaviplay.domain.repository.NotificationRepository
+import pe.breaker.dkaviplay.core.data.remote.AutoLoginResult
+import pe.breaker.dkaviplay.core.data.util.UserSessionManager
+import pe.breaker.dkaviplay.core.data.util.isTokenExpired
+import pe.breaker.dkaviplay.core.domain.repository.AuthRepository
+import pe.breaker.dkaviplay.core.domain.repository.NotificationRepository
 
 class SplashModel(
     private val authRepository: AuthRepository,
@@ -35,8 +35,8 @@ class SplashModel(
                 }
 
                 if (isTokenExpired(token)) {
-                    val firebaseUser = authRepository.getFirebaseUser()
-                    if (firebaseUser == null) {
+                    val isLogged = authRepository.isUserLoggedIn()
+                    if (!isLogged) {
                         clearAndGoLogin()
                         return@launch
                     }

@@ -2,20 +2,20 @@ package pe.breaker.dkaviplay.presentation.screen.perfil
 
 import cafe.adriel.voyager.core.model.StateScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
-import dev.gitlive.firebase.auth.FirebaseAuth
 import io.github.ismoy.imagepickerkmp.domain.models.GalleryPhotoResult
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import pe.breaker.dkaviplay.di.UserSessionManager
-import pe.breaker.dkaviplay.domain.usecase.UploadProfileImageUseCase
+import pe.breaker.dkaviplay.core.data.util.UserSessionManager
+import pe.breaker.dkaviplay.core.domain.repository.AuthRepository
+import pe.breaker.dkaviplay.core.domain.usecase.UploadProfileImageUseCase
 import pe.breaker.dkaviplay.presentation.util.ImageResizer
 
 class ProfileScreenModel(
     private val sessionManager: UserSessionManager,
     private val uploadProfileImageUseCase: UploadProfileImageUseCase,
     private val imageResizer: ImageResizer,
-    private val firebaseAuth: FirebaseAuth
+    private val authRepository: AuthRepository
 ) : StateScreenModel<ProfileScreenState>(ProfileScreenState()){
     private val _profileImage = MutableStateFlow<String?>(null)
 
@@ -57,6 +57,6 @@ class ProfileScreenModel(
 
     suspend fun logOut(){
         sessionManager.clearSession()
-        firebaseAuth.signOut()
+        authRepository.logout()
     }
 }

@@ -34,7 +34,7 @@ import cafe.adriel.voyager.navigator.tab.TabOptions
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
-import pe.breaker.dkaviplay.domain.model.Sede
+import pe.breaker.dkaviplay.core.domain.model.Sede
 import pe.breaker.dkaviplay.presentation.components.GoogleMapView
 import pe.breaker.dkaviplay.presentation.components.dialog.LoadingDialog
 import pe.breaker.dkaviplay.presentation.screen.map.components.SedeDetailContent

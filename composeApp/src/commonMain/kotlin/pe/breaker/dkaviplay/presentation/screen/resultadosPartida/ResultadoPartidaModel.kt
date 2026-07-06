@@ -7,9 +7,9 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import pe.breaker.dkaviplay.di.UserSessionManager
-import pe.breaker.dkaviplay.domain.model.Reserva
-import pe.breaker.dkaviplay.domain.repository.QuickPlayRepository
-import pe.breaker.dkaviplay.domain.repository.ReservaRepository
+import pe.breaker.dkaviplay.core.domain.model.Reserva
+import pe.breaker.dkaviplay.core.domain.repository.QuickPlayRepository
+import pe.breaker.dkaviplay.core.domain.repository.ReservaRepository
 
 class ResultadoPartidaModel(
     private val reservaId: String,

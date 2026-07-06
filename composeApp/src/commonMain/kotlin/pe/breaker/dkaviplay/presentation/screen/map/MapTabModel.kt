@@ -6,7 +6,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import pe.breaker.dkaviplay.domain.repository.SedeRepository
+import pe.breaker.dkaviplay.core.domain.repository.SedeRepository
 
 class MapTabModel(
     private val sedeRepository: SedeRepository,

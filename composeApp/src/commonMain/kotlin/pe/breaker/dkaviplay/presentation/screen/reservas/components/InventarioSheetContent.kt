@@ -26,9 +26,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dkaviplay.composeapp.generated.resources.Res
 import dkaviplay.composeapp.generated.resources.ic_no_item_available
-import pe.breaker.dkaviplay.domain.model.inventory.DetallePremio
-import pe.breaker.dkaviplay.domain.model.inventory.MomentoUso
-import pe.breaker.dkaviplay.domain.model.inventory.TipoPremio
+import pe.breaker.dkaviplay.core.domain.model.inventory.DetallePremio
+import pe.breaker.dkaviplay.core.domain.model.inventory.MomentoUso
+import pe.breaker.dkaviplay.core.domain.model.inventory.TipoPremio
 import pe.breaker.dkaviplay.presentation.components.button.CustomButtonFilled
 import pe.breaker.dkaviplay.presentation.theme.colorPrimary
 

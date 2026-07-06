@@ -1,7 +1,7 @@
 package pe.breaker.dkaviplay.presentation.screen.registerReserva
 
-import pe.breaker.dkaviplay.domain.model.Mesa
-import pe.breaker.dkaviplay.domain.model.TipoJuego
+import pe.breaker.dkaviplay.core.domain.model.Mesa
+import pe.breaker.dkaviplay.core.domain.model.TipoJuego
 
 data class RegisterReservationScreenState (
     val mesas: List<Mesa> = emptyList(),

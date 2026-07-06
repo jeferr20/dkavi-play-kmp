@@ -9,4 +9,6 @@ plugins {
     alias(libs.plugins.cocoapods) apply false
     alias(libs.plugins.serialization) apply false
     alias(libs.plugins.google.services) apply false
+    alias(libs.plugins.android.kotlin.multiplatform.library) apply false
+    alias(libs.plugins.android.lint) apply false
 }

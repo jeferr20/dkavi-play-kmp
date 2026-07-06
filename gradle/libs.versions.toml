@@ -48,6 +48,9 @@ buildkonfig = "0.15.1"
 coreSplashscreen = "1.0.1"
 
 iconsGenerator = "1.2.6"
+kotlinStdlib = "2.3.20"
+runner = "1.5.2"
+core = "1.5.0"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -136,6 +139,9 @@ kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.
 #swmansion-kmpMaps-core = { module = "com.swmansion.kmpmaps:core", version.ref = "kmpMaps" }
 
 androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "coreSplashscreen" }
+kotlin-stdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib", version.ref = "kotlinStdlib" }
+androidx-runner = { group = "androidx.test", name = "runner", version.ref = "runner" }
+androidx-core = { group = "androidx.test", name = "core", version.ref = "core" }
 ##
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
@@ -149,3 +155,5 @@ serialization = {id = "org.jetbrains.kotlin.plugin.serialization" , version.ref 
 google-services = { id = "com.google.gms.google-services", version.ref = "gradlePlugins-google-services" }
 buildkonfig = { id = "com.codingfeline.buildkonfig", version.ref = "buildkonfig" }
 iconsGenerator = { id = "io.github.qamarelsafadi.kmp.app.icon.generator", version.ref = "iconsGenerator" }
+android-kotlin-multiplatform-library = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
+android-lint = { id = "com.android.lint", version.ref = "agp" }

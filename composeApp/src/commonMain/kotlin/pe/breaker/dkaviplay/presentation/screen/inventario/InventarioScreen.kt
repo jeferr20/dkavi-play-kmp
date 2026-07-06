@@ -28,8 +28,8 @@ import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import org.koin.core.parameter.parametersOf
-import pe.breaker.dkaviplay.domain.model.inventory.DetallePremio
-import pe.breaker.dkaviplay.domain.model.inventory.TipoPremio
+import pe.breaker.dkaviplay.core.domain.model.inventory.DetallePremio
+import pe.breaker.dkaviplay.core.domain.model.inventory.TipoPremio
 import pe.breaker.dkaviplay.presentation.components.CustomAppbar
 import pe.breaker.dkaviplay.presentation.screen.inventario.components.DetalleItemDialog
 import pe.breaker.dkaviplay.presentation.screen.inventario.components.ItemCard

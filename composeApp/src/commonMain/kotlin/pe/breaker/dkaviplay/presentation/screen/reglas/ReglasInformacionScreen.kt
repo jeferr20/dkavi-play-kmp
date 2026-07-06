@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import pe.breaker.dkaviplay.domain.model.TipoJuego
+import pe.breaker.dkaviplay.core.domain.model.TipoJuego
 import pe.breaker.dkaviplay.presentation.components.CustomAppbar
 import pe.breaker.dkaviplay.presentation.screen.reglas.components.CardClubDKAVI
 import pe.breaker.dkaviplay.presentation.screen.reglas.components.CardItem

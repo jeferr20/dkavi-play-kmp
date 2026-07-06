@@ -7,9 +7,9 @@ import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import pe.breaker.dkaviplay.di.UserSessionManager
-import pe.breaker.dkaviplay.domain.model.GlobalEvent
-import pe.breaker.dkaviplay.domain.model.inventory.DetallePremio
+import pe.breaker.dkaviplay.core.data.util.UserSessionManager
+import pe.breaker.dkaviplay.core.domain.model.GlobalEvent
+import pe.breaker.dkaviplay.core.domain.model.inventory.DetallePremio
 
 class GlobalUiManager(
     private val sessionManager: UserSessionManager

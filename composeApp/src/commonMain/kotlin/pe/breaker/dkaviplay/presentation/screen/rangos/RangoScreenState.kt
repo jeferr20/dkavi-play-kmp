@@ -1,6 +1,6 @@
 package pe.breaker.dkaviplay.presentation.screen.rangos
 
-import pe.breaker.dkaviplay.domain.model.rango.Rango
+import pe.breaker.dkaviplay.core.domain.model.rango.Rango
 
 data class RangoScreenState(
     val listaRangos: List<Rango> = emptyList(),

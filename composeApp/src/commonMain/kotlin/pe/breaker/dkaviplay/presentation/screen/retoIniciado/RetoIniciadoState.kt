@@ -1,7 +1,7 @@
 package pe.breaker.dkaviplay.presentation.screen.retoIniciado
 
-import pe.breaker.dkaviplay.domain.model.Reserva
-import pe.breaker.dkaviplay.domain.model.UserQuick
+import pe.breaker.dkaviplay.core.domain.model.Reserva
+import pe.breaker.dkaviplay.core.domain.model.UserQuick
 
 data class RetoIniciadoState (
     val reserva: Reserva? = null,

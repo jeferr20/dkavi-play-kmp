@@ -1,6 +1,6 @@
 package pe.breaker.dkaviplay.presentation.screen.quickPlayDetail
 
-import pe.breaker.dkaviplay.domain.model.UserQuick
+import pe.breaker.dkaviplay.core.domain.model.UserQuick
 
 data class QuickPlayDetailState(
     var usuario: UserQuick? = null,

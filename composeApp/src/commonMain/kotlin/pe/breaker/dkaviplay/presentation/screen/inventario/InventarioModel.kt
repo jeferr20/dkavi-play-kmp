@@ -5,12 +5,13 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
+import pe.breaker.dkaviplay.core.data.util.UserSessionManager
 import pe.breaker.dkaviplay.data.remote.firebase.InventarioFirebase
 import pe.breaker.dkaviplay.di.UserSessionManager
-import pe.breaker.dkaviplay.domain.model.Reserva
-import pe.breaker.dkaviplay.domain.model.inventory.PremiosRegistry
-import pe.breaker.dkaviplay.domain.model.inventory.TipoPremio
-import pe.breaker.dkaviplay.domain.repository.UsuarioRepository
+import pe.breaker.dkaviplay.core.domain.model.Reserva
+import pe.breaker.dkaviplay.core.domain.model.inventory.PremiosRegistry
+import pe.breaker.dkaviplay.core.domain.model.inventory.TipoPremio
+import pe.breaker.dkaviplay.core.domain.repository.UsuarioRepository
 
 class InventarioModel(
     private val tipoItem: TipoPremio,
@@ -28,20 +29,14 @@ class InventarioModel(
 
             userSessionManager.getCurrentUsuarioFlow().collect { usuario ->
                 if (usuario != null) {
-                    val inventarioFirebase = usuario.inventarioJson?.let { jsonStr ->
-                        try {
-                            Json.decodeFromString<List<InventarioFirebase>>(jsonStr)
-                        } catch (e: Exception) {
-                            null
-                        }
-                    } ?: emptyList()
+                    val inventarioUsuario = usuario.inventario
 
                     val itemsBase = PremiosRegistry.obtenerByTipo(tipoItem)
 
                     val itemsConCantidad = itemsBase.map { itemBase ->
-                        val itemEnFb = inventarioFirebase.find { it.id == itemBase.id }
+                        val itemEnInventario = inventarioUsuario.find { it.id == itemBase.id }
                         itemBase.copy(
-                            cantidad = itemEnFb?.cantidad ?: 0
+                            cantidad = itemEnInventario?.cantidad ?: 0
                         )
                     }
 

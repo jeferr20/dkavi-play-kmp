@@ -1,6 +1,6 @@
 package pe.breaker.dkaviplay.presentation.screen.registerDatos
 
-import pe.breaker.dkaviplay.domain.model.ValidationResult
+import pe.breaker.dkaviplay.core.domain.model.ValidationResult
 import pe.breaker.dkaviplay.util.isMayorEdad
 import pe.breaker.dkaviplay.util.isValidEmail
 import pe.breaker.dkaviplay.util.isValidPhone

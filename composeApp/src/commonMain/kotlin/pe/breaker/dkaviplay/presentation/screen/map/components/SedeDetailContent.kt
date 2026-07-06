@@ -19,7 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import pe.breaker.dkaviplay.data.mapper.findTodaySchedule
-import pe.breaker.dkaviplay.domain.model.Sede
+import pe.breaker.dkaviplay.core.domain.model.Sede
 import pe.breaker.dkaviplay.presentation.components.button.ActionIconButton
 import pe.breaker.dkaviplay.presentation.components.button.CustomButtonFilled
 import pe.breaker.dkaviplay.presentation.theme.colorGrey400

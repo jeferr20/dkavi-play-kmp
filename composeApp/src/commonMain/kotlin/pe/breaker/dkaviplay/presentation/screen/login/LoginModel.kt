@@ -4,8 +4,8 @@ import cafe.adriel.voyager.core.model.StateScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import pe.breaker.dkaviplay.domain.repository.NotificationRepository
-import pe.breaker.dkaviplay.domain.usecase.LoginUseCase
+import pe.breaker.dkaviplay.core.domain.repository.NotificationRepository
+import pe.breaker.dkaviplay.core.domain.usecase.LoginUseCase
 
 class LoginModel(
     private val loginUseCase: LoginUseCase,

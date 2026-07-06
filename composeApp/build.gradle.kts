@@ -8,7 +8,6 @@ plugins {
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.cocoapods)
-    alias(libs.plugins.sqldelight)
     alias(libs.plugins.serialization)
     alias(libs.plugins.google.services)
     alias(libs.plugins.buildkonfig)
@@ -94,11 +93,6 @@ kotlin {
                 implementation(libs.compose.uiToolingPreview)
                 implementation(libs.androidx.activity.compose)
 
-                implementation(libs.ktor.client.okhttp)
-                implementation(libs.ktor.client.android)
-
-                implementation(libs.android.driver)
-
                 implementation(libs.koin.android)
 
                 implementation(libs.maps.compose)
@@ -119,6 +113,8 @@ kotlin {
             }
         }
         commonMain.dependencies {
+            implementation(project(":core"))
+
             implementation(libs.compose.runtime)
             implementation(libs.compose.foundation)
             implementation(libs.compose.material3)
@@ -128,32 +124,14 @@ kotlin {
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
 
-            implementation(libs.ktor.client.core)
-            implementation(libs.ktor.client.content.negotiation)
-            implementation(libs.ktor.serialization.json)
-            implementation(libs.ktor.client.auth)
-            implementation(libs.ktor.logging)
-
-            implementation(libs.sqldelight.coroutines)
-
             implementation(libs.koin.core)
             implementation(libs.koin.compose)
-
-            implementation(libs.ksafe)
-            implementation(libs.ksafe.compose)
 
             implementation(libs.voyager.navigator)
             implementation(libs.voyager.screenmodel)
             implementation(libs.voyager.koin)
             implementation(libs.voyager.transitions)
             implementation(libs.voyager.tab)
-
-            implementation(libs.firebase.auth)
-            implementation(libs.firebase.firestore)
-            implementation(libs.firebase.common)
-            implementation(libs.firebase.storage)
-            implementation(libs.firebase.config)
-            implementation(libs.firebase.messaging)
 
             implementation(libs.material.icons.extended)
 
@@ -175,8 +153,6 @@ kotlin {
             implementation(libs.kotlin.test)
         }
         iosMain.dependencies {
-            implementation(libs.ktor.client.darwin)
-            implementation(libs.native.driver)
         }
     }
 }
@@ -211,13 +187,4 @@ android {
 
 dependencies {
     debugImplementation(libs.compose.uiTooling)
-}
-
-sqldelight {
-    databases {
-        create("AppDatabase") {
-            packageName.set("pe.breaker.dkaviplay.cache")
-        }
-    }
-    linkSqlite.set(true)
 }

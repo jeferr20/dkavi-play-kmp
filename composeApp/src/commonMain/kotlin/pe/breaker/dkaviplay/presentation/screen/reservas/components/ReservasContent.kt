@@ -10,7 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import pe.breaker.dkaviplay.domain.model.Reserva
+import pe.breaker.dkaviplay.core.domain.model.Reserva
 import pe.breaker.dkaviplay.presentation.screen.reservas.ReservasState
 import pe.breaker.dkaviplay.presentation.util.formatToRelativeDate
 

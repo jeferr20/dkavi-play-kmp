@@ -6,11 +6,11 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import pe.breaker.dkaviplay.domain.model.Reserva
-import pe.breaker.dkaviplay.domain.model.ReservaEstado
-import pe.breaker.dkaviplay.domain.repository.JuegoRepository
-import pe.breaker.dkaviplay.domain.repository.QuickPlayRepository
-import pe.breaker.dkaviplay.domain.repository.ReservaRepository
+import pe.breaker.dkaviplay.core.domain.model.Reserva
+import pe.breaker.dkaviplay.core.domain.model.ReservaEstado
+import pe.breaker.dkaviplay.core.domain.repository.JuegoRepository
+import pe.breaker.dkaviplay.core.domain.repository.QuickPlayRepository
+import pe.breaker.dkaviplay.core.domain.repository.ReservaRepository
 
 class RetoIniciadoModel(
     private val reservaId: String,

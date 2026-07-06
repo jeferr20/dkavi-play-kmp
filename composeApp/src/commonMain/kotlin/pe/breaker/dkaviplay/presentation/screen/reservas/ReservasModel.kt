@@ -10,12 +10,12 @@ import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.minus
 import kotlinx.datetime.toInstant
-import pe.breaker.dkaviplay.di.UserSessionManager
-import pe.breaker.dkaviplay.domain.model.Reserva
-import pe.breaker.dkaviplay.domain.repository.TimeRepository
-import pe.breaker.dkaviplay.domain.usecase.EliminarReservaUseCase
-import pe.breaker.dkaviplay.domain.usecase.GetReservasUseCase
-import pe.breaker.dkaviplay.presentation.util.parseStringToLocalDateTime
+import pe.breaker.dkaviplay.core.data.util.UserSessionManager
+import pe.breaker.dkaviplay.core.domain.model.Reserva
+import pe.breaker.dkaviplay.core.domain.repository.TimeRepository
+import pe.breaker.dkaviplay.core.domain.usecase.EliminarReservaUseCase
+import pe.breaker.dkaviplay.core.domain.usecase.GetReservasUseCase
+import pe.breaker.dkaviplay.core.util.parseStringToLocalDateTime
 
 class ReservasModel(
     private val sessionManager: UserSessionManager,

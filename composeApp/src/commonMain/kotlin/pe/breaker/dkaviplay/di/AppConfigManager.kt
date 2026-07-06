@@ -7,8 +7,8 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
-import pe.breaker.dkaviplay.domain.model.AppConfig
-import pe.breaker.dkaviplay.domain.usecase.ObserveAppConfigUseCase
+import pe.breaker.dkaviplay.core.domain.model.AppConfig
+import pe.breaker.dkaviplay.core.domain.usecase.ObserveAppConfigUseCase
 
 class AppConfigManager(
     observeAppConfig: ObserveAppConfigUseCase

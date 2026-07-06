@@ -33,9 +33,9 @@ import dkaviplay.composeapp.generated.resources.Res
 import dkaviplay.composeapp.generated.resources.billas
 import dkaviplay.composeapp.generated.resources.pool
 import org.koin.core.parameter.parametersOf
-import pe.breaker.dkaviplay.domain.model.Sede
-import pe.breaker.dkaviplay.domain.model.TipoJuego
-import pe.breaker.dkaviplay.domain.model.UserQuick
+import pe.breaker.dkaviplay.core.domain.model.Sede
+import pe.breaker.dkaviplay.core.domain.model.TipoJuego
+import pe.breaker.dkaviplay.core.domain.model.UserQuick
 import pe.breaker.dkaviplay.presentation.components.CustomAppbar
 import pe.breaker.dkaviplay.presentation.components.button.CustomButtonFilled
 import pe.breaker.dkaviplay.presentation.components.datetime.DatePickerModal

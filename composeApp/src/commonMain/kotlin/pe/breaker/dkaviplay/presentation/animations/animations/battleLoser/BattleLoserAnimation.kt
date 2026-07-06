@@ -31,7 +31,7 @@ import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.DrawableResource
-import pe.breaker.dkaviplay.domain.animations.AshParticle
+import pe.breaker.dkaviplay.core.domain.animations.AshParticle
 import pe.breaker.dkaviplay.presentation.animations.animations.battleLoser.components.ActionButtons
 import pe.breaker.dkaviplay.presentation.animations.animations.battleLoser.components.AshEffect
 import pe.breaker.dkaviplay.presentation.animations.animations.battleLoser.components.DefeatAvatar

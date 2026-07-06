@@ -1,6 +1,6 @@
 package pe.breaker.dkaviplay.presentation.screen.inventario
 
-import pe.breaker.dkaviplay.domain.model.inventory.DetallePremio
+import pe.breaker.dkaviplay.core.domain.model.inventory.DetallePremio
 
 data class InventarioState (
     val items: List<DetallePremio> = emptyList(),

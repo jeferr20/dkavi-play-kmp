@@ -36,7 +36,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import kotlinx.coroutines.launch
-import pe.breaker.dkaviplay.domain.animations.AshParticle
+import pe.breaker.dkaviplay.core.domain.animations.AshParticle
 
 @Composable
 fun AshEffect(ash: AshParticle, screenHeightDp: Float, onFinished: () -> Unit) {

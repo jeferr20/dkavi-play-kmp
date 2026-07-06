@@ -5,15 +5,19 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
+import pe.breaker.dkaviplay.core.data.mapper.toState
+import pe.breaker.dkaviplay.core.data.remote.firebase.UserHorarioFirebase
+import pe.breaker.dkaviplay.core.data.repository.UbigeoRepositoryImpl
+import pe.breaker.dkaviplay.core.data.util.UserSessionManager
 import pe.breaker.dkaviplay.data.mapper.toDTO
 import pe.breaker.dkaviplay.data.mapper.toState
 import pe.breaker.dkaviplay.data.remote.dto.RegisterUsuarioRequestDto
 import pe.breaker.dkaviplay.data.remote.firebase.UserHorarioFirebase
 import pe.breaker.dkaviplay.data.repository.UbigeoRepositoryImpl
 import pe.breaker.dkaviplay.di.UserSessionManager
-import pe.breaker.dkaviplay.domain.repository.UbigeoRepository
-import pe.breaker.dkaviplay.domain.usecase.GetSedesByUbigeoUseCase
-import pe.breaker.dkaviplay.domain.usecase.RegisterPersonaUseCase
+import pe.breaker.dkaviplay.core.domain.repository.UbigeoRepository
+import pe.breaker.dkaviplay.core.domain.usecase.GetSedesByUbigeoUseCase
+import pe.breaker.dkaviplay.core.domain.usecase.RegisterPersonaUseCase
 
 class RegisterDatosModel(
     private val usuarioUid: String?,
@@ -36,15 +40,7 @@ class RegisterDatosModel(
         val persona = sessionManager.getCurrentPersona()
         val usuario = sessionManager.getCurrentUsuario()
         if (persona != null && usuario != null) {
-            val horario = usuario.horariosJson.let { jsonStr ->
-                try {
-                    Json.decodeFromString<List<UserHorarioFirebase>>(jsonStr)
-                } catch (e: Exception) {
-                    null
-                }
-            }
-
-            if (horario != null) {
+            if (usuario.horarios.isEmpty()) {
                 updateState {
                     copy(
                         nombres = persona.nombres,
@@ -58,7 +54,7 @@ class RegisterDatosModel(
                         idProvincia = usuario.provincia,
                         idDistrito = usuario.distrito,
                         personaUid = persona.personaUid,
-                        horarios = horario.map { it.toState() }
+                        horarios = usuario.horarios.map { it.toState() }
                     )
                 }
             }

@@ -14,7 +14,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import kotlinx.coroutines.launch
-import pe.breaker.dkaviplay.domain.model.inventory.TipoPremio
+import pe.breaker.dkaviplay.core.domain.model.inventory.TipoPremio
 import pe.breaker.dkaviplay.presentation.screen.arbitro.ArbitroScreen
 import pe.breaker.dkaviplay.presentation.screen.inventario.InventarioScreen
 import pe.breaker.dkaviplay.presentation.screen.login.LoginScreen

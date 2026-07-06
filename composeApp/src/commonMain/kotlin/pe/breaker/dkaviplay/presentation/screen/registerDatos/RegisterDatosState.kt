@@ -1,8 +1,8 @@
 package pe.breaker.dkaviplay.presentation.screen.registerDatos
 
-import pe.breaker.dkaviplay.domain.model.Sede
-import pe.breaker.dkaviplay.domain.model.UbigeoItem
-
+import pe.breaker.dkaviplay.core.domain.model.DiaHorarioState
+import pe.breaker.dkaviplay.core.domain.model.Sede
+import pe.breaker.dkaviplay.core.domain.model.UbigeoItem
 
 data class RegisterDatosState(
     val personaUid: String? = null,
@@ -52,10 +52,3 @@ data class RegisterDatosState(
         ).map { DiaHorarioState(nombre = it, habilitado = false) }
     }
 }
-
-data class DiaHorarioState(
-    val nombre: String,
-    val habilitado: Boolean = false,
-    val horaInicio: String = "08:00",
-    val horaFin: String = "22:00"
-)

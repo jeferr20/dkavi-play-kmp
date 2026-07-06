@@ -14,7 +14,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.rotate
-import pe.breaker.dkaviplay.domain.animations.ConfettiParticle
+import pe.breaker.dkaviplay.core.domain.animations.ConfettiParticle
 import kotlin.random.Random
 
 @Composable

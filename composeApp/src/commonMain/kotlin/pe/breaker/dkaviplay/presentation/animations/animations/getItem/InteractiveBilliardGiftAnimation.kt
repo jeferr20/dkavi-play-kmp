@@ -38,7 +38,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.DrawableResource
 import org.koin.compose.koinInject
-import pe.breaker.dkaviplay.domain.animations.ParticleState
+import pe.breaker.dkaviplay.core.domain.animations.ParticleState
 import pe.breaker.dkaviplay.presentation.animations.animations.getItem.components.BilliardBackground
 import pe.breaker.dkaviplay.presentation.animations.animations.getItem.components.BilliardBallGift
 import pe.breaker.dkaviplay.presentation.animations.animations.getItem.components.GiftActionButtons

@@ -52,7 +52,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.DrawableResource
 import org.koin.compose.koinInject
-import pe.breaker.dkaviplay.domain.animations.ChallengeSpark
+import pe.breaker.dkaviplay.core.domain.animations.ChallengeSpark
 import pe.breaker.dkaviplay.presentation.animations.animations.battleChallenge.components.ChallengeLightningEffect
 import pe.breaker.dkaviplay.presentation.animations.animations.battleChallenge.components.ChallengePlayerCard
 import pe.breaker.dkaviplay.presentation.animations.animations.battleChallenge.components.ItemSheet

@@ -6,9 +6,9 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import pe.breaker.dkaviplay.domain.usecase.SendCodeUseCase
-import pe.breaker.dkaviplay.domain.usecase.UpdatePasswordUseCase
-import pe.breaker.dkaviplay.domain.usecase.VerifyCodeUseCase
+import pe.breaker.dkaviplay.core.domain.usecase.SendCodeUseCase
+import pe.breaker.dkaviplay.core.domain.usecase.UpdatePasswordUseCase
+import pe.breaker.dkaviplay.core.domain.usecase.VerifyCodeUseCase
 import pe.breaker.dkaviplay.util.isValidEmail
 import pe.breaker.dkaviplay.util.isValidPhone
 

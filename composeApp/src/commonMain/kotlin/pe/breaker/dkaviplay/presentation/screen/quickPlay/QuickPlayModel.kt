@@ -4,7 +4,7 @@ import cafe.adriel.voyager.core.model.StateScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import pe.breaker.dkaviplay.domain.usecase.SearchUsersQuickPlayUseCase
+import pe.breaker.dkaviplay.core.domain.usecase.SearchUsersQuickPlayUseCase
 
 class QuickPlayModel(
     private val searchUsersQuickPlayUseCase: SearchUsersQuickPlayUseCase

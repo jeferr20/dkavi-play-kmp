@@ -1,6 +1,6 @@
 package pe.breaker.dkaviplay.presentation.screen.quickPlay
 
-import pe.breaker.dkaviplay.domain.model.UserQuick
+import pe.breaker.dkaviplay.core.domain.model.UserQuick
 
 data class QuickPlayState (
     val userToSearch: String? = null,

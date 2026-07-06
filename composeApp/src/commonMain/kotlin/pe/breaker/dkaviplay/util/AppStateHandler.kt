@@ -10,7 +10,7 @@ import org.koin.compose.koinInject
 import pe.breaker.dkaviplay.AppConfigGlobal
 import pe.breaker.dkaviplay.di.AppConfigManager
 import pe.breaker.dkaviplay.di.UserSessionManager
-import pe.breaker.dkaviplay.domain.model.rango.RangoRegistry
+import pe.breaker.dkaviplay.core.domain.model.rango.RangoRegistry
 import pe.breaker.dkaviplay.presentation.components.dialog.LevelUpDialog
 import pe.breaker.dkaviplay.presentation.components.dialog.LoadingDialog
 import pe.breaker.dkaviplay.presentation.components.dialog.NewItemDialog

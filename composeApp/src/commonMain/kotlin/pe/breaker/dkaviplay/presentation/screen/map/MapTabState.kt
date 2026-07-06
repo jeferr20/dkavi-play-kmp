@@ -1,6 +1,6 @@
 package pe.breaker.dkaviplay.presentation.screen.map
 
-import pe.breaker.dkaviplay.domain.model.Sede
+import pe.breaker.dkaviplay.core.domain.model.Sede
 
 data class MapTabState (
     val sedes: List<Sede>? = null,
