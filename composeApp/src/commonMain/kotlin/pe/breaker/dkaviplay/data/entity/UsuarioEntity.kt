@@ -49,4 +49,7 @@ data class UsuarioEntity (
 
     @SerialName("vc_horarios")
     val horariosJson: String,
+
+    @SerialName("i_monedas")
+    val monedas: Int,
 )

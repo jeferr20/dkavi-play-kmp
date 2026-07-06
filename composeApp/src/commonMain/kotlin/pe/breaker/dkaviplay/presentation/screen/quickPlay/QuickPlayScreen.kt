@@ -34,6 +34,8 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import org.koin.compose.koinInject
 import pe.breaker.dkaviplay.di.PlatformContext
 import pe.breaker.dkaviplay.domain.model.Sede
+import pe.breaker.dkaviplay.presentation.component.EmptyStateMessage
+import pe.breaker.dkaviplay.presentation.component.ErrorMessage
 import pe.breaker.dkaviplay.presentation.components.CustomAppbar
 import pe.breaker.dkaviplay.presentation.components.EditText
 import pe.breaker.dkaviplay.presentation.components.button.ActionIconButton
@@ -42,8 +44,6 @@ import pe.breaker.dkaviplay.presentation.screen.quickPlay.component.ItemPlayer
 import pe.breaker.dkaviplay.presentation.screen.quickPlayDetail.QuickPlayDetailScreen
 import pe.breaker.dkaviplay.presentation.theme.colorPrimary
 import pe.breaker.dkaviplay.presentation.util.InputType
-import pe.breaker.dkaviplay.presentation.component.EmptyStateMessage
-import pe.breaker.dkaviplay.presentation.component.ErrorMessage
 import pe.breaker.dkaviplay.presentation.util.lectorQR.LectorQR
 
 class QuickPlayScreen(val sede: Sede) : Screen {

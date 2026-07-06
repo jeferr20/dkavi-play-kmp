@@ -24,6 +24,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import pe.breaker.dkaviplay.domain.model.Sede
 import pe.breaker.dkaviplay.domain.model.UserQuick
+import pe.breaker.dkaviplay.presentation.component.ErrorMessage
 import pe.breaker.dkaviplay.presentation.components.CustomAppbar
 import pe.breaker.dkaviplay.presentation.components.button.CustomButtonFilled
 import pe.breaker.dkaviplay.presentation.components.dialog.LoadingDialog
@@ -32,7 +33,6 @@ import pe.breaker.dkaviplay.presentation.screen.quickPlayDetail.components.Porce
 import pe.breaker.dkaviplay.presentation.screen.quickPlayDetail.components.ProfileHeader
 import pe.breaker.dkaviplay.presentation.screen.registerReserva.RegisterReservationScreen
 import pe.breaker.dkaviplay.presentation.theme.colorPrimary
-import pe.breaker.dkaviplay.presentation.component.ErrorMessage
 
 class QuickPlayDetailScreen(private val sede: Sede, private val usuario: UserQuick) : Screen {
     @Composable

@@ -21,7 +21,8 @@ fun UserMovilFirebase.toEntity() = UsuarioEntity(
     distrito = distrito ?: "",
     provincia = provincia ?: "",
     sedePreferencia = sedePreferencia ?: "",
-    horariosJson = Json.encodeToString(this.horarios ?: emptyList())
+    horariosJson = Json.encodeToString(this.horarios ?: emptyList()),
+    monedas = monedas ?: 0
 )
 
 fun UsuarioEntity.toTable() = UsuarioTable(
@@ -39,5 +40,6 @@ fun UsuarioEntity.toTable() = UsuarioTable(
     distrito = distrito,
     provincia = provincia,
     sedePreferencia = sedePreferencia,
-    horariosJson = horariosJson
+    horariosJson = horariosJson,
+    monedas = monedas.toLong()
 )

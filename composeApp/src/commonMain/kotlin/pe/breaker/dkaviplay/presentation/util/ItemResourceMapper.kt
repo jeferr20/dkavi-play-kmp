@@ -1,6 +1,5 @@
 package pe.breaker.dkaviplay.presentation.util
 
-import org.jetbrains.compose.resources.DrawableResource
 import dkaviplay.composeapp.generated.resources.Res
 import dkaviplay.composeapp.generated.resources.ic_no_item_available
 import dkaviplay.composeapp.generated.resources.item_1
@@ -27,6 +26,7 @@ import dkaviplay.composeapp.generated.resources.item_6
 import dkaviplay.composeapp.generated.resources.item_7
 import dkaviplay.composeapp.generated.resources.item_8
 import dkaviplay.composeapp.generated.resources.item_9
+import org.jetbrains.compose.resources.DrawableResource
 
 object ItemResourceMapper {
     fun getItemImage(id: Int): DrawableResource {

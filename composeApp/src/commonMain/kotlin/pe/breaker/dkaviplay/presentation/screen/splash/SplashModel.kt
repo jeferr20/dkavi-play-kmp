@@ -8,71 +8,46 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
-import pe.breaker.dkaviplay.data.remote.AutoLoginResult
-import pe.breaker.dkaviplay.data.util.isTokenExpired
-import pe.breaker.dkaviplay.di.UserSessionManager
-import pe.breaker.dkaviplay.domain.repository.AuthRepository
+import pe.breaker.dkaviplay.domain.model.SessionCheckResult
 import pe.breaker.dkaviplay.domain.repository.NotificationRepository
+import pe.breaker.dkaviplay.domain.usecase.CheckSessionUseCase
+import pe.breaker.dkaviplay.domain.usecase.GetCurrentPersonaUseCase
+import pe.breaker.dkaviplay.domain.usecase.LogOutUseCase
 
 class SplashModel(
-    private val authRepository: AuthRepository,
+    private val checkSessionUseCase: CheckSessionUseCase,
+    private val getCurrentPersonaUseCase: GetCurrentPersonaUseCase,
     private val notificationRepository: NotificationRepository,
-    private val sessionManager: UserSessionManager
+    private val logOutUseCase: LogOutUseCase
 ) : ScreenModel {
     val state = MutableStateFlow<SplashState>(SplashState.Loading)
 
     fun initialize() {
         screenModelScope.launch {
-            sessionManager.loadSession()
+            state.value = SplashState.Loading
             delay(500)
             try {
-                val token = sessionManager.getToken()
-                val userId = sessionManager.getUserUid()
-
-                if (token == null || userId == null) {
-                    clearAndGoLogin()
-                    return@launch
-                }
-
-                if (isTokenExpired(token)) {
-                    val firebaseUser = authRepository.getFirebaseUser()
-                    if (firebaseUser == null) {
-                        clearAndGoLogin()
-                        return@launch
-                    }
-
-                    when (authRepository.autoLogin(token)) {
-                        is AutoLoginResult.InvalidToken -> {
-                            clearAndGoLogin()
-                            return@launch
+                when (val result = checkSessionUseCase()) {
+                    is SessionCheckResult.NoSession -> clearAndGoLogin()
+                    is SessionCheckResult.NetworkError -> state.value = SplashState.NetworkError
+                    is SessionCheckResult.Authenticated -> {
+                        launch {
+                            try {
+                                notificationRepository.saveToken()
+                            } catch (e: Exception) {
+                                println("Error FCM en Splash: ${e.message}")
+                            }
                         }
-                        is AutoLoginResult.NetworkError -> {
-                            state.value = SplashState.NetworkError
-                            return@launch
+
+                        val persona = withTimeoutOrNull(10000) {
+                            getCurrentPersonaUseCase.execute().filterNotNull().first()
                         }
-                        is AutoLoginResult.Success -> {
-                            println("✅ Token refrescado con éxito")
+
+                        state.value = when {
+                            persona != null -> SplashState.GoToMain
+                            else -> SplashState.GoToRegister(result.userId)
                         }
                     }
-                }
-
-                sessionManager.startSync()
-
-                launch {
-                    try{
-                        notificationRepository.saveToken()
-                    } catch (e: Exception) {
-                        println("Error actualizando token en Splash : ${e.message}")
-                    }
-                }
-
-                val persona = withTimeoutOrNull(10000) {
-                    sessionManager.personaFlow().filterNotNull().first()
-                }
-
-                state.value = when {
-                    persona != null -> SplashState.GoToMain
-                    else -> SplashState.GoToRegister(userId)
                 }
 
             } catch (e: Exception) {
@@ -83,12 +58,11 @@ class SplashModel(
     }
 
     fun retry() {
-        state.value = SplashState.Loading
         initialize()
     }
 
     private suspend fun clearAndGoLogin() {
-        sessionManager.clearSession()
+        logOutUseCase()
         delay(1000)
         state.value = SplashState.GoToLogin
     }

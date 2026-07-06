@@ -5,8 +5,10 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -14,7 +16,6 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Icon
@@ -40,7 +41,9 @@ fun ProfileHeader(
     modifier: Modifier,
     nombre: String,
     rango: String,
+    monedas: Int,
     urlImage: String?,
+    onConseguirMonedas: () -> Unit,
     onImagenClick: () -> Unit,
 ) {
     Column(
@@ -108,18 +111,16 @@ fun ProfileHeader(
             )
         )
 
-        Surface(
-            modifier = Modifier.padding(top = 8.dp),
-            color = colorPrimary.copy(alpha = 0.15f),
-            shape = RoundedCornerShape(8.dp)
+        Row(
+            modifier = Modifier.padding(top = 10.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = rango.uppercase(),
-                modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
-                color = colorPrimary,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.ExtraBold,
-                letterSpacing = 1.sp
+            RangoBadge(rango = rango)
+
+            CoinBalanceBadge(
+                coins = monedas,
+                onClick = onConseguirMonedas,
             )
         }
     }

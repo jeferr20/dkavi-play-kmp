@@ -1,8 +1,5 @@
 package pe.breaker.dkaviplay.presentation.util
 
-import dkaviplay.composeapp.generated.resources.Res
-import org.jetbrains.compose.resources.DrawableResource
-import org.jetbrains.compose.resources.InternalResourceApi
 import dkaviplay.composeapp.generated.resources.Aprendiz
 import dkaviplay.composeapp.generated.resources.Arcángel
 import dkaviplay.composeapp.generated.resources.Asesino
@@ -26,8 +23,11 @@ import dkaviplay.composeapp.generated.resources.Oro
 import dkaviplay.composeapp.generated.resources.Plata
 import dkaviplay.composeapp.generated.resources.Platino
 import dkaviplay.composeapp.generated.resources.Recluta
+import dkaviplay.composeapp.generated.resources.Res
 import dkaviplay.composeapp.generated.resources.Roca
 import dkaviplay.composeapp.generated.resources.Samurai
+import org.jetbrains.compose.resources.DrawableResource
+import org.jetbrains.compose.resources.InternalResourceApi
 
 object RankResourceMapper {
     @OptIn(InternalResourceApi::class)

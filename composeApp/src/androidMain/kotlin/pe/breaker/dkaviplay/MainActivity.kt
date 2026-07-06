@@ -15,7 +15,6 @@ import org.koin.core.context.loadKoinModules
 import org.koin.core.context.unloadKoinModules
 import org.koin.dsl.module
 import pe.breaker.dkaviplay.presentation.navigation.NotificationHandler
-import kotlin.getValue
 
 class MainActivity : ComponentActivity() {
     private val handler: NotificationHandler by inject()

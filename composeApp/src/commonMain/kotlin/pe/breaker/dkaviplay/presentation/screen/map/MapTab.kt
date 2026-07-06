@@ -25,7 +25,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalUriHandler
-import androidx.compose.ui.platform.UriHandler
 import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
@@ -40,6 +39,7 @@ import pe.breaker.dkaviplay.presentation.components.dialog.LoadingDialog
 import pe.breaker.dkaviplay.presentation.screen.map.components.SedeDetailContent
 import pe.breaker.dkaviplay.presentation.screen.quickPlay.QuickPlayScreen
 import pe.breaker.dkaviplay.presentation.util.ToastHandler
+import pe.breaker.dkaviplay.util.handleAction
 
 object MapTab : Tab {
     override val options: TabOptions
@@ -148,13 +148,5 @@ object MapTab : Tab {
                 }
             }
         }
-    }
-}
-
-private fun handleAction(uriHandler: UriHandler, toast: ToastHandler, uri: String, errorMsg: String) {
-    try {
-        uriHandler.openUri(uri)
-    } catch (e: Exception) {
-        toast.showToast("$errorMsg: ${e.message}")
     }
 }

@@ -18,4 +18,5 @@ data class UserMovilFirebase(
     val distrito: String?,
     val provincia: String?,
     val sedePreferencia: String?,
+    val monedas: Int? = 0
 )

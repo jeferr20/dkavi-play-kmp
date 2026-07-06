@@ -7,12 +7,12 @@ import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import pe.breaker.dkaviplay.di.UserSessionManager
+import pe.breaker.dkaviplay.di.SessionSyncManager
 import pe.breaker.dkaviplay.domain.model.GlobalEvent
 import pe.breaker.dkaviplay.domain.model.inventory.DetallePremio
 
 class GlobalUiManager(
-    private val sessionManager: UserSessionManager
+    private val sessionSyncManager: SessionSyncManager
 ) : ScreenModel {
 
     var uiState by mutableStateOf<UiFlowState>(UiFlowState.Idle)
@@ -21,8 +21,12 @@ class GlobalUiManager(
     private var premioPendiente: DetallePremio? = null
 
     init {
+        observeGlobalEvents()
+    }
+
+    private fun observeGlobalEvents() {
         screenModelScope.launch {
-            sessionManager.globalEvent.collect { event ->
+            sessionSyncManager.globalEvent.collect { event ->
                 reduce(event)
             }
         }
@@ -30,7 +34,6 @@ class GlobalUiManager(
 
     private fun reduce(event: GlobalEvent) {
         when (event) {
-
             is GlobalEvent.LevelUp -> {
                 uiState = UiFlowState.ShowingLevelUp(event.nuevoRango)
             }

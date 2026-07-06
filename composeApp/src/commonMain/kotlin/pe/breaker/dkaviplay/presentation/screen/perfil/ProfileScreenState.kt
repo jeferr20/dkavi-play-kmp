@@ -2,6 +2,7 @@ package pe.breaker.dkaviplay.presentation.screen.perfil
 
 data class ProfileScreenState (
     val nombre: String? = null,
+    val monedas: Int = 0,
     val urlImagenPerfil: String? = null,
 
     val isLoading: Boolean = false,

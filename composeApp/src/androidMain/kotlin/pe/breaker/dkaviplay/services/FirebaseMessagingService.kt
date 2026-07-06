@@ -10,18 +10,18 @@ import android.media.AudioAttributes
 import android.net.Uri
 import android.os.Build
 import androidx.core.app.NotificationCompat
+import androidx.core.net.toUri
+import com.google.firebase.messaging.FirebaseMessagingService
+import com.google.firebase.messaging.RemoteMessage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import androidx.core.net.toUri
-import kotlinx.coroutines.cancel
-import pe.breaker.dkaviplay.domain.repository.NotificationRepository
-import com.google.firebase.messaging.FirebaseMessagingService
-import com.google.firebase.messaging.RemoteMessage
 import pe.breaker.dkaviplay.R
+import pe.breaker.dkaviplay.domain.repository.NotificationRepository
 
 class FirebaseMessagingService : FirebaseMessagingService(), KoinComponent {
     private val repo: NotificationRepository by inject()

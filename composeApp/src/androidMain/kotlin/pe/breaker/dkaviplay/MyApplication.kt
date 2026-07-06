@@ -8,9 +8,12 @@ import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
 import org.koin.core.logger.Level
 import pe.breaker.dkaviplay.di.androidModule
-import pe.breaker.dkaviplay.di.commonModule
+import pe.breaker.dkaviplay.di.dataModule
+import pe.breaker.dkaviplay.di.domainModule
+import pe.breaker.dkaviplay.di.firebaseModule
 import pe.breaker.dkaviplay.di.networkModule
 import pe.breaker.dkaviplay.di.platformModule
+import pe.breaker.dkaviplay.di.presentationModule
 import pe.breaker.dkaviplay.util.ContextProvider
 
 class MyApplication : Application() {
@@ -18,10 +21,18 @@ class MyApplication : Application() {
         super.onCreate()
         ContextProvider.initialize(this)
         Firebase.initialize(this)
-        startKoin{
+        startKoin {
             androidContext(this@MyApplication)
             androidLogger(Level.DEBUG)
-            modules(commonModule,androidModule, platformModule, networkModule)
+            modules(
+                firebaseModule,
+                networkModule,
+                dataModule,
+                domainModule,
+                presentationModule,
+                androidModule,
+                platformModule
+            )
         }
     }
 }

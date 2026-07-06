@@ -2,14 +2,6 @@ package pe.breaker.dkaviplay.domain.model.inventory
 
 import dkaviplay.composeapp.generated.resources.Res
 import dkaviplay.composeapp.generated.resources.item_1
-import dkaviplay.composeapp.generated.resources.item_2
-import dkaviplay.composeapp.generated.resources.item_3
-import dkaviplay.composeapp.generated.resources.item_4
-import dkaviplay.composeapp.generated.resources.item_5
-import dkaviplay.composeapp.generated.resources.item_6
-import dkaviplay.composeapp.generated.resources.item_7
-import dkaviplay.composeapp.generated.resources.item_8
-import dkaviplay.composeapp.generated.resources.item_9
 import dkaviplay.composeapp.generated.resources.item_10
 import dkaviplay.composeapp.generated.resources.item_11
 import dkaviplay.composeapp.generated.resources.item_12
@@ -20,11 +12,19 @@ import dkaviplay.composeapp.generated.resources.item_16
 import dkaviplay.composeapp.generated.resources.item_17
 import dkaviplay.composeapp.generated.resources.item_18
 import dkaviplay.composeapp.generated.resources.item_19
+import dkaviplay.composeapp.generated.resources.item_2
 import dkaviplay.composeapp.generated.resources.item_20
 import dkaviplay.composeapp.generated.resources.item_21
 import dkaviplay.composeapp.generated.resources.item_22
 import dkaviplay.composeapp.generated.resources.item_23
 import dkaviplay.composeapp.generated.resources.item_24
+import dkaviplay.composeapp.generated.resources.item_3
+import dkaviplay.composeapp.generated.resources.item_4
+import dkaviplay.composeapp.generated.resources.item_5
+import dkaviplay.composeapp.generated.resources.item_6
+import dkaviplay.composeapp.generated.resources.item_7
+import dkaviplay.composeapp.generated.resources.item_8
+import dkaviplay.composeapp.generated.resources.item_9
 
 object PremiosRegistry {
     val lista = listOf(

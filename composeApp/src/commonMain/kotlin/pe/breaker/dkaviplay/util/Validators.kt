@@ -1,10 +1,10 @@
 package pe.breaker.dkaviplay.util
 
 import kotlinx.datetime.LocalDate
-import kotlin.time.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.number
 import kotlinx.datetime.todayIn
+import kotlin.time.Clock
 
 fun String.isValidEmail() : Boolean {
     val emailRegex = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Z|a-z]{2,}\$".toRegex()

@@ -13,7 +13,8 @@ CREATE TABLE UsuarioTable(
     distrito TEXT NOT NULL,
     provincia TEXT NOT NULL,
     sedePreferencia TEXT NOT NULL,
-    horariosJson TEXT NOT NULL
+    horariosJson TEXT NOT NULL,
+    monedas INTEGER NOT NULL
 );
 
 CREATE TABLE PersonaTable(

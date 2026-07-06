@@ -1,14 +1,14 @@
 package pe.breaker.dkaviplay.presentation.util.lectorQR
 
 import android.content.Context
+import androidx.core.net.toUri
 import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.barcode.common.Barcode
+import com.google.mlkit.vision.common.InputImage
 import io.github.ismoy.imagepickerkmp.domain.models.GalleryPhotoResult
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
-import androidx.core.net.toUri
-import com.google.mlkit.vision.common.InputImage
 
 actual suspend fun decodeQrFromPhoto(photo: GalleryPhotoResult, context: Any?): String? = suspendCancellableCoroutine { continuation ->
     try{

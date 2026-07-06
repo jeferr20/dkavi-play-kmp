@@ -14,8 +14,6 @@ import pe.breaker.dkaviplay.domain.repository.AppConfigRepository
 class AppConfigRepositoryImpl(
     private val remoteConfig: FirebaseRemoteConfig,
     private val firestore: FirebaseFirestore
-//    private val remoteConfig: RemoteConfigDataSource,
-//    private val firestore: FirestoreDataSource
 ) : AppConfigRepository {
     object RemoteConfigKeys {
         const val ACTIVE = "activeServiceMovil"

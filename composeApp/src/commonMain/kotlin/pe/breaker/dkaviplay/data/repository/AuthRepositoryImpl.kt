@@ -1,7 +1,6 @@
 package pe.breaker.dkaviplay.data.repository
 
 import dev.gitlive.firebase.auth.FirebaseAuth
-import dev.gitlive.firebase.auth.FirebaseUser
 import dev.gitlive.firebase.firestore.FirebaseFirestore
 import dev.gitlive.firebase.storage.FirebaseStorage
 import io.ktor.client.HttpClient
@@ -14,6 +13,7 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
+import org.koin.mp.KoinPlatform.getKoin
 import pe.breaker.dkaviplay.data.remote.AutoLoginResult
 import pe.breaker.dkaviplay.data.remote.dto.LoginRequestDTO
 import pe.breaker.dkaviplay.data.remote.dto.LoginResponseDTO
@@ -25,6 +25,7 @@ import pe.breaker.dkaviplay.data.remote.firebase.PersonaFirebase
 import pe.breaker.dkaviplay.data.util.ConstatesCloud
 import pe.breaker.dkaviplay.data.util.decodeJwt
 import pe.breaker.dkaviplay.data.util.handleResponse
+import pe.breaker.dkaviplay.di.SessionSyncManager
 import pe.breaker.dkaviplay.di.UserSessionManager
 import pe.breaker.dkaviplay.domain.model.UserSession
 import pe.breaker.dkaviplay.domain.repository.AuthRepository
@@ -182,7 +183,24 @@ class AuthRepositoryImpl(
         }
     }
 
-    override suspend fun getFirebaseUser(): FirebaseUser? {
-        return firebaseAuth.currentUser
+    override suspend fun isLoggedIn(): Boolean {
+        return firebaseAuth.currentUser != null
+    }
+
+    override suspend fun logOut() {
+        val syncManager: SessionSyncManager = getKoin().get()
+        syncManager.stopSync()
+        sessionManager.clearSession()
+        firebaseAuth.signOut()
+    }
+
+    override suspend fun deleteAccount(): Result<Unit> {
+        return try{
+            logOut()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            println("❌ Error crítico al eliminar la cuenta: ${e.message}")
+            Result.failure(e)
+        }
     }
 }

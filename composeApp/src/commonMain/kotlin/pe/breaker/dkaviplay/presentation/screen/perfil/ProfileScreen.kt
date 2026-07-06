@@ -46,19 +46,23 @@ import androidx.compose.ui.unit.dp
 import io.github.ismoy.imagepickerkmp.domain.models.GalleryPhotoResult
 import io.github.ismoy.imagepickerkmp.presentation.ui.components.GalleryPickerLauncher
 import pe.breaker.dkaviplay.presentation.components.dialog.LoadingDialog
+import pe.breaker.dkaviplay.presentation.screen.perfil.components.DeleteAccountOptionItem
 import pe.breaker.dkaviplay.presentation.screen.perfil.components.OptionGroupCard
 import pe.breaker.dkaviplay.presentation.screen.perfil.components.ProfileHeader
 import pe.breaker.dkaviplay.presentation.screen.perfil.components.ProfileOptionItem
 import pe.breaker.dkaviplay.presentation.screen.perfil.components.SectionTitle
 import pe.breaker.dkaviplay.presentation.screen.perfil.components.UserQrDialog
 import pe.breaker.dkaviplay.presentation.screen.rangos.RangoScreenState
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
     profileState: ProfileScreenState,
     rangoState: RangoScreenState,
     onLogout: () -> Unit,
+    onEliminarcuenta: () -> Unit,
     onUploadPhoto: (GalleryPhotoResult) -> Unit,
+    onConseguirMonedas: () -> Unit,
     onOpenMisDatos: () -> Unit,
     onOpenArbitro: () -> Unit,
     onOpenRangos: () -> Unit,
@@ -86,12 +90,14 @@ fun ProfileScreen(
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            item{
+            item {
                 ProfileHeader(
                     modifier = Modifier.fillMaxWidth(),
                     nombre = profileState.nombre ?: "",
                     rango = rangoState.rangoActual?.categoria ?: "",
+                    monedas = profileState.monedas,
                     urlImage = profileState.urlImagenPerfil,
+                    onConseguirMonedas = onConseguirMonedas,
                     onImagenClick = { showSheet = true }
                 )
             }
@@ -99,32 +105,83 @@ fun ProfileScreen(
             item { SectionTitle("MI CARRERA") }
             item {
                 OptionGroupCard {
-                    ProfileOptionItem(Icons.Default.QrCode, "Mi QR", onClick = { showQrDialog = true })
-                    HorizontalDivider(Modifier, DividerDefaults.Thickness, color = Color.White.copy(alpha = 0.05f))
-                    ProfileOptionItem(Icons.Default.EmojiEvents, "Progreso de Rangos",onClick = onOpenRangos)
-                    HorizontalDivider(Modifier, DividerDefaults.Thickness, color = Color.White.copy(alpha = 0.05f))
-                    ProfileOptionItem(Icons.Default.SportsKabaddi, "Mis Tipos de Retos", onClick = onOpenTiposRetos)
+                    ProfileOptionItem(
+                        Icons.Default.QrCode,
+                        "Mi QR",
+                        onClick = { showQrDialog = true })
+                    HorizontalDivider(
+                        Modifier,
+                        DividerDefaults.Thickness,
+                        color = Color.White.copy(alpha = 0.05f)
+                    )
+                    ProfileOptionItem(
+                        Icons.Default.EmojiEvents,
+                        "Progreso de Rangos",
+                        onClick = onOpenRangos
+                    )
+                    HorizontalDivider(
+                        Modifier,
+                        DividerDefaults.Thickness,
+                        color = Color.White.copy(alpha = 0.05f)
+                    )
+                    ProfileOptionItem(
+                        Icons.Default.SportsKabaddi,
+                        "Mis Tipos de Retos",
+                        onClick = onOpenTiposRetos
+                    )
                 }
             }
 
             item { SectionTitle("MOCHILA Y PREMIOS") }
             item {
                 OptionGroupCard {
-                    ProfileOptionItem(Icons.Default.Backpack, "Mis Poderes", onClick = onOpenInventario)
-                    HorizontalDivider(Modifier, DividerDefaults.Thickness, color = Color.White.copy(alpha = 0.05f))
-                    ProfileOptionItem(Icons.Default.Inventory, "Mis Premios Físicos", onClick = onOpenPremios)
-                    HorizontalDivider(Modifier, DividerDefaults.Thickness, color = Color.White.copy(alpha = 0.05f))
-                    ProfileOptionItem(Icons.Default.ConfirmationNumber, "Mis Cupones", onClick = onOpenCupones)
+                    ProfileOptionItem(
+                        Icons.Default.Backpack,
+                        "Mis Poderes",
+                        onClick = onOpenInventario
+                    )
+                    HorizontalDivider(
+                        Modifier,
+                        DividerDefaults.Thickness,
+                        color = Color.White.copy(alpha = 0.05f)
+                    )
+                    ProfileOptionItem(
+                        Icons.Default.Inventory,
+                        "Mis Premios Físicos",
+                        onClick = onOpenPremios
+                    )
+                    HorizontalDivider(
+                        Modifier,
+                        DividerDefaults.Thickness,
+                        color = Color.White.copy(alpha = 0.05f)
+                    )
+                    ProfileOptionItem(
+                        Icons.Default.ConfirmationNumber,
+                        "Mis Cupones",
+                        onClick = onOpenCupones
+                    )
                 }
             }
 
             item { SectionTitle("AJUSTES") }
             item {
                 OptionGroupCard {
-                    ProfileOptionItem(Icons.Default.Person, "Mis Datos Personales", onClick = onOpenMisDatos)
-                    HorizontalDivider(Modifier, DividerDefaults.Thickness, color = Color.White.copy(alpha = 0.05f))
+                    ProfileOptionItem(
+                        Icons.Default.Person,
+                        "Mis Datos Personales",
+                        onClick = onOpenMisDatos
+                    )
+                    HorizontalDivider(
+                        Modifier,
+                        DividerDefaults.Thickness,
+                        color = Color.White.copy(alpha = 0.05f)
+                    )
                     ProfileOptionItem(Icons.Default.Sports, "Árbitro", onClick = onOpenArbitro)
-                    HorizontalDivider(Modifier, DividerDefaults.Thickness, color = Color.White.copy(alpha = 0.05f))
+                    HorizontalDivider(
+                        Modifier,
+                        DividerDefaults.Thickness,
+                        color = Color.White.copy(alpha = 0.05f)
+                    )
                     ProfileOptionItem(Icons.Default.Info, "Reglas del Club", onClick = onOpenReglas)
                 }
             }
@@ -135,6 +192,15 @@ fun ProfileScreen(
                     text = "Cerrar sesión",
                     textColor = Color(0xFFEF4444),
                     onClick = onLogout
+                )
+            }
+
+            item {
+                Spacer(
+                    modifier = Modifier.height(8.dp)
+                )
+                DeleteAccountOptionItem(
+                    onClick = onEliminarcuenta
                 )
             }
 
@@ -196,7 +262,7 @@ fun ProfileScreen(
         }
     }
 
-    if(profileState.isLoading){
+    if (profileState.isLoading) {
         LoadingDialog()
     }
 }

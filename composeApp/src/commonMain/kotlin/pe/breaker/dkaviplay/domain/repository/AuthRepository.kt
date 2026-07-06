@@ -1,6 +1,5 @@
 package pe.breaker.dkaviplay.domain.repository
 
-import dev.gitlive.firebase.auth.FirebaseUser
 import pe.breaker.dkaviplay.data.remote.AutoLoginResult
 import pe.breaker.dkaviplay.data.remote.dto.RegisterUsuarioRequestDto
 import pe.breaker.dkaviplay.domain.model.UserSession
@@ -14,5 +13,7 @@ interface AuthRepository {
     suspend fun sendCode(email: String, celular: String): Result<String>
     suspend fun actualizarPassword(userId:String,newPassword: String): Result<String>
     suspend fun verifyPassword(userId:String,code:String) : Result<Boolean>
-    suspend fun getFirebaseUser() : FirebaseUser?
+    suspend fun isLoggedIn() : Boolean
+    suspend fun logOut()
+    suspend fun deleteAccount(): Result<Unit>
 }

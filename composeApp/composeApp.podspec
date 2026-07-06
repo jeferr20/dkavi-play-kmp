@@ -44,7 +44,7 @@ Pod::Spec.new do |spec|
             SCRIPT
         }
     ]
-    spec.resources = ['build/compose/cocoapods/compose-resources']
+    spec.resources = ['build\compose\cocoapods\compose-resources']
     spec.libraries = 'sqlite3'
     spec.pod_target_xcconfig = { 'OTHER_LDFLAGS' => '-lsqlite3' }
 end

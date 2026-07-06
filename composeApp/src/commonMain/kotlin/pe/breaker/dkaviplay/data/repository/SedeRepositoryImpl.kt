@@ -24,7 +24,6 @@ import pe.breaker.dkaviplay.data.remote.firebase.SedeFirebase
 import pe.breaker.dkaviplay.di.UserSessionManager
 import pe.breaker.dkaviplay.domain.model.Sede
 import pe.breaker.dkaviplay.domain.repository.SedeRepository
-import kotlin.collections.emptyList
 import kotlin.time.Clock
 import kotlin.time.Instant
 
