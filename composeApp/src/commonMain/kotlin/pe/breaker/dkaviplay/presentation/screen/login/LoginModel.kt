@@ -4,6 +4,7 @@ import cafe.adriel.voyager.core.model.StateScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import pe.breaker.dkaviplay.domain.model.LoginResult
 import pe.breaker.dkaviplay.domain.repository.NotificationRepository
 import pe.breaker.dkaviplay.domain.usecase.LoginUseCase
 
@@ -36,13 +37,17 @@ class LoginModel(
         screenModelScope.launch {
             mutableState.update { it.copy(isLoading = true) }
             val result = loginUseCase(usuario, pass)
-            result.onSuccess {
-                try {
-                    notificationRepository.saveToken()
-                } catch (e: Exception) {
-                    println("Error guardando token en login: ${e.message}")
+            result.onSuccess { loginResult ->
+                mutableState.update { it.copy(isLoading = false, navigationResult = loginResult) }
+
+                // Guardamos el token de notificaciones SOLO si el login es Success real
+                if (loginResult is LoginResult.Success) {
+                    try {
+                        notificationRepository.saveToken()
+                    } catch (e: Exception) {
+                        println("Error guardando token en login: ${e.message}")
+                    }
                 }
-                mutableState.update { it.copy(isLoading = false, isSuccess = true) }
             }.onFailure { error ->
                 mutableState.update { it.copy(isLoading = false, errorMessage = error.message) }
             }

@@ -1,13 +1,15 @@
 package pe.breaker.dkaviplay.presentation.screen.reservas
 
 import pe.breaker.dkaviplay.domain.model.Reserva
+import kotlin.time.Instant
 
-data class ReservasState (
-    val reservas : List<Reserva> = emptyList(),
+data class ReservasState(
+    val reservas: List<Reserva> = emptyList(),
     val currentUserUid: String = "",
     val currentFilter: ReservaFilter = ReservaFilter.ACTUALES,
 
     val isLoading: Boolean = false,
     val isSuccess: Boolean = false,
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
+    val serverTime: Instant? = null
 )

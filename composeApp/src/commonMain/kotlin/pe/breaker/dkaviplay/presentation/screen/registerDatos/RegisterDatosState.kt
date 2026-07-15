@@ -2,10 +2,10 @@ package pe.breaker.dkaviplay.presentation.screen.registerDatos
 
 import pe.breaker.dkaviplay.domain.model.Sede
 import pe.breaker.dkaviplay.domain.model.UbigeoItem
-
+import pe.breaker.dkaviplay.util.Dias
 
 data class RegisterDatosState(
-    val personaUid: String? = null,
+    val usuarioUid: Int? = null,
     val nombres: String? = null,
     val apellidoPaterno: String? = null,
     val apellidoMaterno: String? = null,
@@ -47,9 +47,12 @@ data class RegisterDatosState(
     val successMessage : String?= null
 ) {
     companion object {
-        val defaultHorarios = listOf(
-            "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"
-        ).map { DiaHorarioState(nombre = it, habilitado = false) }
+        val defaultHorarios = Dias.entries.map { dia ->
+            DiaHorarioState(
+                nombre = dia.dia,
+                habilitado = false,
+            )
+        }
     }
 }
 

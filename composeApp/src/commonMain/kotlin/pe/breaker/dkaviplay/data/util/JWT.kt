@@ -18,14 +18,15 @@ fun decodeJwt(token: String, cripKey: String): UserSession {
 
     // Creamos un modelo temporal para el parseo del JSON interno del JWT
     @Serializable
-    data class JwtPayload(val uid: String = "", val role: String = "")
+    data class JwtPayload(val uuid_auth: String = "", val role: String = "",val uid: Int = 0)
     val data = json.decodeFromString<JwtPayload>(payload)
 
     return UserSession(
-        uid = data.uid,
+        uid = data.uuid_auth,
         role = data.role,
         token = token,
-        cripKey = cripKey
+        cripKey = cripKey,
+        userId = data.uid
     )
 }
 

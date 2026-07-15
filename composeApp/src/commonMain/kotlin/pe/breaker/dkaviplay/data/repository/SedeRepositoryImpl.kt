@@ -1,9 +1,13 @@
 package pe.breaker.dkaviplay.data.repository
 
-import dev.gitlive.firebase.firestore.FieldPath.Companion.documentId
 import dev.gitlive.firebase.firestore.FirebaseFirestore
 import dev.gitlive.firebase.firestore.Timestamp
-import kotlinx.coroutines.CoroutineScope
+import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.annotations.SupabaseExperimental
+import io.github.jan.supabase.postgrest.from
+import io.github.jan.supabase.postgrest.query.filter.FilterOperation
+import io.github.jan.supabase.postgrest.query.filter.FilterOperator
+import io.github.jan.supabase.realtime.selectAsFlow
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.IO
@@ -12,15 +16,18 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.onEach
-import pe.breaker.dkaviplay.data.mapper.mapToSede
-import pe.breaker.dkaviplay.data.remote.firebase.EmpresaFirebase
-import pe.breaker.dkaviplay.data.remote.firebase.SedeFirebase
+import pe.breaker.dkaviplay.data.mapper.toDomain
+import pe.breaker.dkaviplay.data.remote.supabase.EmpresaDTO
+import pe.breaker.dkaviplay.data.remote.supabase.SedeDTO
+import pe.breaker.dkaviplay.data.remote.supabase.view.SedeEmpresaView
+import pe.breaker.dkaviplay.data.remote.supabase.view.TarifarioView
 import pe.breaker.dkaviplay.di.UserSessionManager
 import pe.breaker.dkaviplay.domain.model.Sede
 import pe.breaker.dkaviplay.domain.repository.SedeRepository
@@ -29,7 +36,8 @@ import kotlin.time.Instant
 
 class SedeRepositoryImpl(
     private val firestore: FirebaseFirestore,
-    private val sessionManager: UserSessionManager
+    private val sessionManager: UserSessionManager,
+    private val supabaseClient: SupabaseClient
 ) : SedeRepository {
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -39,8 +47,7 @@ class SedeRepositoryImpl(
                 if (usuario == null) {
                     flowOf(Result.success(emptyList()))
                 } else {
-                    // Aquí es donde ocurre la magia reactiva
-                    listenSedesByUbigeo(usuario.departamento,usuario.provincia)
+                    listenSedesByUbigeo(usuario.departamento, usuario.provincia)
                 }
             }
             .catch { e ->
@@ -49,110 +56,115 @@ class SedeRepositoryImpl(
             .flowOn(Dispatchers.IO)
     }
 
-    override suspend fun getSedesByDepartamento(departamento: String,provincia:String): Result<List<Sede>> {
-        return fetchSedesByUbigeo(departamento,provincia,false)
-    }
-
-    private suspend fun fetchSedesByUbigeo(
-        idDepartamento: String,
-        idProvinicia:String,
-        needEmpresa: Boolean
+    override suspend fun getSedesByDepartamento(
+        departamento: String,
+        provincia: String
     ): Result<List<Sede>> {
         return try {
-            val sedesSnapshot = firestore.collection("Sede")
-                .where { "status" equalTo true }
-                .where { "departamento" equalTo idDepartamento }
-                .where { "provincia" equalTo idProvinicia }
-                .get()
+            val sedesViewList = supabaseClient
+                .from(schema = "public", table = "v_SedesEmpresa")
+                .select {
+                    filter {
+                        eq("departamento", departamento)
+                        eq("provincia", provincia)
+                    }
+                }.decodeList<SedeEmpresaView>()
 
-            if (sedesSnapshot.documents.isEmpty()) return Result.success(emptyList())
+            val sedesDomain = sedesViewList.map { viewDto -> viewDto.toDomain() }
 
-            val sedesData = sedesSnapshot.documents.map { it.id to it.data<SedeFirebase>() }
-
-            if (!needEmpresa) {
-                val simpleResult = sedesData.map { (id, dto) -> mapToSede(id, dto, null) }
-                return Result.success(simpleResult)
-            }
-
-            val empresaIds = sedesData.mapNotNull { it.second.uuidEmpresa }.distinct()
-
-            val empresasMap = if (empresaIds.isNotEmpty()) {
-                firestore.collection("Empresa")
-                    .where { documentId inArray empresaIds }
-                    .get()
-                    .documents
-                    .associate { it.id to it.data<EmpresaFirebase>() }
-            } else {
-                emptyMap()
-            }
-
-            val result = sedesData.mapNotNull { (id, sedeDto) ->
-                val empresaDto = empresasMap[sedeDto.uuidEmpresa]
-                empresaDto?.let { mapToSede(id, sedeDto, it) }
-            }
-
-            Result.success(result)
-
+            Result.success(sedesDomain)
         } catch (e: Exception) {
             println("Error FetchSedes: ${e.message}")
             Result.failure(e)
         }
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
+    @OptIn(ExperimentalCoroutinesApi::class, SupabaseExperimental::class)
     private fun listenSedesByUbigeo(
         idDepartamento: String,
-        idProvinicia:String
-    ): Flow<Result<List<Sede>>> = firestore.collection("Sede")
-        .where { "status" equalTo true }
-        .where { "departamento" equalTo idDepartamento }
-        .where { "provincia" equalTo idProvinicia }
-        .snapshots()
-        .mapLatest { sedesSnapshot ->
+        idProvincia: String
+    ): Flow<Result<List<Sede>>> {
+        val sedesFlow = supabaseClient
+            .from(schema = "public", table = "Sede")
+            .selectAsFlow(
+                primaryKey = SedeDTO::id,
+                channelName = "public:Sede:ubigeo:$idDepartamento:$idProvincia",
+                filter = FilterOperation("departamento", FilterOperator.EQ, idDepartamento)
+            )
+            .mapLatest { listaSedes ->
+                listaSedes.filter { it.status && it.provincia == idProvincia }
+            }
+
+        // 2. Canal reactivo para las Empresas en general
+        // Al usar selectAsFlow sin filtros pesados, mantendrás un caché de empresas sincronizado en RAM
+        val empresasFlow = supabaseClient
+            .from(schema = "public", table = "Empresa")
+            .selectAsFlow(
+                primaryKey = EmpresaDTO::id,
+                channelName = "public:Empresa:activas"
+            )
+            .mapLatest { listaEmpresas ->
+                listaEmpresas.filter { it.status }.associateBy { it.id }
+            }
+
+        // 3. Combinamos ambos flujos reactivos usando 'flatMapLatest' o 'combine'
+        return combine(sedesFlow, empresasFlow) { sedesData, empresasMap ->
             try {
-                if (sedesSnapshot.documents.isEmpty()) {
-                    return@mapLatest Result.success(emptyList())
+                val resultadoDomain = sedesData.mapNotNull { sedeDto ->
+                    val empresaDto = empresasMap[sedeDto.idEmpresa]
+
+                    // Si la sede tiene una empresa válida y activa, mapeamos al Dominio
+                    empresaDto?.let {
+                        Sede(
+                            sedeUid = sedeDto.id.toString(),
+                            empresaUid = it.id.toString(),
+                            nombreSede = sedeDto.nombre ?: "",
+                            direccion = sedeDto.direccion ?: "",
+                            horario = sedeDto.horario.map { h -> h.toDomain() },
+                            numSede = sedeDto.numeroSede ?: "",
+                            referencia = sedeDto.referencia ?: "",
+                            nombreEmpresa = it.nombre ?: "",
+                            logo = it.logo ?: "",
+                            ruc = it.ruc ?: "",
+                            latitud = sedeDto.latitud?.toDouble() ?:  0.0,
+                            longitud = sedeDto.longitud?.toDouble() ?:  0.0
+                        )
+                    }
                 }
-
-                val sedesData = sedesSnapshot.documents.map { it.id to it.data<SedeFirebase>() }
-
-                val empresaIds = sedesData.mapNotNull { it.second.uuidEmpresa }.distinct()
-
-                val empresasMap = if (empresaIds.isNotEmpty()) {
-                    firestore.collection("Empresa")
-                        .where { documentId inArray empresaIds }
-                        .get()
-                        .documents
-                        .associate { it.id to it.data<EmpresaFirebase>() }
-                } else {
-                    emptyMap()
-                }
-
-                val result = sedesData.mapNotNull { (id, sedeDto) ->
-                    val empresaDto = empresasMap[sedeDto.uuidEmpresa]
-                    empresaDto?.let { mapToSede(id, sedeDto, it) }
-                }
-
-                Result.success(result)
+                Result.success(resultadoDomain)
             } catch (e: Exception) {
+                println("❌ Error procesando snapshot combinado de Supabase: ${e.message}")
                 Result.failure(e)
             }
         }
+            .distinctUntilChanged()
+            .catch { e ->
+                emit(Result.failure(e))
+            }
+            .flowOn(Dispatchers.IO)
+    }
 
-    override fun getTarifaSede(sedeUid: String): Flow<Double?> = callbackFlow {
-        val query = firestore.collection("TarifarioSede")
-            .where { "uuidSede" equalTo sedeUid }
-            .where { "status" equalTo true }
+    override suspend fun getTarifaSede(sedeUid: String): Result<Double?> {
+        return try{
+            val sedeIdInt = sedeUid.toIntOrNull() ?: 0
 
-        val subscription = query.snapshots.onEach { querySnapshot ->
-            val monto = querySnapshot.documents.firstOrNull()?.get<Double>("montoMesa")
-            trySend(monto)
-        }.catch { e ->
-            println("Error trayendo tarifa: ${e.message}")
-            trySend(null)
-        }.launchIn(CoroutineScope(Dispatchers.IO))
+            val tarifa = supabaseClient
+                .from(schema = "dkavi", table = "v_tarifario")
+                .select {
+                    filter {
+                        eq("sede_id", sedeIdInt)
+                    }
+                }.decodeSingleOrNull<TarifarioView>()
 
-        awaitClose { subscription.cancel() }
+            if (tarifa == null) {
+                println("⚠️ Alerta: No se encontró tarifario activo para la sede con ID: $sedeIdInt")
+            }
+
+            Result.success(tarifa?.cantidadMonedasReto)
+        }catch (e: Exception) {
+            println("❌ Error trayendo tarifa desde Supabase: ${e.message}")
+            Result.failure(e)
+        }
     }
 
     override fun getMesasSede(sedeUid: String): Flow<String> = callbackFlow {

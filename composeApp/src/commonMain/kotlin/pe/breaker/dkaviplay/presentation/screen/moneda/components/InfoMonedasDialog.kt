@@ -33,9 +33,17 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import pe.breaker.dkaviplay.presentation.theme.colorPrimary
 import pe.breaker.dkaviplay.presentation.theme.goldColor
+import pe.breaker.dkaviplay.presentation.util.format
 
 @Composable
-fun InfoMonedasDialog(onDismiss: () -> Unit) {
+fun InfoMonedasDialog(
+    precioMoneda: Double,
+    monedasBase:Int,
+    onDismiss: () -> Unit
+) {
+    val costoBase = monedasBase * precioMoneda
+    val costoFormateado = costoBase.format(2)
+
     Dialog(onDismissRequest = onDismiss) {
         Card(
             modifier = Modifier
@@ -89,7 +97,6 @@ fun InfoMonedasDialog(onDismiss: () -> Unit) {
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                // Divisa Destacada (Conversión Principal)
                 Surface(
                     color = Color.White.copy(alpha = 0.03f),
                     shape = RoundedCornerShape(16.dp),
@@ -101,12 +108,20 @@ fun InfoMonedasDialog(onDismiss: () -> Unit) {
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Center
                     ) {
+                        Icon(
+                            imageVector = Icons.Default.MonetizationOn,
+                            contentDescription = null,
+                            tint = goldColor,
+                            modifier = Modifier.size(22.dp)
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
                         Text(
-                            text = "1 SOL",
-                            color = Color.White,
-                            fontSize = 18.sp,
+                            text = "$monedasBase",
+                            color = goldColor,
+                            fontSize = 20.sp,
                             fontWeight = FontWeight.Black
                         )
+
                         Spacer(modifier = Modifier.padding(horizontal = 12.dp))
                         Text(
                             text = "=",
@@ -116,16 +131,9 @@ fun InfoMonedasDialog(onDismiss: () -> Unit) {
                         )
                         Spacer(modifier = Modifier.padding(horizontal = 12.dp))
 
-                        Icon(
-                            imageVector = Icons.Default.MonetizationOn,
-                            contentDescription = null,
-                            tint = goldColor,
-                            modifier = Modifier.size(20.dp)
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
                         Text(
-                            text = "10",
-                            color = goldColor,
+                            text = "$costoFormateado SOLES",
+                            color = Color.White,
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Black
                         )
@@ -134,7 +142,6 @@ fun InfoMonedasDialog(onDismiss: () -> Unit) {
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // Reglas y Atributos de Uso
                 Column(
                     modifier = Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -144,8 +151,12 @@ fun InfoMonedasDialog(onDismiss: () -> Unit) {
                     )
 
                     ReglaInfoRow(
-                        texto = "Iniciar o aceptar un reto en la plataforma tiene un costo fijo de 50 monedas.",
-                        destacarCosto = true
+                        texto = "La adquisición de monedas se realiza en paquetes desde un mínimo de $monedasBase monedas en adelante.",
+                        destacarCosto = true // Puedes usar este flag para darle un color sutil de énfasis
+                    )
+
+                    ReglaInfoRow(
+                        texto = "Iniciar o aceptar un reto en la plataforma tiene un costo fijo de 50 monedas."
                     )
                 }
 

@@ -38,10 +38,12 @@ import org.koin.compose.koinInject
 import pe.breaker.dkaviplay.presentation.components.CustomAppbar
 import pe.breaker.dkaviplay.presentation.components.button.CustomButtonFilled
 import pe.breaker.dkaviplay.presentation.components.dialog.LoadingDialog
+import pe.breaker.dkaviplay.presentation.components.dialog.QRPagoDialog
 import pe.breaker.dkaviplay.presentation.screen.moneda.components.CustomCoinCounter
 import pe.breaker.dkaviplay.presentation.screen.moneda.components.InfoMonedasDialog
 import pe.breaker.dkaviplay.presentation.screen.moneda.components.QuickBundleGrid
 import pe.breaker.dkaviplay.presentation.util.ToastHandler
+import pe.breaker.dkaviplay.util.ClipboardManager
 import pe.breaker.dkaviplay.util.handleAction
 
 class MonedaScreen : Screen {
@@ -64,7 +66,9 @@ class MonedaScreen : Screen {
                 is MonedaUiEvent.OpenWhatsApp -> {
                     handleAction(uriHandler, toastHandler, event.url, "No se pudo abrir WhatsApp")
                     model.consumeActionEvent()
+                    navigator.pop()
                 }
+
                 null -> {}
             }
         }
@@ -124,13 +128,13 @@ class MonedaScreen : Screen {
                 )
 
                 CustomButtonFilled(
-                    text = if (esMontoValido) "COMPRAR $cantidadMonedas MONEDAS" else "INGRESE UNA CANTIDAD",
+                    text = if (esMontoValido) "COMPRAR $cantidadMonedas MONEDAS" else "INGRESE UNA CIDAD",
                     onClick = {
                         if (esMontoValido) {
                             model.procesarCompra(cantidadMonedas)
                         }
                     },
-                    enabled = esMontoValido && !state.isLoading,
+                    enabled = state.isTiendaDisponible && esMontoValido && !state.isLoading,
                     icon = Icons.Default.MonetizationOn,
                 )
 
@@ -139,10 +143,29 @@ class MonedaScreen : Screen {
 
             if (showInfoDialog) {
                 InfoMonedasDialog(
+                    precioMoneda = state.precioMoneda,
+                    monedasBase = paquetesSugeridos[0],
                     onDismiss = { showInfoDialog = false }
                 )
             }
 
+            if (state.showPagoDialog) {
+                QRPagoDialog(
+                    monto = state.montoCalculado,
+                    text = "Escanea el QR de la sede para pagar vía Yape/Plin o copia el número de celular. Al terminar, presiona el botón inferior para reportarlo por WhatsApp al administrador.",
+                    numCelularPago = state.numPago ?: "",
+                    onCopiarNumero = { numero ->
+                        ClipboardManager.copyToClipboard(numero)
+                        toastHandler.showToast("Número copiado al portapapeles")
+                    },
+                    onEnviarWhatsApp = {
+                        model.enviarConfirmacionWhatsApp()
+                    },
+                    onDismissRequest = {
+                        model.ocultarPagoDialog()
+                    }
+                )
+            }
             if (state.isLoading) {
                 LoadingDialog()
             }

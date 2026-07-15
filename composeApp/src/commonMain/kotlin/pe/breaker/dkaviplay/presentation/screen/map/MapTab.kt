@@ -13,7 +13,6 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -63,27 +62,17 @@ object MapTab : Tab {
         var selectedSede by remember { mutableStateOf<Sede?>(null) }
         var showSheet by remember { mutableStateOf(false) }
 
-        var mapCenter by remember { mutableStateOf<Pair<Double, Double>?>(null) }
         val scope = rememberCoroutineScope()
-
-        LaunchedEffect(state.isSuccess, state.sedes) {
-            val sedes = state.sedes
-            if (state.isSuccess && !sedes.isNullOrEmpty()) {
-                val avgLat = sedes.map { it.latitud }.average()
-                val avgLng = sedes.map { it.longitud }.average()
-                mapCenter = Pair(avgLat, avgLng)
-            }
-        }
 
         Box(
             modifier = Modifier.fillMaxSize().background(Color.Black),
             contentAlignment = Alignment.Center
         ) {
-            if (state.sedes != null && mapCenter != null) {
+            if (state.sedes != null && state.mapCenter != null) {
                 GoogleMapView(
                     modifier = Modifier.fillMaxSize(),
-                    lat = mapCenter!!.first,
-                    lng = mapCenter!!.second,
+                    lat = state.mapCenter!!.first,
+                    lng = state.mapCenter!!.second,
                     sedes = state.sedes!!,
                     onMarkerClick = { sede ->
                         selectedSede = sede
@@ -91,9 +80,13 @@ object MapTab : Tab {
                         mapModel.listenToMesas(sede.sedeUid)
                     }
                 )
+
+                if(state.sedes!!.isEmpty()){
+                    toastHandler.showToast("No hay sedes en tu región")
+                }
             }
 
-            if (state.isLoading || (state.isSuccess && mapCenter == null))  LoadingDialog()
+            if (state.isLoading || (state.isSuccess && state.mapCenter == null)) LoadingDialog()
 
             state.errorMessage?.let { error ->
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {

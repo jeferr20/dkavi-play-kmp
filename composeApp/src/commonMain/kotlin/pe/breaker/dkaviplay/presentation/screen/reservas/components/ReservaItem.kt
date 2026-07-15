@@ -35,6 +35,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
+import org.koin.compose.koinInject
 import pe.breaker.dkaviplay.domain.model.Reserva
 import pe.breaker.dkaviplay.domain.model.ReservaEstado
 import pe.breaker.dkaviplay.presentation.components.button.CustomButtonFilled
@@ -46,6 +47,7 @@ import pe.breaker.dkaviplay.presentation.theme.colorCelesteNeon
 import pe.breaker.dkaviplay.presentation.theme.colorPrimary
 import pe.breaker.dkaviplay.presentation.theme.colorRedError
 import pe.breaker.dkaviplay.presentation.theme.colorVerdeClaro
+import pe.breaker.dkaviplay.util.DateTimeFormatter
 
 @Composable
 fun ReservaItem(
@@ -57,7 +59,7 @@ fun ReservaItem(
     onVerificarResultado: (Reserva) -> Unit,
     onVerResultados: (Reserva) -> Unit,
     onShowInventario: (Reserva) -> Unit,
-    onShowQrPago: (Reserva) -> Unit
+    dateTimeFormatter: DateTimeFormatter = koinInject()
 ) {
     val estado = ReservaEstado.fromId(reserva.estadoInt)
     val soyElCreador = reserva.creadorUid == currentUsuario
@@ -67,7 +69,6 @@ fun ReservaItem(
     val contrincanteReady = if (soyElCreador) reserva.userRetadoReady else reserva.userCreadorReady
     val yoEstoyReady = if (soyElCreador) reserva.userCreadorReady else reserva.userRetadoReady
     val contrincanteNombre = if (soyElCreador) reserva.retado else reserva.creador
-    val isPagado = reserva.montoTotal - reserva.montoPagado == 0.0
 
     val estadoBotonReady = when {
         bothUsersReady -> "EMPEZAR RETO"
@@ -120,12 +121,6 @@ fun ReservaItem(
                 ) {
                     // Badge de Estado
                     BadgeEstado(reserva = reserva)
-
-                    // Badge de Saldo Pendiente mejorado
-                    val saldoPendiente = reserva.montoTotal - reserva.montoPagado
-                    if (saldoPendiente > 0 && estado.mostrarSaldo()) {
-                        BadgeMontoPendiente(saldoPendiente)
-                    }
                 }
 
                 // Nombre de la Sede sobre la imagen (Bottom Start)
@@ -152,8 +147,17 @@ fun ReservaItem(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    InfoReservaCol("INICIO", reserva.fechaInicio, Icons.Default.CalendarToday)
-                    InfoReservaCol("FIN", reserva.fechaFin, Icons.Default.AccessTime)
+                    InfoReservaCol(
+                        label = "INICIO",
+                        value = dateTimeFormatter.formatToFullDateTime(reserva.fechaInicio),
+                        icon = Icons.Default.CalendarToday
+                    )
+
+                    InfoReservaCol(
+                        label = "FIN",
+                        value = dateTimeFormatter.formatToFullDateTime(reserva.fechaFin),
+                        icon = Icons.Default.AccessTime
+                    )
                 }
 
                 Row(
@@ -166,7 +170,7 @@ fun ReservaItem(
 
                 val mostrarAcciones = (estado.puedeGestionarReto() && soyElRetado) ||
                         (estado.puedeCancelarse() && soyElCreador) ||
-                        estado.puedeVerJuego() || estado.puedeVerResultado() || estado.puedeEscogerItem() || (!isPagado && estado.puedePagarse())
+                        estado.puedeVerJuego() || estado.puedeVerResultado() || estado.puedeEscogerItem()
 
                 if (mostrarAcciones) {
                     HorizontalDivider(
@@ -202,15 +206,6 @@ fun ReservaItem(
                             )
                         }
 
-                        // --2.5. PENDIENTE PAGO
-                        if (!isPagado && estado.puedePagarse()) {
-                            CustomButtonFilled(
-                                modifier = Modifier.weight(1f),
-                                enabled = true,
-                                onClick = { onShowQrPago(reserva) },
-                                text = "Ver QR de Pago"
-                            )
-                        }
                         // --- 3. INVENTARIO (Se muestra si el estado permite jugar y aún no empieza el juego) ---
                         if (estado.puedeEscogerItem() && !bothUsersReady) {
                             CustomOutlineButtonTextIcon(

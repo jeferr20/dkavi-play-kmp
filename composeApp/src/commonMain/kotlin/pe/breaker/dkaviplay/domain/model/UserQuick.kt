@@ -5,7 +5,6 @@ data class UserQuick(
     val usuario: String,
     val imagen: String? = null,
     val rango: String,
-    val horarios: List<Horario>? = null,
     val partidasGanadas: Int,
     val partidasJugadas: Int,
     val puntos: Int

@@ -1,6 +1,5 @@
 package pe.breaker.dkaviplay.presentation.screen.aceptarReto.components
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,11 +15,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.Payments
-import androidx.compose.material.icons.rounded.QrCode2
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,7 +29,6 @@ import androidx.compose.ui.platform.UriHandler
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import org.koin.compose.koinInject
 import pe.breaker.dkaviplay.presentation.components.button.CustomButtonFilled
 import pe.breaker.dkaviplay.presentation.components.button.CustomOutlineButtonTextIcon
@@ -45,8 +41,7 @@ fun AccionesReto(
     successMessage: String?,
     onAccept: () -> Unit,
     onReject: () -> Unit,
-    onClose: () -> Unit,
-    onShowPaymentQr: () -> Unit
+    onClose: () -> Unit
 ) {
     val uriHandler = LocalUriHandler.current
     val toastHandler = koinInject<ToastHandler>()
@@ -85,28 +80,6 @@ fun AccionesReto(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
-                        // Botón QR (Nuevo)
-                        OutlinedButton(
-                            onClick = onShowPaymentQr,
-                            modifier = Modifier.weight(1f).height(58.dp),
-                            shape = RoundedCornerShape(18.dp),
-                            border = BorderStroke(1.5.dp, Color.White.copy(alpha = 0.3f))
-                        ) {
-                            Icon(
-                                Icons.Rounded.QrCode2,
-                                contentDescription = null,
-                                modifier = Modifier.size(20.dp),
-                                tint = Color.White
-                            )
-                            Spacer(Modifier.width(8.dp))
-                            Text(
-                                text = "QR PAGO",
-                                fontWeight = FontWeight.Bold,
-                                color = Color.White,
-                                fontSize = 14.sp
-                            )
-                        }
-
                         // Botón WhatsApp
                         CustomButtonFilled(
                             modifier = Modifier.weight(1f).height(56.dp),

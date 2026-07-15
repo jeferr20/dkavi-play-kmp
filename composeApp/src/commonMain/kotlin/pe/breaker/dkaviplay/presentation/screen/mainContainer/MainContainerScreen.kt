@@ -19,6 +19,7 @@ import cafe.adriel.voyager.navigator.tab.TabNavigator
 import dev.icerock.moko.permissions.DeniedAlwaysException
 import dev.icerock.moko.permissions.DeniedException
 import dev.icerock.moko.permissions.Permission
+import dev.icerock.moko.permissions.RequestCanceledException
 import dev.icerock.moko.permissions.compose.BindEffect
 import dev.icerock.moko.permissions.compose.rememberPermissionsControllerFactory
 import dev.icerock.moko.permissions.notifications.REMOTE_NOTIFICATION
@@ -45,13 +46,20 @@ class MainContainerScreen : Screen {
         LaunchedEffect(Unit) {
             try {
                 permissionsController.providePermission(Permission.REMOTE_NOTIFICATION)
+                // Se ejecuta si estamos en Android 13+ y el usuario aceptó, o en iOS
                 model.syncNotificationToken()
             } catch (e: DeniedAlwaysException) {
                 println("Permiso denegado permanentemente: ${e.message}")
             } catch (e: DeniedException) {
                 println("Permiso denegado: ${e.message}")
+            } catch (e: RequestCanceledException) {
+                // Se canceló la petición. Esto es el comportamiento esperado en Android 12 o inferior.
+                println("Petición de permiso cancelada (Sistema operativo no lo requiere o el usuario cerró el diálogo): ${e.message}")
+                // Como en Android 12 el permiso ya existe por defecto, podemos sincronizar el token con seguridad.
+                model.syncNotificationToken()
+            } catch (e: Exception) {
+                println("Error desconocido al solicitar permiso: ${e.message}")
             }
-            model.syncNotificationToken()
         }
 
         TabNavigator(MapTab) { tabNavigator ->

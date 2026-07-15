@@ -3,7 +3,7 @@ package pe.breaker.dkaviplay.presentation.screen.registerReserva
 import pe.breaker.dkaviplay.domain.model.Mesa
 import pe.breaker.dkaviplay.domain.model.TipoJuego
 
-data class RegisterReservationScreenState (
+data class RegisterReservationScreenState(
     val mesas: List<Mesa> = emptyList(),
     val selectedMesa: Mesa? = null,
     val tipoJuego: TipoJuego = TipoJuego.BILLAR,
@@ -11,11 +11,10 @@ data class RegisterReservationScreenState (
     val fInicio: String? = null,
     val hSalida: String? = null,
     val fSalida: String? = null,
-    val usuarioRetadoUid : String? = null,
-    val usuarioRetado : String? = null,
+    val usuarioRetadoUid: String? = null,
+    val usuarioRetado: String? = null,
 
-    val precioPorHora: Double? = null,
-    val montoReserva: Double? = null,
+    val tarifario: Double? = null,
     val usuario: String? = null,
     val sedeUid: String? = null,
 

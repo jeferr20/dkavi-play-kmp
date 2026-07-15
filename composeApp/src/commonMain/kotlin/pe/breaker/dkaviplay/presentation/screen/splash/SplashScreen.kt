@@ -14,7 +14,6 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import pe.breaker.dkaviplay.presentation.components.dialog.NoNetworkDialog
 import pe.breaker.dkaviplay.presentation.screen.login.LoginScreen
 import pe.breaker.dkaviplay.presentation.screen.mainContainer.MainContainerScreen
-import pe.breaker.dkaviplay.presentation.screen.registerDatos.RegisterDatosScreen
 import pe.breaker.dkaviplay.presentation.screen.splash.components.SplashLayout
 
 class SplashScreen : Screen {
@@ -29,13 +28,9 @@ class SplashScreen : Screen {
         }
 
         LaunchedEffect(state) {
-            when (val s = state) {
-                is SplashState.GoToLogin ->
-                    navigator.replaceAll(LoginScreen())
-                is SplashState.GoToMain ->
-                    navigator.replaceAll(MainContainerScreen())
-                is SplashState.GoToRegister ->
-                    navigator.replaceAll(RegisterDatosScreen(false, s.userId))
+            when (state) {
+                is SplashState.GoToLogin -> navigator.replaceAll(LoginScreen())
+                is SplashState.GoToMain -> navigator.replaceAll(MainContainerScreen())
                 else -> Unit
             }
         }

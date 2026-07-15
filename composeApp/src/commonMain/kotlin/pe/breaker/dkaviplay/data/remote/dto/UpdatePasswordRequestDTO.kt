@@ -4,6 +4,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class UpdatePasswordRequestDTO(
-    val id: String?,
+    val id: Int?,
     val newPassword: String?
 )

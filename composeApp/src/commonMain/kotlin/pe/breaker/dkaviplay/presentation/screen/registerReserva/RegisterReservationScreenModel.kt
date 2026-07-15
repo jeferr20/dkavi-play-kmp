@@ -25,7 +25,7 @@ class RegisterReservationScreenModel(
 ) : StateScreenModel<RegisterReservationScreenState>(RegisterReservationScreenState()){
 
     init {
-        listenToTarifa()
+        cargarTarifa()
         getMesas()
     }
 
@@ -83,13 +83,20 @@ class RegisterReservationScreenModel(
         }
     }
 
-    private fun listenToTarifa() {
-        sedeUid?.let {
+    private fun cargarTarifa() {
+        sedeUid?.let { uid ->
             screenModelScope.launch {
-                sedeRepository.getTarifaSede(it).collect { tarifa ->
-                    mutableState.update { it.copy(precioPorHora = tarifa ?: 0.0) }
-                    validateAndCalculate()
-                }
+                sedeRepository.getTarifaSede(uid)
+                    .onSuccess { tarifa ->
+                        mutableState.update {
+                            it.copy(tarifario = tarifa ?: 0.0)
+                        }
+                        validateAndCalculate()
+                    }
+                    .onFailure { error ->
+                        println("❌ Error al cargar la tarifa en el ScreenModel: ${error.message}")
+                        mutableState.update { it.copy(tarifario = 0.0) }
+                    }
             }
         }
     }
@@ -107,37 +114,30 @@ class RegisterReservationScreenModel(
 
                 // 1. ¿Es en el pasado? (Margen de 1 minuto para evitar errores por segundos)
                 if (inicioSeconds < (ahoraSeconds - 60)) {
-                    mutableState.update { it.copy(errorMessage = "La fecha de inicio no puede ser pasada.", montoReserva = 0.0) }
+                    mutableState.update { it.copy(errorMessage = "La fecha de inicio no puede ser pasada.") }
                     return
                 }
 
                 // 2. ¿Orden cronológico?
                 if (finSeconds <= inicioSeconds) {
-                    mutableState.update { it.copy(errorMessage = "La salida debe ser después del inicio.", montoReserva = 0.0) }
+                    mutableState.update { it.copy(errorMessage = "La salida debe ser después del inicio.") }
                     return
                 }
 
                 // 3. ¿Mínimo 30 minutos?
                 if (diferenciaSegundos < 30 * 60) {
-                    mutableState.update { it.copy(errorMessage = "La reserva mínima es de 30 min.", montoReserva = 0.0) }
+                    mutableState.update { it.copy(errorMessage = "La reserva mínima es de 30 min.") }
                     return
                 }
 
                 // 4. ¿Máximo 18 horas?
                 if (diferenciaSegundos > 18 * 3600) {
-                    mutableState.update { it.copy(errorMessage = "La reserva máxima es de 18 horas.", montoReserva = 0.0) }
+                    mutableState.update { it.copy(errorMessage = "La reserva máxima es de 18 horas.") }
                     return
                 }
 
-                val horas = diferenciaSegundos.toDouble() / 3600.0
-//                val costoHoras = horas * (s.precioPorHora ?: 0.0)
-                val costoHoras = 0//temporal
-                val comisionTotal = 5.0 * 2
-                val totalFinal = costoHoras + comisionTotal
-
                 mutableState.update { it.copy(
                     errorMessage = null,
-                    montoReserva = totalFinal,
                 ) }
 
             } catch (e: Exception) {
@@ -169,8 +169,8 @@ class RegisterReservationScreenModel(
                     sedeUid = sedeUid ?: "",
                     fechaHoraInicio = createTimestampDTO(s.fInicio!!, s.hInicio!!),
                     fechaHoraFin = createTimestampDTO(s.fSalida!!, s.hSalida!!),
-                    montoTotal = s.montoReserva ?: 0.0,
-                    uuidUser1 = usuario.usuarioUid,
+                    montoTotal = s.tarifario ?: 0.0,
+                    uuidUser1 = usuario.uidAuth,
                     user1 = usuario.usuario,
                     mesaUid = mesaUidFinal,
                     uuidUser2 = s.usuarioRetadoUid ?: "",

@@ -15,6 +15,7 @@ import org.koin.core.context.loadKoinModules
 import org.koin.core.context.unloadKoinModules
 import org.koin.dsl.module
 import pe.breaker.dkaviplay.presentation.navigation.NotificationHandler
+import pe.breaker.dkaviplay.util.ClipboardManager
 
 class MainActivity : ComponentActivity() {
     private val handler: NotificationHandler by inject()
@@ -26,6 +27,8 @@ class MainActivity : ComponentActivity() {
         loadKoinModules(module {
             single<Context> { this@MainActivity }
         })
+
+        ClipboardManager.applicationContext = applicationContext
 
         checkIntent(intent)
 

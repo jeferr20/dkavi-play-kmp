@@ -5,14 +5,14 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class UsuarioEntity (
-    @SerialName("vc_usuario_uid")
-    val usuarioUid : String,
+    @SerialName("i_usuario_id")
+    val usuarioUid : Int,
+
+    @SerialName("vc_uid_auth")
+    val uidAuth : String,
 
     @SerialName("vc_usuario")
     val usuario : String,
-
-    @SerialName("vc_rango")
-    val rango : String,
 
     @SerialName("i_puntos")
     val puntos : Int,
@@ -29,9 +29,6 @@ data class UsuarioEntity (
     @SerialName("vc_rol")
     val rol: String,
 
-    @SerialName("vc_inventario")
-    val inventarioJson: String,
-
     @SerialName("vc_genero")
     val genero: String,
 
@@ -47,9 +44,21 @@ data class UsuarioEntity (
     @SerialName("vc_sedePreferencia")
     val sedePreferencia: String,
 
-    @SerialName("vc_horarios")
-    val horariosJson: String,
-
     @SerialName("i_monedas")
     val monedas: Int,
+
+    @SerialName("vc_nombres")
+    val nombres: String,
+
+    @SerialName("vc_apellidoPaterno")
+    val apellidoPaterno: String,
+
+    @SerialName("vc_apellidoMaterno")
+    val apellidoMaterno: String,
+
+    @SerialName("vc_celular")
+    val celular: String,
+
+    @SerialName("vc_correo")
+    val correo: String,
 )

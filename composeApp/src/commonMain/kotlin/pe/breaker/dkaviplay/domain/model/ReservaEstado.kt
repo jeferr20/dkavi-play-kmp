@@ -20,7 +20,6 @@ enum class ReservaEstado(
     fun puedeDarResultado () : Boolean = this == EN_JUEGO
     fun puedeVerResultado() : Boolean = this == FINALIZADO
     fun puedeEscogerItem() : Boolean = this == APROBADO
-    fun puedePagarse() : Boolean = this == RESERVA_PENDIENTE
 
     companion object {
         fun fromId(id: Int?): ReservaEstado {

@@ -12,7 +12,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ConfirmationNumber
+import androidx.compose.material.icons.filled.Casino
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -36,11 +36,9 @@ import pe.breaker.dkaviplay.presentation.util.format
 fun ResumenPrecioReserva(
     modifier: Modifier = Modifier,
     duracion: String,
-    costoHora: String,
-    comisionPorUsuario: Double,
-    montoTotal: String
+    montoReserva: Double,
 ) {
-    val comisionTotal = comisionPorUsuario * 2
+    val costoMitadUsuario = montoReserva / 2
 
     Card(
         modifier = modifier
@@ -62,17 +60,17 @@ fun ResumenPrecioReserva(
                 value = duracion
             )
 
-//            ResumenRow(
-//                icon = Icons.Filled.Payments,
-//                label = "Costo por Hora",
-//                value = costoHora
-//            )
+            ResumenRow(
+                icon = Icons.Filled.Casino,
+                label = "Monto Total Mesa",
+                value = "${montoReserva.format(0)} Monedas"
+            )
 
             ResumenRow(
-                icon = Icons.Filled.ConfirmationNumber,
-                label = "Comisión por usuario (x2)",
-                value = "S/. ${comisionTotal.format(2)}",
-                valueColor = colorPrimary
+                icon = Icons.Filled.Casino,
+                label = "Dividido por jugador (50%)",
+                value = "${costoMitadUsuario.format(0)} Monedas",
+                valueColor = Color.White.copy(alpha = 0.6f)
             )
 
             HorizontalDivider(
@@ -89,19 +87,19 @@ fun ResumenPrecioReserva(
                     modifier = Modifier.weight(1f)
                 ) {
                     Text(
-                        text = "Total a Pagar",
+                        text = "Tu total a pagar",
                         color = colorPrimary,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold
                     )
                     Text(
-                        text = "Incluye impuestos",
+                        text = "Se descontará de tu saldo",
                         color = Color.Gray,
                         fontSize = 11.sp,
                     )
                 }
                 Text(
-                    text = montoTotal,
+                    text = "${costoMitadUsuario.format(0)} Monedas",
                     color = colorPrimary,
                     fontWeight = FontWeight.ExtraBold,
                     fontSize = 28.sp,

@@ -7,26 +7,24 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.DateTimeUnit
-import kotlinx.datetime.TimeZone
 import kotlinx.datetime.minus
-import kotlinx.datetime.toInstant
 import pe.breaker.dkaviplay.di.UserSessionManager
 import pe.breaker.dkaviplay.domain.model.Reserva
 import pe.breaker.dkaviplay.domain.repository.TimeRepository
 import pe.breaker.dkaviplay.domain.usecase.EliminarReservaUseCase
 import pe.breaker.dkaviplay.domain.usecase.GetReservasUseCase
-import pe.breaker.dkaviplay.presentation.util.parseStringToLocalDateTime
+import pe.breaker.dkaviplay.util.DateTimeFormatter
 
 class ReservasModel(
     private val sessionManager: UserSessionManager,
     private val getReservasUseCase: GetReservasUseCase,
     private val eliminarReservaUseCase : EliminarReservaUseCase,
-    private val timeRepository: TimeRepository
+    private val timeRepository: TimeRepository,
+    private val dateTimeFormatter: DateTimeFormatter
 ) : StateScreenModel<ReservasState>(ReservasState()){
 
     private var reservasJob: Job? = null
     private var allReservas: List<Reserva> = emptyList()
-    private val timeZone = TimeZone.of("America/Lima")
 
     init {
         val uid = sessionManager.getUserUid() ?: ""
@@ -57,29 +55,29 @@ class ReservasModel(
 
         val filtradas = when (currentFilter) {
             ReservaFilter.TODAS -> allReservas
-            ReservaFilter.ACTUALES -> allReservas.filter {
-                val fin = parseStringToLocalDateTime(it.fechaFin).toInstant(timeZone)
-                fin > now
+            ReservaFilter.ACTUALES -> allReservas.filter { reserva ->
+                val finInstant = dateTimeFormatter.parseIsoToInstant(reserva.fechaFin)
+                finInstant != null && finInstant > now
             }.sortedWith(
                 compareByDescending<Reserva> {
-                    // Retos pendientes de MI confirmación
                     it.esperandoConfirmacion && it.userPendienteUid == uid
                 }.thenBy {
-                    //Las que están ocurriendo o más próximas a iniciar
-                    parseStringToLocalDateTime(it.fechaInicio).toInstant(timeZone)
+                    dateTimeFormatter.parseIsoToInstant(it.fechaInicio)
                 }
             )
 
-            ReservaFilter.HISTORIAL -> allReservas.filter {
-                val fin = parseStringToLocalDateTime(it.fechaFin).toInstant(timeZone)
-                fin <= now
+            ReservaFilter.HISTORIAL -> allReservas.filter { reserva ->
+                val finInstant = dateTimeFormatter.parseIsoToInstant(reserva.fechaFin)
+                finInstant != null && finInstant <= now
             }.sortedByDescending {
-                parseStringToLocalDateTime(it.fechaInicio).toInstant(timeZone)
+                dateTimeFormatter.parseIsoToInstant(it.fechaInicio)
             }
         }
 
+        // 💡 Guardamos tanto las reservas como el tiempo seguro de este ciclo en el estado
         mutableState.update { it.copy(
             reservas = filtradas,
+            serverTime = now,
             isLoading = false,
             isSuccess = true
         ) }
@@ -120,18 +118,23 @@ class ReservasModel(
 
         return try {
             val now = timeRepository.getServerTime()
-            val inicio = parseStringToLocalDateTime(reserva.fechaInicio).toInstant(timeZone)
-            val fin = parseStringToLocalDateTime(reserva.fechaFin).toInstant(timeZone)
+            val inicio = dateTimeFormatter.parseIsoToInstant(reserva.fechaInicio)
+            val fin = dateTimeFormatter.parseIsoToInstant(reserva.fechaFin)
+
+            if (inicio == null || fin == null) {
+                mutableState.update { it.copy(isLoading = false, errorMessage = "Error en el formato de la reserva") }
+                return false
+            }
 
             val inicioConMargen = inicio.minus(1, DateTimeUnit.MINUTE)
 
             when {
                 now < inicioConMargen -> {
-                    val horaSolo = reserva.fechaInicio.split(" ").getOrNull(1)?.take(5) ?: reserva.fechaInicio
+                    val horaFormateada = dateTimeFormatter.formatTimeToHHMM(reserva.fechaInicio)
                     mutableState.update {
                         it.copy(
                             isLoading = false,
-                            errorMessage = "La partida empieza a las $horaSolo. ¡Paciencia, campeón!"
+                            errorMessage = "La partida empieza a las $horaFormateada. ¡Paciencia, campeón!"
                         )
                     }
                     false

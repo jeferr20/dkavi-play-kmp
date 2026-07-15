@@ -1,7 +1,7 @@
 package pe.breaker.dkaviplay.presentation.screen.registerUsuario
 
 data class RegisterUsuarioState(
-    val usuarioUid: String? = null,
+    val usuarioUid: Int? = null,
     val isLoading: Boolean = false,
     val isLoadingSedes: Boolean = false,
     val isStepOneSuccess: Boolean = false,

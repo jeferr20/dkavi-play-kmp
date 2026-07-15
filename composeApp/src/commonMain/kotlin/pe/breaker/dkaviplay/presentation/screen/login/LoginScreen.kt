@@ -44,6 +44,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import pe.breaker.dkaviplay.domain.model.LoginResult
 import pe.breaker.dkaviplay.presentation.components.button.CustomButtonFilled
 import pe.breaker.dkaviplay.presentation.components.dialog.LoadingDialog
 import pe.breaker.dkaviplay.presentation.components.dialog.StatusDialog
@@ -51,6 +52,7 @@ import pe.breaker.dkaviplay.presentation.components.form.FormTextField
 import pe.breaker.dkaviplay.presentation.screen.forgetPassword.ForgetPasswordScreen
 import pe.breaker.dkaviplay.presentation.screen.login.components.IconHeader
 import pe.breaker.dkaviplay.presentation.screen.login.components.NoAccount
+import pe.breaker.dkaviplay.presentation.screen.registerDatos.RegisterDatosScreen
 import pe.breaker.dkaviplay.presentation.screen.registerUsuario.RegisterUsuarioScreen
 import pe.breaker.dkaviplay.presentation.screen.splash.SplashScreen
 import pe.breaker.dkaviplay.presentation.theme.colorPrimary
@@ -77,9 +79,15 @@ class LoginScreen : Screen {
             )
         )
 
-        LaunchedEffect(state.isSuccess) {
-            if (state.isSuccess) {
-                navigator.replaceAll(SplashScreen())
+        LaunchedEffect(state.navigationResult) {
+            when (val result = state.navigationResult) {
+                is LoginResult.Success -> {
+                    navigator.replaceAll(SplashScreen())
+                }
+                is LoginResult.Incomplete -> {
+                    navigator.replaceAll(RegisterDatosScreen(false, result.usuarioId))
+                }
+                null -> Unit
             }
         }
 

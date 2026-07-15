@@ -29,7 +29,6 @@ fun mapToReserva(
         fechaFin = reserva.fechaFin?.let { timestampToStringCompleto(it.seconds) } ?: "Sin hora",
         estadoColor = estadoEnum.colorHex,
         montoTotal = reserva.montoTotal ?: 0.0,
-        montoPagado = reserva.montoTotalPagado ?: 0.0,
         creador = reserva.user1 ?: "",
         creadorUid = reserva.uuidUser1 ?: "",
         retado = reserva.user2 ?: "",

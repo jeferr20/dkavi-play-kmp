@@ -1,15 +1,18 @@
 package pe.breaker.dkaviplay.data.database
 
 import app.cash.sqldelight.coroutines.asFlow
+import app.cash.sqldelight.coroutines.mapToList
 import app.cash.sqldelight.coroutines.mapToOneOrNull
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
 import pe.breaker.dkaviplay.cache.AppDatabase
 import pe.breaker.dkaviplay.cache.DatabaseDriverFactory
-import pe.breaker.dkaviplay.cache.PersonaTable
+import pe.breaker.dkaviplay.cache.HorarioTable
+import pe.breaker.dkaviplay.cache.InventarioTable
 import pe.breaker.dkaviplay.cache.UsuarioTable
-import pe.breaker.dkaviplay.data.entity.PersonaEntity
+import pe.breaker.dkaviplay.data.entity.HorarioEntity
+import pe.breaker.dkaviplay.data.entity.InventarioEntity
 import pe.breaker.dkaviplay.data.entity.UsuarioEntity
 import pe.breaker.dkaviplay.data.mapper.toTable
 
@@ -27,29 +30,49 @@ class Database(databaseDriverFactory: DatabaseDriverFactory) {
             .mapToOneOrNull(Dispatchers.IO)
     }
 
-    fun getCurrentPersonaFlow(): Flow<PersonaTable?> {
-        return dbQuery.getPersonaTable()
+    fun getCurrentInventarioFlow(): Flow<List<InventarioTable>> {
+        return dbQuery.getInventarioTable()
             .asFlow()
-            .mapToOneOrNull(Dispatchers.IO)
+            .mapToList(Dispatchers.IO)
     }
 
-    internal fun getPersonaTable(): PersonaTable? {
-        return dbQuery.getPersonaTable().executeAsOneOrNull()
+    internal fun getHorarioTable(): List<HorarioTable> {
+        return dbQuery.getHorarioTable().executeAsList()
     }
 
     internal fun insertUsuarioTable(usuario: UsuarioEntity){
         dbQuery.insertUsuarioTable(usuario.toTable())
     }
 
-    internal fun insertPersonaTable(persona: PersonaEntity){
-        dbQuery.insertPersonaTable(persona.toTable())
+    internal fun insertInventarioTable(inventario: List<InventarioEntity>){
+        dbQuery.transaction {
+            dbQuery.removeInventarioTable()
+
+            inventario.forEach { item ->
+                dbQuery.insertInventarioTable(item.toTable())
+            }
+        }
     }
 
-    internal fun clearPersonaTable() {
-        dbQuery.removePersonaTable()
+    internal fun insertHorarioTable(horario: List<HorarioEntity>){
+        dbQuery.transaction {
+            dbQuery.removeHorarioTable()
+
+            horario.forEach { item ->
+                dbQuery.insertHorarioTable(item.toTable())
+            }
+        }
     }
 
     internal fun clearUsuarioTable() {
         dbQuery.removeUsuarioTable()
+    }
+
+    internal fun clearInventarioable() {
+        dbQuery.removeInventarioTable()
+    }
+
+    internal fun clearHorarioTable() {
+        dbQuery.removeHorarioTable()
     }
 }

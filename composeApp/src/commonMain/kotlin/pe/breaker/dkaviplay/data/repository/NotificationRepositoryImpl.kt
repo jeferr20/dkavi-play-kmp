@@ -1,6 +1,5 @@
 package pe.breaker.dkaviplay.data.repository
 
-import dev.gitlive.firebase.firestore.FirebaseFirestore
 import dev.gitlive.firebase.messaging.FirebaseMessaging
 import io.ktor.client.HttpClient
 import io.ktor.client.request.post
@@ -9,12 +8,12 @@ import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import pe.breaker.dkaviplay.data.remote.dto.DataNotificacionDTO
 import pe.breaker.dkaviplay.data.remote.dto.SendNotificationRequestDTO
+import pe.breaker.dkaviplay.data.remote.dto.request.RequestUpdateTokenDTO
 import pe.breaker.dkaviplay.data.util.ConstatesCloud
 import pe.breaker.dkaviplay.data.util.handleResponse
 import pe.breaker.dkaviplay.domain.repository.NotificationRepository
 
 class NotificationRepositoryImpl(
-    private val firestore: FirebaseFirestore,
     private val firebaseMessaging: FirebaseMessaging,
     private val getUserUid: () -> String?,
     private val httpClient: HttpClient,
@@ -23,23 +22,29 @@ class NotificationRepositoryImpl(
     override suspend fun saveToken(token: String?): Result<Unit> {
         val finalToken = if (token.isNullOrEmpty()) firebaseMessaging.getToken() else token
         val userUid = getUserUid() ?: return Result.failure(Exception("No user"))
-        return try {
-            firestore.collection("UserMovil").document(userUid)
-                .update(mapOf("fcmToken" to finalToken))
+
+        val response =
+            httpClient.post("${ConstatesCloud.URLBASE}apiPublic/public/notificaciones/updateFCMToken") {
+                contentType(ContentType.Application.Json)
+                setBody(RequestUpdateTokenDTO(userUid, finalToken))
+            }
+        return handleResponse<String, Unit>(response) { msg ->
+            println("Respuesta del server: $msg")
             Result.success(Unit)
-        } catch (e: Exception) {
-            Result.failure(e)
         }
     }
 
     override suspend fun deleteToken(): Result<Unit> {
         val userUid = getUserUid() ?: return Result.failure(Exception("No user"))
-        return try {
-            firestore.collection("UserMovil").document(userUid)
-                .update(mapOf("fcmToken" to null))
+
+        val response =
+            httpClient.post("${ConstatesCloud.URLBASE}apiPublic/public/notificaciones/updateFCMToken") {
+                contentType(ContentType.Application.Json)
+                setBody(RequestUpdateTokenDTO(userUid, null))
+            }
+        return handleResponse<String, Unit>(response) { msg ->
+            println("Respuesta del server: $msg")
             Result.success(Unit)
-        } catch (e: Exception) {
-            Result.failure(e)
         }
     }
 
@@ -53,7 +58,7 @@ class NotificationRepositoryImpl(
             data = DataNotificacionDTO(action = action)
         )
         val response =
-            httpClient.post("${ConstatesCloud.URLBASE}apiPublic/public/notificaciones") {
+            httpClient.post("${ConstatesCloud.URLBASE}apiPublic/public/notificaciones/send") {
                 contentType(ContentType.Application.Json)
                 setBody(requestBody)
             }

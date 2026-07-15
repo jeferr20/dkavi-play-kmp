@@ -5,8 +5,11 @@ import kotlinx.datetime.toLocalDateTime
 import pe.breaker.dkaviplay.data.remote.firebase.EmpresaFirebase
 import pe.breaker.dkaviplay.data.remote.firebase.SedeFirebase
 import pe.breaker.dkaviplay.data.remote.firebase.SedeHorarioFirebase
+import pe.breaker.dkaviplay.data.remote.supabase.HorarioSedeDTO
+import pe.breaker.dkaviplay.data.remote.supabase.view.SedeEmpresaView
 import pe.breaker.dkaviplay.domain.model.HorarioSede
 import pe.breaker.dkaviplay.domain.model.Sede
+import pe.breaker.dkaviplay.util.Dias
 import kotlin.time.Clock
 
 fun mapToSede(
@@ -42,16 +45,7 @@ fun SedeHorarioFirebase.toDomain(): HorarioSede {
 fun List<HorarioSede>.findTodaySchedule(): String {
     val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).dayOfWeek
 
-    val dayName = when(today.name) {
-        "MONDAY" -> "Lunes"
-        "TUESDAY" -> "Martes"
-        "WEDNESDAY" -> "Miércoles"
-        "THURSDAY" -> "Jueves"
-        "FRIDAY" -> "Viernes"
-        "SATURDAY" -> "Sábado"
-        "SUNDAY" -> "Domingo"
-        else -> ""
-    }
+    val dayName = Dias.fromDayOfWeek(today)?.dia.orEmpty()
 
     val horarioHoy = this.find { it.dia.contains(dayName, ignoreCase = true) }
 
@@ -60,4 +54,30 @@ fun List<HorarioSede>.findTodaySchedule(): String {
     } else {
         "${horarioHoy.inicio} - ${horarioHoy.fin}"
     }
+}
+
+fun SedeEmpresaView.toDomain(): Sede {
+    return Sede(
+        sedeUid = this.sedeId.toString(),
+        empresaUid = this.empresaId.toString(),
+        nombreSede = this.nombreSede,
+        direccion = this.direccion ?: "",
+        numSede = this.numSede ?: "",
+        referencia = this.referencia ?: "",
+        nombreEmpresa = this.nombreEmpresa,
+        logo = this.logo ?: "",
+        ruc = this.ruc ?: "",
+        latitud = this.latitud,
+        longitud = this.longitud,
+        horario = this.horarios.map { it.toDomain() }
+    )
+}
+
+fun HorarioSedeDTO.toDomain(): HorarioSede {
+    return HorarioSede(
+        activo = this.activo,
+        dia = this.dia,
+        fin = this.fin,
+        inicio = this.inicio
+    )
 }

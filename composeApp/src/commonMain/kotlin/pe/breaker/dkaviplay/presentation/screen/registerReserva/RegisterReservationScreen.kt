@@ -47,7 +47,6 @@ import pe.breaker.dkaviplay.presentation.screen.registerReserva.components.Mesas
 import pe.breaker.dkaviplay.presentation.screen.registerReserva.components.ReservationStatusOverlay
 import pe.breaker.dkaviplay.presentation.screen.registerReserva.components.ReservationTimeSection
 import pe.breaker.dkaviplay.presentation.screen.registerReserva.components.ResumenPrecioReserva
-import pe.breaker.dkaviplay.presentation.util.format
 
 class RegisterReservationScreen(val sede: Sede, private val usuario: UserQuick) : Screen {
     @Composable
@@ -165,9 +164,7 @@ class RegisterReservationScreen(val sede: Sede, private val usuario: UserQuick) 
 
                         ResumenPrecioReserva(
                             duracion = screenModel.calcularDuracion(),
-                            costoHora = state.precioPorHora?.let { "S/ ${it.format(2)}" } ?: "...",
-                            comisionPorUsuario = 5.0,
-                            montoTotal = state.montoReserva?.let { "S/ ${it.format(2)}" } ?: "S/ 0.00",
+                            montoReserva = state.tarifario ?: 0.0,
                         )
 
                         Spacer(modifier = Modifier.height(32.dp))

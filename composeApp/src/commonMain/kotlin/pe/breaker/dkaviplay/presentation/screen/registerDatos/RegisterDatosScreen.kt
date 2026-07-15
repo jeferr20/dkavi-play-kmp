@@ -10,6 +10,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -51,13 +52,16 @@ import pe.breaker.dkaviplay.presentation.screen.registerDatos.component.DatosUbi
 import pe.breaker.dkaviplay.presentation.screen.registerDatos.component.InfoContacto
 import pe.breaker.dkaviplay.presentation.util.StatusUiType
 
-class RegisterDatosScreen(private val isLogged: Boolean, private val usuarioUid: String?) : Screen {
+class RegisterDatosScreen(
+    private val isLogged: Boolean,
+    private val usuarioId: Int?,
+) : Screen {
     @OptIn(InternalVoyagerApi::class)
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val screenModel = koinScreenModel<RegisterDatosModel>(
-            parameters = { parametersOf(usuarioUid, isLogged) }
+            parameters = { parametersOf(isLogged,usuarioId) }
         )
         val state by screenModel.state.collectAsState()
 
@@ -155,6 +159,8 @@ class RegisterDatosScreen(private val isLogged: Boolean, private val usuarioUid:
                             enabled = !state.isLoading,
                             text = if (isLogged) "ACTUALIZAR DATOS" else "FINALIZAR REGISTRO"
                         )
+
+                        Spacer(modifier = Modifier.height(16.dp))
                     }
                 }
 

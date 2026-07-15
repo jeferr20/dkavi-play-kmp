@@ -14,7 +14,6 @@ data class Reserva(
     val fechaInicio: String,
     val fechaFin: String,
     val montoTotal: Double,
-    val montoPagado: Double,
     val mesa: String,
     val creador: String,
     val creadorUid: String,

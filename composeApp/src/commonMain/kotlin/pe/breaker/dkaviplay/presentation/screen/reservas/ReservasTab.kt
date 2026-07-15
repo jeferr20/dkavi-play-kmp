@@ -39,7 +39,6 @@ import org.koin.core.parameter.parametersOf
 import pe.breaker.dkaviplay.domain.model.Reserva
 import pe.breaker.dkaviplay.domain.model.inventory.TipoPremio
 import pe.breaker.dkaviplay.presentation.components.dialog.LoadingDialog
-import pe.breaker.dkaviplay.presentation.components.dialog.QRPagoDialog
 import pe.breaker.dkaviplay.presentation.components.dialog.StatusDialog
 import pe.breaker.dkaviplay.presentation.screen.aceptarReto.AceptarRetoScreen
 import pe.breaker.dkaviplay.presentation.screen.acuerdoMutuo.AcuerdoMutuoScreen
@@ -76,8 +75,6 @@ object ReservasTab : Tab {
         val inventarioState by inventarioModel.state.collectAsState()
 
         var showInventario by remember { mutableStateOf(false) }
-        var showQRPago by remember { mutableStateOf(false) }
-
         var reservaSeleccionada by remember { mutableStateOf<Reserva?>(null) }
         val pagerState = rememberPagerState(pageCount = { ReservaFilter.entries.size })
 
@@ -134,7 +131,7 @@ object ReservasTab : Tab {
                 onRefresh = { reservaTabModel.refresh() },
                 modifier = Modifier
                     .fillMaxSize()
-                   .padding(padding),
+                    .padding(padding),
                 indicator = {
                     PullToRefreshDefaults.Indicator(
                         state = pullToRefreshState,
@@ -161,9 +158,9 @@ object ReservasTab : Tab {
                             navigator?.push(AceptarRetoScreen(reserva.reservaUid))
                         },
                         onStartGame = { reserva ->
-                            if (!state.isLoading){
+                            if (!state.isLoading) {
                                 scope.launch {
-                                    if(reservaTabModel.validarHoraInicio(reserva)){
+                                    if (reservaTabModel.validarHoraInicio(reserva)) {
                                         navigator?.push(RetoIniciadoScreen(reserva.reservaUid))
                                     }
                                 }
@@ -179,16 +176,12 @@ object ReservasTab : Tab {
                         onShowInventario = { reserva ->
                             reservaSeleccionada = reserva
                             showInventario = true
-                        },
-                        onShowQrPago = {reserva ->
-                            reservaSeleccionada = reserva
-                            showQRPago = true
                         }
                     )
                 }
             }
 
-            reservaSeleccionada?.let{ reserva ->
+            reservaSeleccionada?.let { reserva ->
                 if (showInventario) {
                     InventarioBottomSheetWrapper(
                         inventarioModel = inventarioModel,
@@ -198,17 +191,6 @@ object ReservasTab : Tab {
                             showInventario = false
                             reservaSeleccionada = null
                         }
-                    )
-                }
-
-                if (showQRPago) {
-                    QRPagoDialog(
-                        onDismissRequest = {
-                            showQRPago = false
-                            reservaSeleccionada = null
-                        },
-                        monto = reserva.montoTotal - reserva.montoPagado,
-                        text = "Escanea el código QR para completar el pago de tu reserva.",
                     )
                 }
             }
@@ -226,7 +208,9 @@ object ReservasTab : Tab {
                 )
             }
 
-            if(isInitialLoading) LoadingDialog(message = "Cargando Reservas...", subMessage = "Espere por favor")
+            if (isInitialLoading) {
+                LoadingDialog(message = "Cargando Reservas...", subMessage = "Espere por favor")
+            }
         }
     }
 }

@@ -3,6 +3,7 @@ package pe.breaker.dkaviplay.di
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
+import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.client.request.header
 import io.ktor.http.encodedPath
 import io.ktor.serialization.kotlinx.json.json
@@ -40,6 +41,7 @@ val networkModule = module {
 
     single {
         provideHttpClient().config {
+            install(WebSockets)
             defaultRequest {
                 val sessionManager = get<UserSessionManager>()
                 val token = sessionManager.getToken()

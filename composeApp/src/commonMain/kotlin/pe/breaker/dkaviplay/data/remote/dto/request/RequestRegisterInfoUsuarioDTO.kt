@@ -1,11 +1,10 @@
-package pe.breaker.dkaviplay.data.remote.dto
+package pe.breaker.dkaviplay.data.remote.dto.request
 
 import kotlinx.serialization.Serializable
-import pe.breaker.dkaviplay.data.remote.firebase.UserHorarioFirebase
 
 @Serializable
-data class RegisterUsuarioRequestDto(
-    val usuarioUid: String,
+data class RequestRegisterInfoUsuarioDTO(
+    val usuarioUid: Int,
     val nombres: String,
     val apellidoPaterno: String,
     val apellidoMaterno: String,
@@ -16,6 +15,6 @@ data class RegisterUsuarioRequestDto(
     val departamento: String,
     val provincia: String,
     val distrito: String,
-    val horarios: List<UserHorarioFirebase>,
+    val horarios: List<RequestHorarioDTO>,
     val sedePreferencia: String
 )

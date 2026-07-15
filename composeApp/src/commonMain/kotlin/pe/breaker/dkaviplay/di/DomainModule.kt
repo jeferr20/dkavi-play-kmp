@@ -4,8 +4,6 @@ import org.koin.dsl.module
 import pe.breaker.dkaviplay.domain.usecase.CheckSessionUseCase
 import pe.breaker.dkaviplay.domain.usecase.DeleteAccountUseCase
 import pe.breaker.dkaviplay.domain.usecase.EliminarReservaUseCase
-import pe.breaker.dkaviplay.domain.usecase.GetCurrentPersonaUseCase
-import pe.breaker.dkaviplay.domain.usecase.GetMensajeCompraUseCase
 import pe.breaker.dkaviplay.domain.usecase.GetMesaUseCase
 import pe.breaker.dkaviplay.domain.usecase.GetReservasUseCase
 import pe.breaker.dkaviplay.domain.usecase.GetSedesByUbigeoUseCase
@@ -22,6 +20,9 @@ import pe.breaker.dkaviplay.domain.usecase.SendNotificacionUseCase
 import pe.breaker.dkaviplay.domain.usecase.UpdatePasswordUseCase
 import pe.breaker.dkaviplay.domain.usecase.UploadProfileImageUseCase
 import pe.breaker.dkaviplay.domain.usecase.VerifyCodeUseCase
+import pe.breaker.dkaviplay.domain.usecase.moneda.GetMensajeCompraUseCase
+import pe.breaker.dkaviplay.domain.usecase.moneda.GetTarifaMonedaUseCase
+import pe.breaker.dkaviplay.domain.usecase.moneda.InsertMonedaLogUseCase
 
 val domainModule = module {
     factory { LoginUseCase(get()) }
@@ -32,9 +33,8 @@ val domainModule = module {
     factory { UpdatePasswordUseCase(get()) }
     factory { RegisterReservationUseCase(get()) }
     factory { LogOutUseCase(get()) }
-    factory { GetCurrentPersonaUseCase(get()) }
     factory { DeleteAccountUseCase(get()) }
-    factory { CheckSessionUseCase(get(),get(),get()) }
+    factory { CheckSessionUseCase(get(),get(),get(),get(),get()) }
     factory { GetReservasUseCase(get()) }
     factory { EliminarReservaUseCase(get()) }
     factory { GetMesaUseCase(get()) }
@@ -44,5 +44,7 @@ val domainModule = module {
     factory { GetSedesByUbigeoUseCase(get()) }
     factory { ObserveAppConfigUseCase(get()) }
     factory { SendNotificacionUseCase(get()) }
-    factory { GetMensajeCompraUseCase() }
+    factory { GetMensajeCompraUseCase(get()) }
+    factory { GetTarifaMonedaUseCase(get()) }
+    factory { InsertMonedaLogUseCase(get()) }
 }

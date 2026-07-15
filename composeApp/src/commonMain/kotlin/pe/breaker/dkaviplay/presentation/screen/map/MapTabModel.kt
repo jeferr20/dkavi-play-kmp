@@ -6,10 +6,13 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import pe.breaker.dkaviplay.di.UserSessionManager
 import pe.breaker.dkaviplay.domain.repository.SedeRepository
+import pe.breaker.dkaviplay.util.obtenerCoordenadasPorUbigeo
 
 class MapTabModel(
     private val sedeRepository: SedeRepository,
+    private val userSessionManager: UserSessionManager
 ) : StateScreenModel<MapTabState>(MapTabState()) {
 
     private var mesasJob: Job? = null
@@ -23,7 +26,14 @@ class MapTabModel(
         if (sedesJob?.isActive == true) return
 
         sedesJob = screenModelScope.launch {
-            mutableState.update { it.copy(isLoading = true, errorMessage = null, isSuccess = false) }
+            mutableState.update {
+                it.copy(
+                    isLoading = true,
+                    errorMessage = null,
+                    isSuccess = false
+                )
+            }
+            val usuarioDepartamento = userSessionManager.getCurrentUsuario()?.departamento
 
             sedeRepository.getSedes()
                 .catch { error ->
@@ -33,17 +43,30 @@ class MapTabModel(
                 }
                 .collect { result ->
                     result.onSuccess { sedes ->
+                        val centroCalculado = if (sedes.isNotEmpty()) {
+                            val avgLat = sedes.map { it.latitud }.average()
+                            val avgLng = sedes.map { it.longitud }.average()
+                            Pair(avgLat, avgLng)
+                        } else {
+                            obtenerCoordenadasPorUbigeo(usuarioDepartamento) ?: Pair(-12.0464, -77.0428)
+                        }
+
                         mutableState.update {
                             it.copy(
                                 isLoading = false,
                                 sedes = sedes,
+                                mapCenter = centroCalculado,
                                 isSuccess = true,
                                 errorMessage = null
                             )
                         }
                     }.onFailure { error ->
                         mutableState.update {
-                            it.copy(isLoading = false, errorMessage = error.message, isSuccess = false)
+                            it.copy(
+                                isLoading = false,
+                                errorMessage = error.message,
+                                isSuccess = false
+                            )
                         }
                     }
                 }

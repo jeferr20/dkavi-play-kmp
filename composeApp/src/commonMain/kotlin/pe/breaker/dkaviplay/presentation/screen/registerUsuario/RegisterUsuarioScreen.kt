@@ -84,7 +84,7 @@ class RegisterUsuarioScreen : Screen {
 
         LaunchedEffect(state.isStepOneSuccess) {
             if (state.isStepOneSuccess) {
-                navigator.replaceAll(RegisterDatosScreen(false, state.usuarioUid ?: ""))
+                navigator.replaceAll(RegisterDatosScreen(false, state.usuarioUid))
             }
         }
 

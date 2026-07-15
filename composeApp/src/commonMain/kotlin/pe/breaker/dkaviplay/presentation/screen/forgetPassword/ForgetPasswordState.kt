@@ -6,7 +6,7 @@ data class ForgetPasswordState(
     val correo: String? = null,
     val correoError: String? = null,
 
-    val userUid: String? = null,
+    val userId: Int? = null,
     val code: String = "",
     val codeError: String? = null,
 

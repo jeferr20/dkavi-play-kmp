@@ -2,31 +2,27 @@ package pe.breaker.dkaviplay.di
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import kotlinx.serialization.json.Json
+import kotlinx.coroutines.withContext
 import pe.breaker.dkaviplay.data.database.Database
-import pe.breaker.dkaviplay.data.entity.PersonaEntity
-import pe.breaker.dkaviplay.data.entity.UsuarioEntity
-import pe.breaker.dkaviplay.data.remote.firebase.InventarioFirebase
+import pe.breaker.dkaviplay.data.entity.UsuarioConInventario
 import pe.breaker.dkaviplay.domain.model.GlobalEvent
 import pe.breaker.dkaviplay.domain.model.inventory.PremiosRegistry
 import pe.breaker.dkaviplay.domain.model.rango.RangoRegistry
-import pe.breaker.dkaviplay.domain.repository.PersonaRepository
 import pe.breaker.dkaviplay.domain.repository.UsuarioRepository
 
 class SessionSyncManager(
     private val sessionManager: UserSessionManager,
-    private val personaRepository: PersonaRepository,
     private val usuarioRepository: UsuarioRepository,
     private val database: Database
 ) {
@@ -38,36 +34,62 @@ class SessionSyncManager(
     )
     val globalEvent = _globalEvent.asSharedFlow()
 
-    private var personaJob: Job? = null
     private var usuarioJob: Job? = null
+    private var lastUsuario: UsuarioConInventario? = null
+
+    suspend fun awaitFirstSync(): Boolean = withContext(Dispatchers.IO) {
+        val userUidAuth = sessionManager.getUserUid() ?: return@withContext false
+        val userId = sessionManager.getUserId() ?: return@withContext false
+
+        try {
+            // Tomamos estrictamente la primera emisión válida que responda el WebSocket
+            val primeraEmision = usuarioRepository.getUsuarioStream(userUidAuth, userId)
+                .filterNotNull()
+                .first() // 💡 Captura la primera ráfaga y suspende la ejecución aquí
+
+            // Insertamos inmediatamente en la base de datos local en el hilo de I/O
+            database.insertUsuarioTable(primeraEmision.usuario)
+            database.insertInventarioTable(primeraEmision.inventario)
+            database.insertHorarioTable(primeraEmision.horario)
+
+            // Asignamos la memoria inicial para que el startSync() posterior conozca el estado previo
+            lastUsuario = primeraEmision
+            true
+        } catch (e: Exception) {
+            println("❌ Error en la primera sincronización crítica de datos: ${e.message}")
+            false
+        }
+    }
 
     /**
      * Inicia la escucha activa de los streams de Firestore para el usuario autenticado.
      */
     fun startSync() {
-        val userId = sessionManager.getUserUid() ?: return
+        val userUidAuth = sessionManager.getUserUid() ?: return
+        val userId = sessionManager.getUserId() ?: return
 
         if (usuarioJob?.isActive == true) return
-        var lastUsuario: UsuarioEntity? = null
 
-        usuarioJob = usuarioRepository.getUsuarioStream(userId)
+        usuarioJob = usuarioRepository.getUsuarioStream(userUidAuth, userId)
             .filterNotNull()
             .distinctUntilChanged()
             .onEach { nuevo ->
-                val anterior = lastUsuario
+                withContext(Dispatchers.IO) {
+                    try {
+                        database.insertUsuarioTable(nuevo.usuario)
+                        database.insertInventarioTable(nuevo.inventario)
+                        database.insertHorarioTable(nuevo.horario)
+                    } catch (e: Exception) {
+                        println("Error guardando datos reactivos en DB local: ${e.message}")
+                    }
+                }
 
+                val anterior = lastUsuario
                 if (anterior != null) {
                     handleLevelChange(anterior, nuevo)
                     handleInventoryChange(anterior, nuevo)
                 }
-
                 lastUsuario = nuevo
-            }
-            .launchIn(scope)
-
-        personaJob = personaRepository.getPersonaStream(userId)
-            .onEach { persona ->
-                println("Persona sincronizada con éxito: ${persona?.nombres}")
             }
             .launchIn(scope)
     }
@@ -76,27 +98,16 @@ class SessionSyncManager(
      * Cancela las suscripciones activas a los flujos de datos.
      */
     fun stopSync() {
-        personaJob?.cancel()
         usuarioJob?.cancel()
-
-        personaJob = null
         usuarioJob = null
-    }
-
-    /**
-     * Expone el flujo reactivo de la Persona para ser consumido por los Casos de Uso.
-     */
-    fun personaFlow(): Flow<PersonaEntity?> {
-        val userId = sessionManager.getUserUid() ?: return flowOf(null)
-        return personaRepository.getPersonaStream(userId)
     }
 
     /**
      * Evalúa si el incremento de puntos ocasionó una subida de rango/nivel.
      */
-    private fun handleLevelChange(old: UsuarioEntity, new: UsuarioEntity) {
-        val rangoOld = RangoRegistry.obtenerRangoPorPuntos(old.puntos)
-        val rangoNew = RangoRegistry.obtenerRangoPorPuntos(new.puntos)
+    private fun handleLevelChange(old: UsuarioConInventario, new: UsuarioConInventario) {
+        val rangoOld = RangoRegistry.obtenerRangoPorPuntos(old.usuario.puntos)
+        val rangoNew = RangoRegistry.obtenerRangoPorPuntos(new.usuario.puntos)
 
         if (rangoNew.nivel > rangoOld.nivel) {
             scope.launch {
@@ -113,14 +124,14 @@ class SessionSyncManager(
     /**
      * Detecta e identifica si se han añadido nuevos artículos al inventario JSON del usuario.
      */
-    private fun handleInventoryChange(old: UsuarioEntity, new: UsuarioEntity) {
-        val oldInv = old.parseInventario()
-        val newInv = new.parseInventario()
+    private fun handleInventoryChange(old: UsuarioConInventario, new: UsuarioConInventario) {
+        val oldInv = old.inventario
+        val newInv = new.inventario
 
         if (oldInv.isEmpty()) return
 
         newInv.forEach { newItem ->
-            val oldItem = oldInv.find { it.id == newItem.id }
+            val oldItem = oldInv.find { it.articuloId == newItem.articuloId }
 
             val gainedAmount = when {
                 oldItem == null -> newItem.cantidad
@@ -130,23 +141,12 @@ class SessionSyncManager(
 
             if (gainedAmount > 0) {
                 scope.launch {
-                    PremiosRegistry.buscarPorId(newItem.id)?.let { detalleBase ->
+                    PremiosRegistry.buscarPorId(newItem.articuloId)?.let { detalleBase ->
                         val premioGanado = detalleBase.copy(cantidad = gainedAmount)
                         _globalEvent.emit(GlobalEvent.ItemGained(premioGanado))
                     }
                 }
             }
-        }
-    }
-
-    /**
-     * Helper extension para deserializar el inventario guardado en formato JSON String.
-     */
-    private fun UsuarioEntity.parseInventario(): List<InventarioFirebase> {
-        return try {
-            Json.decodeFromString<List<InventarioFirebase>>(this.inventarioJson)
-        } catch (e: Exception) {
-            emptyList()
         }
     }
 }

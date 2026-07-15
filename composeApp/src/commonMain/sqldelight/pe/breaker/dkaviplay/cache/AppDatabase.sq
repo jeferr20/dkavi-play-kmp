@@ -1,24 +1,18 @@
 CREATE TABLE UsuarioTable(
     usuarioUid TEXT NOT NULL PRIMARY KEY,
+    uidAuth TEXT NOT NULL,
     usuario TEXT NOT NULL,
-    rango TEXT NOT NULL,
     puntos INTEGER NOT NULL,
     partidasGanadas INTEGER NOT NULL,
     partidasJugadas INTEGER NOT NULL,
     urlImagen TEXT,
     rol TEXT NOT NULL,
-    inventarioJson TEXT,
     genero TEXT NOT NULL,
     departamento TEXT NOT NULL,
     distrito TEXT NOT NULL,
     provincia TEXT NOT NULL,
     sedePreferencia TEXT NOT NULL,
-    horariosJson TEXT NOT NULL,
-    monedas INTEGER NOT NULL
-);
-
-CREATE TABLE PersonaTable(
-    personaUid TEXT NOT NULL PRIMARY KEY,
+    monedas INTEGER NOT NULL,
     nombres TEXT NOT NULL,
     apellidoPaterno TEXT NOT NULL,
     apellidoMaterno TEXT NOT NULL,
@@ -26,22 +20,50 @@ CREATE TABLE PersonaTable(
     correo TEXT NOT NULL
 );
 
+CREATE TABLE InventarioTable(
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    usuarioUid INTEGER NOT NULL,
+    itemId INTEGER NOT NULL,
+    cantidad INTEGER NOT NULL,
+    FOREIGN KEY(usuarioUid) REFERENCES UsuarioTable(usuarioUid)
+);
+
+CREATE TABLE HorarioTable(
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    usuarioUid INTEGER NOT NULL,
+    dia INTEGER NOT NULL,
+    horaInicio TEXT NOT NULL,
+    horaFin TEXT NOT NULL,
+    habilitado INTEGER NOT NULL,
+    FOREIGN KEY(usuarioUid) REFERENCES UsuarioTable(usuarioUid)
+);
+
 insertUsuarioTable:
 INSERT OR REPLACE INTO UsuarioTable
 VALUES ?;
 
-insertPersonaTable:
-INSERT OR REPLACE INTO PersonaTable
+insertInventarioTable:
+INSERT OR REPLACE INTO InventarioTable
+VALUES ?;
+
+insertHorarioTable:
+INSERT OR REPLACE INTO HorarioTable
 VALUES ?;
 
 getUsuarioTable:
 SELECT * FROM UsuarioTable LIMIT 1;
 
-getPersonaTable:
-SELECT * FROM PersonaTable LIMIT 1;
+getInventarioTable:
+SELECT * FROM InventarioTable;
+
+getHorarioTable:
+SELECT * FROM HorarioTable;
 
 removeUsuarioTable:
 DELETE FROM UsuarioTable;
 
-removePersonaTable:
-DELETE FROM PersonaTable;
+removeInventarioTable:
+DELETE FROM InventarioTable;
+
+removeHorarioTable:
+DELETE FROM HorarioTable;

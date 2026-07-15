@@ -72,11 +72,11 @@ class ForgetPasswordModel(
 
             val result = sendCodeUseCase(currentState.correo!!, currentState.phone!!)
 
-            result.onSuccess { uid ->
+            result.onSuccess { id ->
                 mutableState.update {
                     it.copy(
                         isLoading = false,
-                        userUid = uid,
+                        userId = id,
                         step = 1,
                         timerSeconds = 60,
                         canResendCode = false
@@ -91,18 +91,18 @@ class ForgetPasswordModel(
 
     fun verifyCode() {
         val currentState = state.value
-        if (currentState.userUid == null || currentState.code.length != 6) return
+        if (currentState.userId == null || currentState.code.length != 6) return
         println("CODIGO: ${currentState.code}")
         screenModelScope.launch {
             mutableState.update { it.copy(isLoading = true, codeError = null) }
 
-            val result = verifyCodeUseCase(currentState.userUid, currentState.code)
+            val result = verifyCodeUseCase(currentState.userId, currentState.code)
 
-            result.onSuccess { isValid ->
-                if (isValid) {
+            result.onSuccess { msg ->
+                if (msg.isEmpty()) {
                     mutableState.update { it.copy(isLoading = false, step = 2) } // Paso 2: Nueva Clave
                 } else {
-                    mutableState.update { it.copy(isLoading = false, codeError = "Código inválido o expirado") }
+                    mutableState.update { it.copy(isLoading = false, codeError = msg) }
                 }
             }.onFailure { e ->
                 mutableState.update { it.copy(isLoading = false, codeError = e.message) }
@@ -112,7 +112,7 @@ class ForgetPasswordModel(
 
     fun updatePassword() {
         val currentState = state.value
-        val uid = currentState.userUid ?: return
+        val uid = currentState.userId ?: return
         val pass = currentState.newPassword ?: ""
         val confirm = currentState.newPasswordConfirm ?: ""
 
@@ -144,7 +144,7 @@ class ForgetPasswordModel(
 
     fun resetStep() {
         timerJob?.cancel()
-        mutableState.update { it.copy(step = 0, code = "", codeError = null, errorMessage = null, userUid = null) }
+        mutableState.update { it.copy(step = 0, code = "", codeError = null, errorMessage = null, userId = null) }
     }
 
     private fun startResendTimer() {

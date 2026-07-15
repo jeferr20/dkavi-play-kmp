@@ -10,9 +10,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import org.koin.compose.koinInject
 import pe.breaker.dkaviplay.domain.model.Reserva
 import pe.breaker.dkaviplay.presentation.screen.reservas.ReservasState
-import pe.breaker.dkaviplay.presentation.util.formatToRelativeDate
+import pe.breaker.dkaviplay.util.DateTimeFormatter
+import kotlin.time.Clock
 
 @Composable
 fun ReservasContent(
@@ -24,15 +26,18 @@ fun ReservasContent(
     onVerResulatdos: (Reserva) -> Unit,
     onRetry: () -> Unit,
     onShowInventario: (Reserva) -> Unit,
-    onShowQrPago: (Reserva) -> Unit
+    dateTimeFormatter: DateTimeFormatter = koinInject()
 ) {
     if (!state.isLoading && state.reservas.isEmpty()) {
         EmptyReservas(onRetry = onRetry)
         return
     }
 
-    val reservasAgrupadas = remember(state.reservas) {
-        state.reservas.groupBy { formatToRelativeDate(it.fechaInicio) }
+    val reservasAgrupadas = remember(state.reservas, state.serverTime) {
+        val referenceTime = state.serverTime ?: Clock.System.now()
+        state.reservas.groupBy {
+            dateTimeFormatter.formatToRelativeDate(it.fechaInicio, referenceTime)
+        }
     }
 
     LazyColumn(
@@ -58,8 +63,7 @@ fun ReservasContent(
                     onStartGameClick = onStartGame,
                     onVerificarResultado = onVerificarResultado,
                     onVerResultados = onVerResulatdos,
-                    onShowInventario = onShowInventario,
-                    onShowQrPago = onShowQrPago
+                    onShowInventario = onShowInventario
                 )
             }
         }

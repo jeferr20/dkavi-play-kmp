@@ -1,6 +1,6 @@
-import java.util.Properties
-import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING
 import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.INT
+import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -84,6 +84,9 @@ kotlin {
 
     sourceSets {
         all {
+            languageSettings.languageVersion = "2.0"
+            languageSettings.apiVersion = "2.0"
+
             languageSettings.optIn("kotlin.time.ExperimentalTime")
             languageSettings.optIn("androidx.compose.material3.ExperimentalMaterial3Api")
             languageSettings.optIn("org.jetbrains.compose.resources.ExperimentalResourceApi")
@@ -133,6 +136,8 @@ kotlin {
             implementation(libs.ktor.serialization.json)
             implementation(libs.ktor.client.auth)
             implementation(libs.ktor.logging)
+            implementation(libs.ktor.cio)
+            implementation(libs.ktor.websockets)
 
             implementation(libs.sqldelight.coroutines)
 
@@ -170,6 +175,12 @@ kotlin {
             implementation(libs.qr.kit)
 
             implementation(libs.kotlinx.datetime)
+
+            implementation(libs.russhwolf.multiplatform.settings)
+            implementation(libs.supabase.auth)
+            implementation(libs.supabase.functions)
+            implementation(libs.supabase.postgrest)
+            implementation(libs.supabase.realtime)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

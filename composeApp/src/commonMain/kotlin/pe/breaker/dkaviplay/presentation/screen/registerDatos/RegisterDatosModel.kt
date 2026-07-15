@@ -4,11 +4,9 @@ import cafe.adriel.voyager.core.model.StateScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.serialization.json.Json
 import pe.breaker.dkaviplay.data.mapper.toDTO
 import pe.breaker.dkaviplay.data.mapper.toState
-import pe.breaker.dkaviplay.data.remote.dto.RegisterUsuarioRequestDto
-import pe.breaker.dkaviplay.data.remote.firebase.UserHorarioFirebase
+import pe.breaker.dkaviplay.data.remote.dto.request.RequestRegisterInfoUsuarioDTO
 import pe.breaker.dkaviplay.data.repository.UbigeoRepositoryImpl
 import pe.breaker.dkaviplay.di.UserSessionManager
 import pe.breaker.dkaviplay.domain.repository.UbigeoRepository
@@ -16,8 +14,8 @@ import pe.breaker.dkaviplay.domain.usecase.GetSedesByUbigeoUseCase
 import pe.breaker.dkaviplay.domain.usecase.RegisterPersonaUseCase
 
 class RegisterDatosModel(
-    private val usuarioUid: String?,
     private val isLogged: Boolean,
+    private val usuarioId: Int?,
     private val registerPersonaUseCase: RegisterPersonaUseCase,
     private val ubigeoRepository: UbigeoRepository,
     private val getSedesByUbigeoUseCase: GetSedesByUbigeoUseCase,
@@ -33,34 +31,24 @@ class RegisterDatosModel(
     }
 
     private fun loadExistingUserData() {
-        val persona = sessionManager.getCurrentPersona()
+        val horario = sessionManager.getCurrentHorario()
         val usuario = sessionManager.getCurrentUsuario()
-        if (persona != null && usuario != null) {
-            val horario = usuario.horariosJson.let { jsonStr ->
-                try {
-                    Json.decodeFromString<List<UserHorarioFirebase>>(jsonStr)
-                } catch (e: Exception) {
-                    null
-                }
-            }
-
-            if (horario != null) {
-                updateState {
-                    copy(
-                        nombres = persona.nombres,
-                        apellidoPaterno = persona.apellidoPaterno,
-                        apellidoMaterno = persona.apellidoMaterno,
-                        correo = persona.correo,
-                        celular = persona.celular,
-                        genero = usuario.genero,
-                        idSedeSeleccionada = usuario.sedePreferencia,
-                        idDepartamento = usuario.departamento,
-                        idProvincia = usuario.provincia,
-                        idDistrito = usuario.distrito,
-                        personaUid = persona.personaUid,
-                        horarios = horario.map { it.toState() }
-                    )
-                }
+        if (horario.isNotEmpty() && usuario != null) {
+            updateState {
+                copy(
+                    nombres = usuario.nombres,
+                    apellidoPaterno = usuario.apellidoPaterno,
+                    apellidoMaterno = usuario.apellidoMaterno,
+                    correo = usuario.correo,
+                    celular = usuario.celular,
+                    genero = usuario.genero,
+                    idSedeSeleccionada = usuario.sedePreferencia,
+                    idDepartamento = usuario.departamento,
+                    idProvincia = usuario.provincia,
+                    idDistrito = usuario.distrito,
+                    usuarioUid = usuario.usuarioUid.toInt(),
+                    horarios = horario.map { it.toState() }
+                )
             }
         }
     }
@@ -180,8 +168,8 @@ class RegisterDatosModel(
         }
     }
 
-    private fun RegisterDatosState.toRequestDto() = RegisterUsuarioRequestDto(
-        usuarioUid = usuarioUid ?: personaUid.orEmpty(),
+    private fun RegisterDatosState.toRequestDto() = RequestRegisterInfoUsuarioDTO(
+        usuarioUid = usuarioId ?: usuarioUid ?: 0,
         nombres = nombres.orEmpty(),
         apellidoPaterno = apellidoPaterno.orEmpty(),
         apellidoMaterno = apellidoMaterno.orEmpty(),

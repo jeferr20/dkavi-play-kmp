@@ -1,8 +1,12 @@
 package pe.breaker.dkaviplay.data.repository
 
-import dev.gitlive.firebase.firestore.DocumentSnapshot
 import dev.gitlive.firebase.firestore.FirebaseFirestore
-import dev.gitlive.firebase.firestore.Timestamp
+import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.annotations.SupabaseExperimental
+import io.github.jan.supabase.postgrest.from
+import io.github.jan.supabase.postgrest.query.filter.FilterOperation
+import io.github.jan.supabase.postgrest.query.filter.FilterOperator
+import io.github.jan.supabase.realtime.selectAsFlow
 import io.ktor.client.HttpClient
 import io.ktor.client.request.post
 import io.ktor.client.request.put
@@ -12,7 +16,6 @@ import io.ktor.http.contentType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -20,9 +23,6 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
-import kotlinx.datetime.DateTimeUnit
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.minus
 import pe.breaker.dkaviplay.data.mapper.mapToReserva
 import pe.breaker.dkaviplay.data.remote.dto.AceptarRetoRequestDTO
 import pe.breaker.dkaviplay.data.remote.dto.RegisterReservaRequestDTO
@@ -30,6 +30,9 @@ import pe.breaker.dkaviplay.data.remote.firebase.JuegoFirebase
 import pe.breaker.dkaviplay.data.remote.firebase.MesaFirebase
 import pe.breaker.dkaviplay.data.remote.firebase.ReservaFirebase
 import pe.breaker.dkaviplay.data.remote.firebase.SedeFirebase
+import pe.breaker.dkaviplay.data.remote.supabase.ReservaDTO
+import pe.breaker.dkaviplay.data.remote.supabase.view.MesaSedeView
+import pe.breaker.dkaviplay.data.remote.supabase.view.UserMovilView
 import pe.breaker.dkaviplay.data.util.ConstatesCloud
 import pe.breaker.dkaviplay.data.util.handleResponse
 import pe.breaker.dkaviplay.domain.model.Reserva
@@ -40,7 +43,8 @@ import pe.breaker.dkaviplay.domain.repository.TimeRepository
 class ReservaRepositoryImpl(
     private val httpClient: HttpClient,
     private val firestore: FirebaseFirestore,
-    private val timeRepository: TimeRepository
+    private val timeRepository: TimeRepository,
+    private val supabaseClient: SupabaseClient
 ) : ReservaRepository {
 
     override suspend fun registroReserva(reserva: RegisterReservaRequestDTO): Result<String> {
@@ -120,69 +124,87 @@ class ReservaRepositoryImpl(
         }
     }
 
+    @OptIn(SupabaseExperimental::class)
     override fun getReservasFlow(usuarioUid: String?): Flow<List<Reserva>> {
         val userUid = usuarioUid ?: return flowOf(emptyList())
 
-        // 1. Usamos flow {} como constructor para poder llamar a funciones suspendidas
-        return flow {
-            // Aquí sí podemos llamar a getServerTime() porque estamos dentro de un bloque suspendido
-            val serverTime = timeRepository.getServerTime()
-            val hace30Dias = serverTime.minus(30, DateTimeUnit.DAY, TimeZone.of("America/Lima"))
-            val timestampCorte = Timestamp(hace30Dias.epochSeconds, 0)
+        val flowJugador1 = supabaseClient.from(schema = "dkavi", table = "Reserva")
+            .selectAsFlow(primaryKey = ReservaDTO::id, channelName = "dkavi.Reserva.u1:$userUid",
+                filter = FilterOperation("uuid_user1", FilterOperator.EQ, userUid))
 
-            // 2. Definimos las queries con el filtro de tiempo
-            val flow1 = firestore.collection("Reserva")
-                .where { "status" equalTo true }
-                .where { "uuidUser1" equalTo userUid }
-                .where { "fechaInicio" greaterThanOrEqualTo timestampCorte }
-                .snapshots
+        val flowJugador2 = supabaseClient.from(schema = "dkavi", table = "Reserva")
+            .selectAsFlow(primaryKey = ReservaDTO::id, channelName = "dkavi.Reserva.u2:$userUid",
+                filter = FilterOperation("uuid_user2", FilterOperator.EQ, userUid))
 
-            val flow2 = firestore.collection("Reserva")
-                .where { "status" equalTo true }
-                .where { "uuidUser2" equalTo userUid }
-                .where { "fechaInicio" greaterThanOrEqualTo timestampCorte }
-                .snapshots
+        val flowReservasUnicas = combine(flowJugador1, flowJugador2) { lista1, lista2 ->
+            (lista1 + lista2).distinctBy { it.id }.filter { it.status }
+        }
 
-            // 3. Combinamos y emitimos los cambios en tiempo real
-            combine(flow1, flow2) { snap1, snap2 ->
-                val allDocs = (snap1.documents + snap2.documents).distinctBy { it.id }
-                allDocs
-            }.map { docs ->
-                processReservasDocuments(docs)
-            }.collect { reservas ->
-                emit(reservas)
+        val flowMesasSedes = flow {
+            val mapaVista = supabaseClient.from(schema = "public", table = "v_MesasSedes")
+                .select().decodeList<MesaSedeView>().associateBy { it.mesaId }
+            emit(mapaVista)
+        }
+
+        val flowUsuariosInvolucrados = flowReservasUnicas.map { reservas ->
+            val userUids = reservas.flatMap { listOfNotNull(it.uuidUser1, it.uuidUser2) }.distinct()
+
+            if (userUids.isEmpty()) return@map emptyMap()
+
+            try {
+                supabaseClient.from(schema = "seguridad", table = "v_UsuariosMovilesInfo")
+                    .select {
+                        filter {
+                            isIn("user_uuid_auth", userUids)
+                        }
+                    }
+                    .decodeList<UserMovilView>()
+                    .associateBy { it.userUid }
+            } catch (e: Exception) {
+                println("❌ Error trayendo usuarios: ${e.message}")
+                emptyMap()
+            }
+        }
+
+        return combine(flowReservasUnicas, flowMesasSedes, flowUsuariosInvolucrados) { reservas, mapaVista, mapaUsuarios ->
+            reservas.mapNotNull { dto ->
+                val infoMaestra = mapaVista[dto.idMesa?.toInt()]
+
+                if (infoMaestra != null) {
+                    val estadoEnum = ReservaEstado.fromId(dto.idEstado?.toInt())
+
+                    // 💥 Buscamos los nombres de los jugadores en nuestra caché dinámica
+                    val nombreCreador = mapaUsuarios[dto.uuidUser1]?.usuario ?: "Jugador 1"
+                    val nombreRetado = mapaUsuarios[dto.uuidUser2]?.usuario ?: ""
+
+                    Reserva(
+                        reservaUid = dto.id.toString(),
+                        estado = estadoEnum.descripcion,
+                        estadoColor = estadoEnum.colorHex,
+                        estadoInt = estadoEnum.id,
+                        sedeImagen = infoMaestra.sedeLogo,
+                        sede = infoMaestra.sedeNombre,
+                        sedeUid = infoMaestra.sedeId.toString(),
+                        tipoJuego = dto.tipoJuego,
+                        fechaInicio = dto.fechaInicio ?: "",
+                        fechaFin = dto.fechaFin ?: "",
+                        montoTotal = dto.montoTotalMonedas,
+                        mesa = infoMaestra.mesaNombre,
+                        creador = nombreCreador,
+                        creadorUid = dto.uuidUser1 ?: "",
+                        retado = nombreRetado,
+                        retadoUid = dto.uuidUser2 ?: "",
+                        userPendienteUid = dto.uuidUserPendiente ?: "",
+                        juegoUid = "",
+                        esperandoConfirmacion = dto.esperandoConfirmacion,
+                        partidas = emptyList(),
+                        ganadorUid = "",
+                        userCreadorReady = dto.user1Ready,
+                        userRetadoReady = dto.user2Ready
+                    )
+                } else null
             }
         }.flowOn(Dispatchers.IO)
-    }
-
-    // Función auxiliar para no saturar el flujo principal
-    private suspend fun processReservasDocuments(docs: List<DocumentSnapshot>): List<Reserva> {
-        if (docs.isEmpty()) return emptyList()
-
-        val docsData = docs.map { it.id to it.data<ReservaFirebase>() }
-        val sedeIds = docsData.mapNotNull { it.second.uuidSede }.distinct()
-        val mesasIds = docsData.mapNotNull { it.second.uuidMesa }.distinct()
-
-        // Consultas paralelas para sedes y mesas (Optimizado con async)
-        return coroutineScope {
-            val sedesDeferred = sedeIds.map { id ->
-                async { id to firestore.collection("Sede").document(id).get().data<SedeFirebase>() }
-            }
-            val mesasDeferred = mesasIds.map { id ->
-                async { id to firestore.collection("Mesa").document(id).get().data<MesaFirebase>() }
-            }
-
-            val sedesMap = sedesDeferred.awaitAll().toMap()
-            val mesasMap = mesasDeferred.awaitAll().toMap()
-
-            docsData.mapNotNull { (docId, fb) ->
-                val sede = sedesMap[fb.uuidSede]
-                val mesa = mesasMap[fb.uuidMesa]
-                if (sede != null && mesa != null) {
-                    mapToReserva(docId, sede, fb, mesa, null)
-                } else null
-            }.sortedByDescending { it.fechaInicio }
-        }
     }
 
     override suspend fun responderReto(

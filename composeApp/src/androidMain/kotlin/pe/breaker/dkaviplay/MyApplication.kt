@@ -14,6 +14,7 @@ import pe.breaker.dkaviplay.di.firebaseModule
 import pe.breaker.dkaviplay.di.networkModule
 import pe.breaker.dkaviplay.di.platformModule
 import pe.breaker.dkaviplay.di.presentationModule
+import pe.breaker.dkaviplay.di.supabaseModule
 import pe.breaker.dkaviplay.util.ContextProvider
 
 class MyApplication : Application() {
@@ -26,6 +27,7 @@ class MyApplication : Application() {
             androidLogger(Level.DEBUG)
             modules(
                 firebaseModule,
+                supabaseModule,
                 networkModule,
                 dataModule,
                 domainModule,
