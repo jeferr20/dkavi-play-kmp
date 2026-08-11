@@ -67,10 +67,10 @@ class JuegoRepositoryImpl(
         }
 
         val requestBody = ActualizarPuntosRequestDTO(
-            juegoId = reserva.juegoUid,
+            juegoId = reserva.juegoUid.toInt(),
             partidas = partidas,
             tipoJuego = reserva.tipoJuego,
-            reservaId = reserva.reservaUid,
+            reservaId = reserva.reservaUid.toInt(),
             contrincanteUid = contrincanteUid,
             sender = sessionManager.getCurrentUsuario()?.usuario
         )
@@ -86,8 +86,8 @@ class JuegoRepositoryImpl(
 
     override suspend fun cerrarAcuerdoMutuo(reserva: Reserva): Result<String> {
         val requestBody = CerrarJuegoMutuoRequestDTO(
-            reservaId = reserva.reservaUid,
-            juegoId = reserva.juegoUid
+            reservaId = reserva.reservaUid.toInt(),
+            juegoId = reserva.juegoUid.toInt()
         )
         val response =
             httpClient.post("${ConstatesCloud.URLBASE}apiPublic/public/juego/confirmJuegoService") {

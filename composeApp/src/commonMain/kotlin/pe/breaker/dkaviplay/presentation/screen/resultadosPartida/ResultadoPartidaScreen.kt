@@ -93,7 +93,6 @@ class ResultadoPartidaScreen(private val reservaUid: String) : Screen {
                                 loserName = state.perdedor?.usuario ?: "USER NO DISPONIBLE",
                                 winnerProfileUrl = state.ganador?.imagen ?: "",
                                 loserProfileUrl = state.perdedor?.imagen ?: "",
-                                winnerRankRes = RankResourceMapper.getDrawableByRank(state.ganador?.rango),
                                 loserRankRes = RankResourceMapper.getDrawableByRank(state.perdedor?.rango),
                             )
                             Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).align(Alignment.TopCenter)) {

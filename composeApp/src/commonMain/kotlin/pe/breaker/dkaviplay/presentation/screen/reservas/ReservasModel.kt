@@ -6,40 +6,72 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.datetime.DateTimeUnit
-import kotlinx.datetime.minus
 import pe.breaker.dkaviplay.di.UserSessionManager
 import pe.breaker.dkaviplay.domain.model.Reserva
 import pe.breaker.dkaviplay.domain.repository.TimeRepository
 import pe.breaker.dkaviplay.domain.usecase.EliminarReservaUseCase
-import pe.breaker.dkaviplay.domain.usecase.GetReservasUseCase
+import pe.breaker.dkaviplay.domain.usecase.reserva.GetReservasUseCase
+import pe.breaker.dkaviplay.domain.usecase.reserva.RefreshReservaUseCase
+import pe.breaker.dkaviplay.domain.usecase.reserva.ValidarHoraReservaUseCase
 import pe.breaker.dkaviplay.util.DateTimeFormatter
 
 class ReservasModel(
     private val sessionManager: UserSessionManager,
     private val getReservasUseCase: GetReservasUseCase,
-    private val eliminarReservaUseCase : EliminarReservaUseCase,
+    private val refreshReservaUseCase : RefreshReservaUseCase,
+    private val eliminarReservaUseCase: EliminarReservaUseCase,
+    private val validarHoraReservaUseCase: ValidarHoraReservaUseCase,
     private val timeRepository: TimeRepository,
     private val dateTimeFormatter: DateTimeFormatter
-) : StateScreenModel<ReservasState>(ReservasState()){
+) : StateScreenModel<ReservasState>(ReservasState()) {
 
     private var reservasJob: Job? = null
     private var allReservas: List<Reserva> = emptyList()
 
-    init {
-        val uid = sessionManager.getUserUid() ?: ""
+    init{
+        cargarSesionYEscuchar()
+    }
+
+    fun cargarSesionYEscuchar() {
+        val uid = sessionManager.getUserUid().orEmpty()
         mutableState.update { it.copy(currentUserUid = uid) }
-        listenToReservas(uid)
+        if (uid.isNotEmpty()) {
+            listenToReservas(uid)
+        }
+    }
+
+    fun refresh() {
+        val uid = sessionManager.getUserUid().orEmpty()
+        mutableState.update { it.copy(currentUserUid = uid) }
+
+        if (uid.isNotEmpty()) {
+            screenModelScope.launch {
+                mutableState.update { it.copy(isLoading = true, errorMessage = null) }
+                runCatching {
+                    refreshReservaUseCase(uid)
+                }.onFailure { error ->
+                    mutableState.update {
+                        it.copy(isLoading = false, errorMessage = error.message ?: "Error al actualizar")
+                    }
+                }
+            }
+        }
     }
 
     private fun listenToReservas(uid: String) {
         reservasJob?.cancel()
+//        if (reservasJob?.isActive == true) return
         reservasJob = screenModelScope.launch {
-            mutableState.update { it.copy(isLoading = true) }
+            mutableState.update { it.copy(isLoading = true, errorMessage = null) }
 
             getReservasUseCase(uid)
                 .catch { error ->
-                    mutableState.update { it.copy(isLoading = false, errorMessage = error.message) }
+                    mutableState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = error.message ?: "Error al obtener las reservas."
+                        )
+                    }
                 }
                 .collect { listaReservas ->
                     allReservas = listaReservas
@@ -51,7 +83,7 @@ class ReservasModel(
     private suspend fun updateFilteredList() {
         val now = timeRepository.getServerTime()
         val currentFilter = state.value.currentFilter
-        val uid = state.value.currentUserUid
+        val uid = sessionManager.getUserUid().orEmpty()
 
         val filtradas = when (currentFilter) {
             ReservaFilter.TODAS -> allReservas
@@ -74,18 +106,15 @@ class ReservasModel(
             }
         }
 
-        // 💡 Guardamos tanto las reservas como el tiempo seguro de este ciclo en el estado
-        mutableState.update { it.copy(
-            reservas = filtradas,
-            serverTime = now,
-            isLoading = false,
-            isSuccess = true
-        ) }
-    }
-
-    fun refresh() {
-        val uid = sessionManager.getUserUid() ?: ""
-        if (uid.isNotEmpty()) listenToReservas(uid)
+        mutableState.update {
+            it.copy(
+                currentUserUid = uid,
+                reservas = filtradas,
+                serverTime = now,
+                isLoading = false,
+                isSuccess = true
+            )
+        }
     }
 
     fun eliminarReserva(reservaUid: String) {
@@ -115,43 +144,36 @@ class ReservasModel(
 
     suspend fun validarHoraInicio(reserva: Reserva): Boolean {
         mutableState.update { it.copy(isLoading = true, errorMessage = null) }
-
         return try {
-            val now = timeRepository.getServerTime()
-            val inicio = dateTimeFormatter.parseIsoToInstant(reserva.fechaInicio)
-            val fin = dateTimeFormatter.parseIsoToInstant(reserva.fechaFin)
+            val result = validarHoraReservaUseCase(reserva.reservaUid)
 
-            if (inicio == null || fin == null) {
-                mutableState.update { it.copy(isLoading = false, errorMessage = "Error en el formato de la reserva") }
-                return false
-            }
+            var esValido = false
 
-            val inicioConMargen = inicio.minus(1, DateTimeUnit.MINUTE)
-
-            when {
-                now < inicioConMargen -> {
-                    val horaFormateada = dateTimeFormatter.formatTimeToHHMM(reserva.fechaInicio)
-                    mutableState.update {
-                        it.copy(
-                            isLoading = false,
-                            errorMessage = "La partida empieza a las $horaFormateada. ¡Paciencia, campeón!"
-                        )
-                    }
-                    false
-                }
-                now > fin -> {
-                    mutableState.update {
-                        it.copy(isLoading = false, errorMessage = "Esta reserva ya expiró.")
-                    }
-                    false
-                }
-                else -> {
+            result.onSuccess { data ->
+                if (data.valido) {
                     mutableState.update { it.copy(isLoading = false) }
-                    true
+                    esValido = true
+                } else {
+                    mutableState.update {
+                        it.copy(isLoading = false, errorMessage = data.mensaje)
+                    }
+                    esValido = false
                 }
+            }.onFailure { error ->
+                mutableState.update {
+                    it.copy(
+                        isLoading = false,
+                        errorMessage = error.message ?: "Error al validar la hora"
+                    )
+                }
+                esValido = false
             }
+
+            esValido
         } catch (e: Exception) {
-            mutableState.update { it.copy(isLoading = false, errorMessage = "Error al validar la hora") }
+            mutableState.update {
+                it.copy(isLoading = false, errorMessage = "Error inesperado al validar la hora")
+            }
             false
         }
     }

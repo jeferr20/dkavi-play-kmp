@@ -3,6 +3,9 @@ package pe.breaker.dkaviplay.cache
 import app.cash.sqldelight.Query
 import app.cash.sqldelight.TransacterImpl
 import app.cash.sqldelight.db.SqlDriver
+import kotlin.Any
+import kotlin.Long
+import kotlin.String
 
 public class AppDatabaseQueries(
   driver: SqlDriver,

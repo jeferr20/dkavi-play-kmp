@@ -1,51 +1,58 @@
 package pe.breaker.dkaviplay.data.repository
 
-import dev.gitlive.firebase.firestore.FirebaseFirestore
 import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.annotations.SupabaseExperimental
-import io.github.jan.supabase.postgrest.from
-import io.github.jan.supabase.postgrest.query.filter.FilterOperation
+import io.github.jan.supabase.postgrest.postgrest
 import io.github.jan.supabase.postgrest.query.filter.FilterOperator
-import io.github.jan.supabase.realtime.selectAsFlow
+import io.github.jan.supabase.postgrest.rpc
+import io.github.jan.supabase.realtime.PostgresAction
+import io.github.jan.supabase.realtime.channel
+import io.github.jan.supabase.realtime.postgresChangeFlow
+import io.github.jan.supabase.realtime.realtime
 import io.ktor.client.HttpClient
 import io.ktor.client.request.post
 import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.map
-import pe.breaker.dkaviplay.data.mapper.mapToReserva
-import pe.breaker.dkaviplay.data.remote.dto.AceptarRetoRequestDTO
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.launch
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
+import pe.breaker.dkaviplay.data.mapper.ReservaMapper
+import pe.breaker.dkaviplay.data.remote.AutoLoginResult
 import pe.breaker.dkaviplay.data.remote.dto.RegisterReservaRequestDTO
-import pe.breaker.dkaviplay.data.remote.firebase.JuegoFirebase
-import pe.breaker.dkaviplay.data.remote.firebase.MesaFirebase
-import pe.breaker.dkaviplay.data.remote.firebase.ReservaFirebase
-import pe.breaker.dkaviplay.data.remote.firebase.SedeFirebase
-import pe.breaker.dkaviplay.data.remote.supabase.ReservaDTO
-import pe.breaker.dkaviplay.data.remote.supabase.view.MesaSedeView
-import pe.breaker.dkaviplay.data.remote.supabase.view.UserMovilView
+import pe.breaker.dkaviplay.data.remote.dto.request.RequestAceptarRetoDTO
+import pe.breaker.dkaviplay.data.remote.dto.request.RequestUpdateEliminarReservaDTO
+import pe.breaker.dkaviplay.data.remote.supabase.rpc.ReservaJuegoDTO
+import pe.breaker.dkaviplay.data.remote.supabase.rpc.ReservaRpcDTO
+import pe.breaker.dkaviplay.data.remote.supabase.rpc.ValidarHoraReservaDTO
 import pe.breaker.dkaviplay.data.util.ConstatesCloud
 import pe.breaker.dkaviplay.data.util.handleResponse
+import pe.breaker.dkaviplay.di.UserSessionManager
 import pe.breaker.dkaviplay.domain.model.Reserva
 import pe.breaker.dkaviplay.domain.model.ReservaEstado
+import pe.breaker.dkaviplay.domain.repository.AuthRepository
 import pe.breaker.dkaviplay.domain.repository.ReservaRepository
-import pe.breaker.dkaviplay.domain.repository.TimeRepository
+import kotlin.random.Random
 
 class ReservaRepositoryImpl(
     private val httpClient: HttpClient,
-    private val firestore: FirebaseFirestore,
-    private val timeRepository: TimeRepository,
-    private val supabaseClient: SupabaseClient
+    private val supabaseClient: SupabaseClient,
+    private val authRepository: AuthRepository,
+    private val sessionManager: UserSessionManager
 ) : ReservaRepository {
+
+    private val _reservasSharedFlow = MutableSharedFlow<List<Reserva>>(replay = 1)
+    private val repositoryScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
     override suspend fun registroReserva(reserva: RegisterReservaRequestDTO): Result<String> {
         val response = httpClient.post("${ConstatesCloud.URLBASE}apiPublic/public/reserva") {
@@ -59,167 +66,109 @@ class ReservaRepositoryImpl(
 
     override suspend fun getReservaById(reservaId: String): Result<Reserva> {
         return try {
-            val snapshot = firestore.collection("Reserva").document(reservaId).get()
-
-            if (!snapshot.exists) {
-                return Result.failure(Exception("La reserva no existe o ya no se encuentra disponible"))
+            val response = safeSupabaseCall {
+                supabaseClient.postgrest.rpc(
+                    function = "get_reserva_completa",
+                    parameters = mapOf(
+                        "p_reserva_id" to reservaId.toInt()
+                    )
+                ) {
+                    schema = "dkavi"
+                }.decodeAs<ReservaJuegoDTO>()
             }
 
-            val reservaFirebase = snapshot.data<ReservaFirebase>()
+            println("PARTIDAS = ${response.partidas}")
+            val reserva = ReservaMapper.mapJuegoToDomain(response)
 
-            val (sede, mesa, juego) = coroutineScope {
-                val sedeDef = async {
-                    reservaFirebase.uuidSede?.let { id ->
-                        try {
-                            firestore.collection("Sede").document(id).get().data<SedeFirebase>()
-                        } catch (e: Exception) {
-                            null
-                        }
-                    }
-                }
-                val mesaDef = async {
-                    reservaFirebase.uuidMesa?.let { id ->
-                        try {
-                            firestore.collection("Mesa").document(id).get().data<MesaFirebase>()
-                        } catch (e: Exception) {
-                            null
-                        }
-                    }
-                }
-
-                val juegoDef = async {
-                    try {
-                        val juegoSnapshot = firestore.collection("Juego")
-                            .where { "reservaId" equalTo reservaId }
-                            .limit(1)
-                            .get()
-
-                        val doc = juegoSnapshot.documents.firstOrNull()
-
-                        doc?.data<JuegoFirebase>()?.copy(uuidJuego = doc.id)
-                    } catch (e: Exception) {
-                        null
-                    }
-                }
-                Triple(sedeDef.await(), mesaDef.await(), juegoDef.await())
-            }
-
-            if (sede == null || mesa == null) {
-                return Result.failure(Exception("No se pudo cargar la información de la sede"))
-            }
-
-            val reservaDominio = mapToReserva(
-                id = reservaId,
-                sede = sede,
-                reserva = reservaFirebase,
-                mesa = mesa,
-                juego = juego
-            )
-
-            Result.success(reservaDominio)
-
+            Result.success(reserva)
         } catch (e: Exception) {
-            println("Error getReservaById en Pool Street: ${e.message}")
+            println("Error getReservaById: ${e.message}")
             Result.failure(e)
         }
     }
 
-    @OptIn(SupabaseExperimental::class)
-    override fun getReservasFlow(usuarioUid: String?): Flow<List<Reserva>> {
-        val userUid = usuarioUid ?: return flowOf(emptyList())
+    override fun getReservasFlow(usuarioUid: String): Flow<List<Reserva>> {
+        if (usuarioUid.isEmpty()) return _reservasSharedFlow.asSharedFlow()
+        return channelFlow {
+            val channelName = "reservas_${usuarioUid}_${Random.nextInt()}"
+            val channel = supabaseClient.realtime.channel(channelName)
 
-        val flowJugador1 = supabaseClient.from(schema = "dkavi", table = "Reserva")
-            .selectAsFlow(primaryKey = ReservaDTO::id, channelName = "dkavi.Reserva.u1:$userUid",
-                filter = FilterOperation("uuid_user1", FilterOperator.EQ, userUid))
+            // 1. REGISTRAR LOS LISTENERS DE CAMBIOS ANTES DE SUBSTRIBIR
+            val flowUser1 = channel.postgresChangeFlow<PostgresAction>(schema = "dkavi") {
+                table = "Reserva"
+                filter("uuid_user1", FilterOperator.EQ, usuarioUid)
+            }
+            val flowUser2 = channel.postgresChangeFlow<PostgresAction>(schema = "dkavi") {
+                table = "Reserva"
+                filter("uuid_user2", FilterOperator.EQ, usuarioUid)
+            }
 
-        val flowJugador2 = supabaseClient.from(schema = "dkavi", table = "Reserva")
-            .selectAsFlow(primaryKey = ReservaDTO::id, channelName = "dkavi.Reserva.u2:$userUid",
-                filter = FilterOperation("uuid_user2", FilterOperator.EQ, userUid))
+            val changesFlow = merge(flowUser1, flowUser2)
 
-        val flowReservasUnicas = combine(flowJugador1, flowJugador2) { lista1, lista2 ->
-            (lista1 + lista2).distinctBy { it.id }.filter { it.status }
-        }
+            // 2. CONECTAR AL CANAL DE REALTIME
+            channel.subscribe()
 
-        val flowMesasSedes = flow {
-            val mapaVista = supabaseClient.from(schema = "public", table = "v_MesasSedes")
-                .select().decodeList<MesaSedeView>().associateBy { it.mesaId }
-            emit(mapaVista)
-        }
+            fetchAndEmitRpc(usuarioUid)
 
-        val flowUsuariosInvolucrados = flowReservasUnicas.map { reservas ->
-            val userUids = reservas.flatMap { listOfNotNull(it.uuidUser1, it.uuidUser2) }.distinct()
+            // Función auxiliar para llamar a la RPC y mapear a Dominio
+            val realtimeJob = launch {
+                changesFlow.collect {
+                    fetchAndEmitRpc(usuarioUid)
+                }
+            }
 
-            if (userUids.isEmpty()) return@map emptyMap()
+            // 5. ESCUCHAR EL SHARED FLOW INTERNO Y REDIRIGIR AL COLLECTOR DE LA UI
+            val collectorJob = launch {
+                _reservasSharedFlow.collect { lista ->
+                    send(lista)
+                }
+            }
 
-            try {
-                supabaseClient.from(schema = "seguridad", table = "v_UsuariosMovilesInfo")
-                    .select {
-                        filter {
-                            isIn("user_uuid_auth", userUids)
-                        }
-                    }
-                    .decodeList<UserMovilView>()
-                    .associateBy { it.userUid }
-            } catch (e: Exception) {
-                println("❌ Error trayendo usuarios: ${e.message}")
-                emptyMap()
+            // 6. LIMPIEZA DE RECURSOS AL DESTRUIR EL FLUJO
+            awaitClose {
+                realtimeJob.cancel()
+                collectorJob.cancel()
+                launch(Dispatchers.IO) {
+                    runCatching { channel.unsubscribe() }
+                }
             }
         }
-
-        return combine(flowReservasUnicas, flowMesasSedes, flowUsuariosInvolucrados) { reservas, mapaVista, mapaUsuarios ->
-            reservas.mapNotNull { dto ->
-                val infoMaestra = mapaVista[dto.idMesa?.toInt()]
-
-                if (infoMaestra != null) {
-                    val estadoEnum = ReservaEstado.fromId(dto.idEstado?.toInt())
-
-                    // 💥 Buscamos los nombres de los jugadores en nuestra caché dinámica
-                    val nombreCreador = mapaUsuarios[dto.uuidUser1]?.usuario ?: "Jugador 1"
-                    val nombreRetado = mapaUsuarios[dto.uuidUser2]?.usuario ?: ""
-
-                    Reserva(
-                        reservaUid = dto.id.toString(),
-                        estado = estadoEnum.descripcion,
-                        estadoColor = estadoEnum.colorHex,
-                        estadoInt = estadoEnum.id,
-                        sedeImagen = infoMaestra.sedeLogo,
-                        sede = infoMaestra.sedeNombre,
-                        sedeUid = infoMaestra.sedeId.toString(),
-                        tipoJuego = dto.tipoJuego,
-                        fechaInicio = dto.fechaInicio ?: "",
-                        fechaFin = dto.fechaFin ?: "",
-                        montoTotal = dto.montoTotalMonedas,
-                        mesa = infoMaestra.mesaNombre,
-                        creador = nombreCreador,
-                        creadorUid = dto.uuidUser1 ?: "",
-                        retado = nombreRetado,
-                        retadoUid = dto.uuidUser2 ?: "",
-                        userPendienteUid = dto.uuidUserPendiente ?: "",
-                        juegoUid = "",
-                        esperandoConfirmacion = dto.esperandoConfirmacion,
-                        partidas = emptyList(),
-                        ganadorUid = "",
-                        userCreadorReady = dto.user1Ready,
-                        userRetadoReady = dto.user2Ready
-                    )
-                } else null
-            }
-        }.flowOn(Dispatchers.IO)
     }
 
-    override suspend fun responderReto(
-        reservaId: String,
-        mesa: String,
-        sedeUid:String,
-        aceptar: Boolean
-    ): Result<String> {
+    private suspend fun fetchAndEmitRpc(usuarioUid: String) {
+        runCatching {
+            safeSupabaseCall {
+                val response = supabaseClient.postgrest.rpc(
+                    function = "get_reservas_by_user",
+                    parameters = mapOf("p_user_uid" to usuarioUid)
+                ) {
+                    schema = "dkavi"
+                }.decodeList<ReservaRpcDTO>()
+
+                response.map { ReservaMapper.mapToDomain(it) }
+            }
+        }.onSuccess { reservasDomain ->
+            _reservasSharedFlow.emit(reservasDomain)
+        }.onFailure { error ->
+            println("❌ [ReservaRepository] Error ejecutando RPC: ${error.message}")
+        }
+    }
+
+    // Disparo manual desde el Pull-To-Refresh sin tocar el socket
+    override suspend fun refreshReservas(uid: String) {
+        if (uid.isNotEmpty()) {
+            fetchAndEmitRpc(uid)
+        }
+    }
+
+    override suspend fun responderReto(reserva: Reserva, aceptar: Boolean): Result<String> {
         return try {
-            val nuevoEstadoId = if (aceptar) 3 else 2
-            val requestBody = AceptarRetoRequestDTO(
+            val nuevoEstadoId = if (aceptar) 5 else 2
+            val requestBody = RequestAceptarRetoDTO(
                 estadoId = nuevoEstadoId,
-                idReserva = reservaId,
-                mesaDescripcion = mesa,
-                idSede = sedeUid
+                idReserva = reserva.reservaUid.toInt(),
+                montoTotal = reserva.montoTotal,
+                user1 = reserva.creadorUid
             )
             val response =
                 httpClient.put("${ConstatesCloud.URLBASE}apiPublic/public/reserva") {
@@ -231,21 +180,24 @@ class ReservaRepositoryImpl(
             }
 
         } catch (e: Exception) {
-            println("Error al responder al reto $reservaId: ${e.message}")
+            println("Error al responder al reto $reserva.reservaUid.toInt(): ${e.message}")
             Result.failure(Exception("No se pudo actualizar la respuesta del reto: ${e.message}"))
         }
     }
 
     override suspend fun eliminarReserva(reservaUid: String): Result<String> {
-        return try {
-            firestore.collection("Reserva")
-                .document(reservaUid)
-                .delete()
-
-            Result.success("Reserva eliminada permanentemente")
-        } catch (e: Exception) {
-            println("Error al eliminar la reserva $reservaUid: ${e.message}")
-            Result.failure(Exception("No se pudo eliminar el registro de la base de datos: ${e.message}"))
+        val response =
+            httpClient.post("${ConstatesCloud.URLBASE}apiPublic/public/reserva/updateEliminar") {
+                contentType(ContentType.Application.Json)
+                setBody(
+                    RequestUpdateEliminarReservaDTO(
+                        idReserva = reservaUid.toInt(),
+                        estadoId = -1
+                    )
+                )
+            }
+        return handleResponse<String, String>(response) { data ->
+            Result.success(data)
         }
     }
 
@@ -253,15 +205,60 @@ class ReservaRepositoryImpl(
         reservaEstado: ReservaEstado,
         reservaUid: String
     ): Result<String> {
-        return try {
-            firestore.collection("Reserva")
-                .document(reservaUid)
-                .update(mapOf("uuidEstado" to reservaEstado.id))
+        val response =
+            httpClient.post("${ConstatesCloud.URLBASE}apiPublic/public/reserva/updateEliminar") {
+                contentType(ContentType.Application.Json)
+                setBody(
+                    RequestUpdateEliminarReservaDTO(
+                        idReserva = reservaUid.toInt(),
+                        estadoId = reservaEstado.id
+                    )
+                )
+            }
+        return handleResponse<String, String>(response) { data ->
+            Result.success(data)
+        }
+    }
 
-            Result.success("Reserva actualizada permanentemente")
+    override suspend fun verificarHoraReserva(reservaId: String): Result<ValidarHoraReservaDTO> {
+        return try {
+            val response = safeSupabaseCall {
+                supabaseClient.postgrest.rpc(
+                    function = "validar_hora_inicio_reserva",
+                    parameters = buildJsonObject {
+                        put("p_reserva_id", reservaId.toInt())
+                    }
+                ) {
+                    schema = "dkavi"
+                }.decodeAs<ValidarHoraReservaDTO>()
+            }
+            Result.success(response)
         } catch (e: Exception) {
-            println("Error al actualizar el estado de la reserva $reservaUid: ${e.message}")
-            Result.failure(Exception("No se pudo actualizar el estado de la reserva: ${e.message}"))
+            println("Error verificando hora: ${e.message}")
+            Result.failure(e)
+        }
+    }
+
+    private suspend fun <T> safeSupabaseCall(block: suspend () -> T): T {
+        return try {
+            block()
+        } catch (e: Exception) {
+            val errorMsg = e.message ?: ""
+            if (errorMsg.contains("JWT expired", ignoreCase = true) || errorMsg.contains("PGRST303")) {
+                println("🔄 [ReservaRepository] Supabase JWT expirado detectado. Intentando autoLogin...")
+                val token = sessionManager.getToken()
+                if (!token.isNullOrBlank()) {
+                    val result = authRepository.autoLogin(token)
+                    if (result is AutoLoginResult.Success) {
+                        println("✅ [ReservaRepository] Sesión refrescada con éxito. Reintentando operación...")
+                        return block() // Reintento único
+                    }
+                }
+                // Si no hay token o autoLogin falló, lanzamos el error original
+                throw e
+            } else {
+                throw e
+            }
         }
     }
 }

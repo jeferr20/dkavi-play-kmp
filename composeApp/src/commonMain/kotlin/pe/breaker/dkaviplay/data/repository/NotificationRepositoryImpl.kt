@@ -15,18 +15,16 @@ import pe.breaker.dkaviplay.domain.repository.NotificationRepository
 
 class NotificationRepositoryImpl(
     private val firebaseMessaging: FirebaseMessaging,
-    private val getUserUid: () -> String?,
     private val httpClient: HttpClient,
 ) : NotificationRepository {
 
     override suspend fun saveToken(token: String?): Result<Unit> {
         val finalToken = if (token.isNullOrEmpty()) firebaseMessaging.getToken() else token
-        val userUid = getUserUid() ?: return Result.failure(Exception("No user"))
 
         val response =
             httpClient.post("${ConstatesCloud.URLBASE}apiPublic/public/notificaciones/updateFCMToken") {
                 contentType(ContentType.Application.Json)
-                setBody(RequestUpdateTokenDTO(userUid, finalToken))
+                setBody(RequestUpdateTokenDTO(finalToken))
             }
         return handleResponse<String, Unit>(response) { msg ->
             println("Respuesta del server: $msg")
@@ -35,12 +33,10 @@ class NotificationRepositoryImpl(
     }
 
     override suspend fun deleteToken(): Result<Unit> {
-        val userUid = getUserUid() ?: return Result.failure(Exception("No user"))
-
         val response =
             httpClient.post("${ConstatesCloud.URLBASE}apiPublic/public/notificaciones/updateFCMToken") {
                 contentType(ContentType.Application.Json)
-                setBody(RequestUpdateTokenDTO(userUid, null))
+                setBody(RequestUpdateTokenDTO(null))
             }
         return handleResponse<String, Unit>(response) { msg ->
             println("Respuesta del server: $msg")

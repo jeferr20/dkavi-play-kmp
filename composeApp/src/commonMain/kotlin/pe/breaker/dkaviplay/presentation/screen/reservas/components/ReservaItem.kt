@@ -212,8 +212,8 @@ fun ReservaItem(
                                 modifier = Modifier.weight(1f),
                                 colorOutline = if (contrincanteReady) colorCeleste else colorBlanco.copy(alpha = 0.4f),
                                 icon = Icons.Default.Inventory2,
-                                enabled = true,
-                                onClick = { onShowInventario(reserva) },
+                                enabled = !yoEstoyReady,
+                                onClick = { if(!yoEstoyReady) onShowInventario(reserva) },
                                 text = estadoBotonReady
                             )
                         }

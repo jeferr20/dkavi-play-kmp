@@ -1,43 +1,39 @@
 package pe.breaker.dkaviplay.data.repository
 
-import dev.gitlive.firebase.firestore.FirebaseFirestore
-import dev.gitlive.firebase.firestore.Timestamp
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.postgrest.from
+import io.github.jan.supabase.postgrest.postgrest
 import io.github.jan.supabase.postgrest.query.filter.FilterOperation
 import io.github.jan.supabase.postgrest.query.filter.FilterOperator
+import io.github.jan.supabase.postgrest.rpc
 import io.github.jan.supabase.realtime.selectAsFlow
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.IO
-import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.mapLatest
-import kotlinx.coroutines.flow.onEach
 import pe.breaker.dkaviplay.data.mapper.toDomain
+import pe.breaker.dkaviplay.data.remote.AutoLoginResult
 import pe.breaker.dkaviplay.data.remote.supabase.EmpresaDTO
 import pe.breaker.dkaviplay.data.remote.supabase.SedeDTO
 import pe.breaker.dkaviplay.data.remote.supabase.view.SedeEmpresaView
 import pe.breaker.dkaviplay.data.remote.supabase.view.TarifarioView
 import pe.breaker.dkaviplay.di.UserSessionManager
 import pe.breaker.dkaviplay.domain.model.Sede
+import pe.breaker.dkaviplay.domain.repository.AuthRepository
 import pe.breaker.dkaviplay.domain.repository.SedeRepository
-import kotlin.time.Clock
-import kotlin.time.Instant
 
 class SedeRepositoryImpl(
-    private val firestore: FirebaseFirestore,
     private val sessionManager: UserSessionManager,
-    private val supabaseClient: SupabaseClient
+    private val supabaseClient: SupabaseClient,
+    private val authRepository: AuthRepository
 ) : SedeRepository {
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -61,14 +57,16 @@ class SedeRepositoryImpl(
         provincia: String
     ): Result<List<Sede>> {
         return try {
-            val sedesViewList = supabaseClient
-                .from(schema = "public", table = "v_SedesEmpresa")
-                .select {
-                    filter {
-                        eq("departamento", departamento)
-                        eq("provincia", provincia)
-                    }
-                }.decodeList<SedeEmpresaView>()
+            val sedesViewList = safeSupabaseCall {
+                supabaseClient
+                    .from(schema = "public", table = "v_SedesEmpresa")
+                    .select {
+                        filter {
+                            eq("departamento", departamento)
+                            eq("provincia", provincia)
+                        }
+                    }.decodeList<SedeEmpresaView>()
+            }
 
             val sedesDomain = sedesViewList.map { viewDto -> viewDto.toDomain() }
 
@@ -148,13 +146,15 @@ class SedeRepositoryImpl(
         return try{
             val sedeIdInt = sedeUid.toIntOrNull() ?: 0
 
-            val tarifa = supabaseClient
-                .from(schema = "dkavi", table = "v_tarifario")
-                .select {
-                    filter {
-                        eq("sede_id", sedeIdInt)
-                    }
-                }.decodeSingleOrNull<TarifarioView>()
+            val tarifa = safeSupabaseCall {
+                supabaseClient
+                    .from(schema = "dkavi", table = "v_tarifario")
+                    .select {
+                        filter {
+                            eq("sede_id", sedeIdInt)
+                        }
+                    }.decodeSingleOrNull<TarifarioView>()
+            }
 
             if (tarifa == null) {
                 println("⚠️ Alerta: No se encontró tarifario activo para la sede con ID: $sedeIdInt")
@@ -167,55 +167,45 @@ class SedeRepositoryImpl(
         }
     }
 
-    override fun getMesasSede(sedeUid: String): Flow<String> = callbackFlow {
-        val ahora = Clock.System.now()
+    override suspend fun getMesasSede(sedeUid: String): String {
+        return try {
+            val resultado :String = safeSupabaseCall {
+                supabaseClient.postgrest.rpc(
+                    function = "get_mesas_sede_status",
+                    parameters = mapOf(
+                        "p_sede_id" to sedeUid.toInt(),
+                    )
+                ) {
+                    schema = "dkavi"
+                }.decodeAs()
+            }
 
-        // 1. Query optimizada (Requiere índice compuesto en Firebase)
-        val queryReservas = firestore.collection("Reserva")
-            .where { "uuidSede" equalTo sedeUid }
-            .where { "status" equalTo true }
-            .where { "fechaFin" greaterThan ahora.toFirebaseTimestamp() }
-
-        val queryMesas = firestore.collection("Mesa")
-            .where { "uuidSede" equalTo sedeUid }
-            .where { "status" equalTo true }
-
-        // 2. Usamos combine directamente y enviamos al canal del callbackFlow
-        val job =
-            combine(queryReservas.snapshots, queryMesas.snapshots) { resSnapshot, mesaSnapshot ->
-                val currentInstant = Clock.System.now()
-
-                // Usamos set para búsqueda O(1) más eficiente
-                val mesasOcupadasIds = resSnapshot.documents.mapNotNull { doc ->
-                    val inicio = doc.get<Timestamp>("fechaInicio")?.toKotlinInstant()
-                    val fin = doc.get<Timestamp>("fechaFin")?.toKotlinInstant()
-                    val mesaId = doc.get<String>("uuidMesa")
-
-                    if (mesaId != null && inicio != null && fin != null && currentInstant in inicio..fin) {
-                        mesaId
-                    } else null
-                }.toSet()
-
-                val totalMesas = mesaSnapshot.documents.size
-                val ocupadasCount = mesasOcupadasIds.size
-                val mesasDisponibles = totalMesas - ocupadasCount
-
-                "$mesasDisponibles/$totalMesas"
-            }.onEach { result ->
-                trySend(result) // Enviamos el String al colector
-            }.launchIn(this) // <--- IMPORTANTE: Usa 'this' (el scope del callbackFlow)
-
-        // 3. awaitClose es vital para limpiar recursos
-        awaitClose {
-            job.cancel()
+            resultado
+        } catch (e: Exception) {
+            println("Error obteniendo estado de mesas: ${e.message}")
+            "0/0" // Valor por defecto en caso de error de red
         }
     }
 
-    fun Timestamp.toKotlinInstant(): Instant {
-        return Instant.fromEpochSeconds(this.seconds, this.nanoseconds)
-    }
-
-    fun Instant.toFirebaseTimestamp(): Timestamp {
-        return Timestamp(this.epochSeconds, this.nanosecondsOfSecond)
+    private suspend fun <T> safeSupabaseCall(block: suspend () -> T): T {
+        return try {
+            block()
+        } catch (e: Exception) {
+            val errorMsg = e.message ?: ""
+            if (errorMsg.contains("JWT expired", ignoreCase = true) || errorMsg.contains("PGRST303")) {
+                println("🔄 [SedeRepository] Supabase JWT expirado detectado. Intentando autoLogin...")
+                val token = sessionManager.getToken()
+                if (!token.isNullOrBlank()) {
+                    val result = authRepository.autoLogin(token)
+                    if (result is AutoLoginResult.Success) {
+                        println("✅ [SedeRepository] Sesión refrescada con éxito. Reintentando operación...")
+                        return block() // Reintento único
+                    }
+                }
+                throw e
+            } else {
+                throw e
+            }
+        }
     }
 }

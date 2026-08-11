@@ -2,11 +2,8 @@ package pe.breaker.dkaviplay.presentation.util
 
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
-import kotlinx.datetime.number
 import kotlinx.datetime.toInstant
-import kotlinx.datetime.toLocalDateTime
 import pe.breaker.dkaviplay.data.remote.dto.TimestampDTO
-import kotlin.time.Instant
 
 fun createTimestampDTO(dateStr: String, timeStr: String): TimestampDTO {
     val dateParts = dateStr.split("/")
@@ -28,27 +25,21 @@ fun createTimestampDTO(dateStr: String, timeStr: String): TimestampDTO {
     )
 }
 
-fun timestampToStringCompleto(seconds: Long): String {
-    val instant = Instant.fromEpochSeconds(seconds)
-    val dateTime = instant.toLocalDateTime(TimeZone.of("America/Lima"))
+fun formatISOWithOffset(dateStr: String, timeStr: String): String {
+    // dateStr = "24/07/2026", timeStr = "12:25"
+    val dateParts = dateStr.split("/")
+    val timeParts = timeStr.split(":")
 
-    val day = dateTime.day.toString().padStart(2, '0')
-    val month = dateTime.month.number.toString().padStart(2, '0')
-    val year = dateTime.year
+    val day = dateParts[0].toInt()
+    val month = dateParts[1].toInt()
+    val year = dateParts[2].toInt()
+    val hour = timeParts[0].toInt()
+    val minute = timeParts[1].toInt()
 
-    // Extraemos hora y minutos
-    val hour = dateTime.hour.toString().padStart(2, '0')
-    val minute = dateTime.minute.toString().padStart(2, '0')
+    val timeZone = TimeZone.of("America/Lima")
+    val localDateTime = LocalDateTime(year, month, day, hour, minute, 0, 0)
 
-    return "$day/$month/$year $hour:$minute"
-}
-fun formatMillisToDate(millis: Long): String {
-    val localDate = Instant.fromEpochMilliseconds(millis)
-        .toLocalDateTime(TimeZone.UTC).date
-
-    val day = localDate.day.toString().padStart(2, '0')
-    val month = localDate.month.number.toString().padStart(2, '0')
-    val year = localDate.year
-
-    return "$day/$month/$year"
+    // Obtenemos el instante exacto conservando el offset
+    val instant = localDateTime.toInstant(timeZone)
+    return instant.toString() // Produce: "2026-07-24T12:25:00-05:00" o "2026-07-24T17:25:00Z"
 }

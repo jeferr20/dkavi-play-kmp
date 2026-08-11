@@ -91,59 +91,56 @@ class MonedaModel(
     fun enviarConfirmacionWhatsApp() {
         val currentState = state.value
         val cantidad = currentState.cantidadSeleccionada
-        val numeroDestino = currentState.numPago ?: "51959817861"
         val usuarioActual = sessionManager.getCurrentUsuario()
 
         val userUid = usuarioActual?.uidAuth ?: "" // UID de Supabase Auth
-        val usuarioNombre = usuarioActual?.usuario ?: "Usuario KMP"
         val sedeId = usuarioActual?.sedePreferencia?.toIntOrNull() ?: 0
 
-        // 1. Disparamos la Cloud Function del log de auditoría en segundo plano (Fire and Forget)
+        // 1. Mostrar estado de carga antes de iniciar la transacción
         screenModelScope.launch {
+            mutableState.update { it.copy(isLoading = true, showPagoDialog = false) }
+
             val logDto = LogMonedaDTO(
-                userUid = userUid,
                 cantidadMonedas = cantidad,
                 monto = currentState.montoCalculado,
                 sedeId = sedeId,
                 idempotencyKey = currentState.idempotencyKey
             )
 
-            insertMonedaLogUseCase(logDto).onFailure { error ->
-                // Guardamos el error de forma silenciosa en la consola para no arruinar la UX
-                println("Error al insertar el Log en segundo plano: ${error.message}")
-            }
-        }
-
-        // 2. Redirigimos al usuario a WhatsApp en paralelo sin esperar al API
-        screenModelScope.launch {
-            mutableState.update { it.copy(isLoading = true, showPagoDialog = false) }
-            try {
-                getMensajeCompraUseCase(
-                    usuario = userUid,
-                    cantidadMonedas = cantidad,
-                ).onSuccess { whatsappUrl ->
-                    mutableState.update {
-                        it.copy(
-                            isLoading = false,
-                            actionEvent = MonedaUiEvent.OpenWhatsApp(whatsappUrl)
-                        )
+            // 2. Registrar el Log de Monedas primero (Operación Bloqueante del Flujo)
+            insertMonedaLogUseCase(logDto)
+                .onSuccess {
+                    // 3. ÉXITO: Proceder a generar el mensaje y enlace de WhatsApp
+                    getMensajeCompraUseCase(
+                        usuario = userUid,
+                        cantidadMonedas = cantidad,
+                    ).onSuccess { whatsappUrl ->
+                        mutableState.update {
+                            it.copy(
+                                isLoading = false,
+                                actionEvent = MonedaUiEvent.OpenWhatsApp(whatsappUrl)
+                            )
+                        }
+                    }.onFailure { error ->
+                        mutableState.update {
+                            it.copy(
+                                isLoading = false,
+                                errorMessage = error.message
+                                    ?: "Error al generar el mensaje de compra"
+                            )
+                        }
                     }
                 }.onFailure { error ->
+                    // 4. ERROR EN LOG: Detener el flujo y notificar al usuario
+                    println("❌ Error en LogMonedas: ${error.message}")
                     mutableState.update {
                         it.copy(
                             isLoading = false,
-                            errorMessage = error.message ?: "Error al generar el mensaje de compra"
+                            errorMessage = error.message
+                                ?: "No se pudo registrar la transacción. Intente nuevamente."
                         )
                     }
                 }
-            } catch (e: Exception) {
-                mutableState.update {
-                    it.copy(
-                        isLoading = false,
-                        errorMessage = e.message ?: "Error al procesar la confirmación"
-                    )
-                }
-            }
         }
     }
 

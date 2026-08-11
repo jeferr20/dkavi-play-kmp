@@ -29,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.unit.dp
+import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
@@ -51,8 +52,11 @@ import pe.breaker.dkaviplay.presentation.screen.retoIniciado.RetoIniciadoScreen
 import pe.breaker.dkaviplay.presentation.theme.colorBlackSurface
 import pe.breaker.dkaviplay.presentation.theme.colorPrimary
 import pe.breaker.dkaviplay.presentation.util.StatusUiType
+import kotlin.time.Clock
 
 object ReservasTab : Tab {
+    override val key: ScreenKey = "ReservasTab_${Clock.System.now()}"
+
     override val options: TabOptions
         @Composable
         get() = TabOptions(
@@ -68,6 +72,10 @@ object ReservasTab : Tab {
         val reservaTabModel = koinScreenModel<ReservasModel>()
         val state by reservaTabModel.state.collectAsState()
         val scope = rememberCoroutineScope()
+
+        LaunchedEffect(Unit) {
+            reservaTabModel.cargarSesionYEscuchar()
+        }
 
         val inventarioModel = koinScreenModel<InventarioModel>(
             parameters = { parametersOf(TipoPremio.ITEM_JUGABLE) }

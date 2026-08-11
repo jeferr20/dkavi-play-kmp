@@ -12,6 +12,7 @@ import pe.breaker.dkaviplay.di.UserSessionManager
 import pe.breaker.dkaviplay.domain.repository.UbigeoRepository
 import pe.breaker.dkaviplay.domain.usecase.GetSedesByUbigeoUseCase
 import pe.breaker.dkaviplay.domain.usecase.RegisterPersonaUseCase
+import pe.breaker.dkaviplay.util.DateTimeFormatter
 
 class RegisterDatosModel(
     private val isLogged: Boolean,
@@ -21,6 +22,7 @@ class RegisterDatosModel(
     private val getSedesByUbigeoUseCase: GetSedesByUbigeoUseCase,
     private val validator: RegisterDatosValidator,
     private val sessionManager: UserSessionManager,
+    private val dateTimeFormatter: DateTimeFormatter,
 ) : StateScreenModel<RegisterDatosState>(RegisterDatosState()) {
 
     init {
@@ -265,6 +267,24 @@ class RegisterDatosModel(
             }
 
             state.copy(horarios = nuevaLista, horarioError = null)
+        }
+    }
+
+    fun onFechaNacimientoSelected(millis: Long) {
+        val formatedFecha = dateTimeFormatter.formatMillisToDate(millis)
+        onFieldChanged {
+            copy(
+                fechaNacimiento = formatedFecha,
+                fechaNacimientoError = null
+            )
+        }
+    }
+
+    fun cerrarSesionYSalir(onComplete: () -> Unit) {
+        screenModelScope.launch {
+            sessionManager.clearSession()
+
+            onComplete()
         }
     }
 

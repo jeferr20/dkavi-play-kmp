@@ -4,6 +4,5 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class RequestUpdateTokenDTO(
-    val authUid: String,
     val token: String?
 )

@@ -1,5 +1,8 @@
 package pe.breaker.dkaviplay.cache
 
+import kotlin.Long
+import kotlin.String
+
 public data class UsuarioTable(
   public val usuarioUid: String,
   public val uidAuth: String,

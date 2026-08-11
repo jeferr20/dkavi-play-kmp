@@ -4,10 +4,10 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ActualizarPuntosRequestDTO(
-    val juegoId: String,
+    val juegoId: Int,
     val partidas: List<ResultadosPartidasDTO>,
     val tipoJuego: String?,
-    val reservaId: String?,
+    val reservaId: Int?,
     val contrincanteUid: String,
     val sender: String?
 )

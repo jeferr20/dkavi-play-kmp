@@ -1,45 +1,86 @@
 package pe.breaker.dkaviplay.data.mapper
 
-import pe.breaker.dkaviplay.data.remote.firebase.JuegoFirebase
-import pe.breaker.dkaviplay.data.remote.firebase.MesaFirebase
-import pe.breaker.dkaviplay.data.remote.firebase.ReservaFirebase
-import pe.breaker.dkaviplay.data.remote.firebase.SedeFirebase
+import kotlinx.serialization.json.Json
+import pe.breaker.dkaviplay.data.remote.dto.ResultadosPartidasDTO
+import pe.breaker.dkaviplay.data.remote.supabase.rpc.ReservaJuegoDTO
+import pe.breaker.dkaviplay.data.remote.supabase.rpc.ReservaRpcDTO
 import pe.breaker.dkaviplay.domain.model.Reserva
 import pe.breaker.dkaviplay.domain.model.ReservaEstado
-import pe.breaker.dkaviplay.presentation.util.timestampToStringCompleto
 
-fun mapToReserva(
-    id: String,
-    sede: SedeFirebase,
-    reserva: ReservaFirebase,
-    mesa: MesaFirebase,
-    juego: JuegoFirebase?
-): Reserva {
-    val estadoEnum = ReservaEstado.fromId(reserva.uuidEstado)
-    return Reserva(
-        reservaUid = id,
-        estado = estadoEnum.descripcion,
-        estadoInt = estadoEnum.id,
-        sedeImagen = sede.imagen ?: "",
-        sede = sede.nombre ?: "",
-        sedeUid = reserva.uuidSede ?: "",
-        tipoJuego = reserva.tipoJuego ?: "",
-        fechaInicio = reserva.fechaInicio?.let { timestampToStringCompleto(it.seconds) }
-            ?: "Sin fecha",
-        fechaFin = reserva.fechaFin?.let { timestampToStringCompleto(it.seconds) } ?: "Sin hora",
-        estadoColor = estadoEnum.colorHex,
-        montoTotal = reserva.montoTotal ?: 0.0,
-        creador = reserva.user1 ?: "",
-        creadorUid = reserva.uuidUser1 ?: "",
-        retado = reserva.user2 ?: "",
-        retadoUid = reserva.uuidUser2 ?: "",
-        mesa = mesa.descripcion ?: "",
-        juegoUid = juego?.uuidJuego ?: "",
-        userPendienteUid = reserva.uuidUserPendiente ?: "",
-        esperandoConfirmacion = reserva.esperandoConfirmacion ?: false,
-        partidas = juego?.partidas ?: emptyList(),
-        ganadorUid = juego?.uuidGanador ?: "",
-        userCreadorReady = reserva.user1Ready ?: false,
-        userRetadoReady = reserva.user2Ready ?: false
-    )
+object ReservaMapper {
+    private val jsonMapper = Json {
+        ignoreUnknownKeys = true
+        isLenient = true
+    }
+
+    fun mapToDomain(
+        dto: ReservaRpcDTO
+    ) : Reserva {
+        return Reserva(
+            reservaUid = dto.reservaId.toString(),
+            estado = dto.estado,
+            estadoColor = dto.estadoColor,
+            estadoInt = dto.estadoId,
+            sedeImagen = dto.sedeImagen ?: "",
+            sede = dto.sede,
+            sedeUid = dto.sedeId.toString(),
+            tipoJuego = dto.tipoJuego,
+            fechaInicio = dto.fechaInicio,
+            fechaFin = dto.fechaFin,
+            montoTotal = dto.montoTotal,
+            mesa = dto.mesa,
+            creador = dto.creador,
+            creadorUid = dto.creadorId,
+            retado = dto.retado,
+            retadoUid = dto.retadoId,
+            userPendienteUid = dto.userPendienteId ?: "",
+            juegoUid = "",
+            esperandoConfirmacion = dto.esperandoConfirmacion,
+            partidas = emptyList(),
+            ganadorUid = "",
+            userCreadorReady = dto.creadorReady,
+            userRetadoReady = dto.retadoReady
+        )
+    }
+
+    fun mapJuegoToDomain(
+        dto: ReservaJuegoDTO
+    ) : Reserva {
+        val estadoEnum = ReservaEstado.fromId(dto.estadoId)
+        val listaPartidas: List<ResultadosPartidasDTO> = if (!dto.partidas.isNullOrBlank()) {
+            try {
+                jsonMapper.decodeFromString<List<ResultadosPartidasDTO>>(dto.partidas)
+            } catch (e: Exception) {
+                println("⚠️ Error deserializando partidas JSON String: ${e.message}")
+                emptyList()
+            }
+        } else {
+            emptyList()
+        }
+        return Reserva(
+            reservaUid = dto.reservaId.toString(),
+            estado = estadoEnum.descripcion,
+            estadoColor = estadoEnum.colorHex,
+            estadoInt = estadoEnum.id,
+            sedeImagen = dto.sedeLogo,
+            sede = dto.sede,
+            sedeUid = dto.sedeId.toString(),
+            tipoJuego = dto.tipoJuego,
+            fechaInicio = dto.fechaInicio,
+            fechaFin = dto.fechaFin,
+            montoTotal = dto.montoTotal,
+            mesa = dto.mesa,
+            creador = dto.creador,
+            creadorUid = dto.creadorUid,
+            retado = dto.retado,
+            retadoUid = dto.retadoUid,
+            userPendienteUid = dto.userPendienteUid,
+            juegoUid = dto.juegoId.toString(),
+            esperandoConfirmacion = dto.esperandoConfirmacion,
+            partidas = listaPartidas,
+            ganadorUid = dto.ganadorUid ?: "",
+            userCreadorReady = dto.userCreadorReady,
+            userRetadoReady = dto.userRetadoReady
+        )
+    }
 }

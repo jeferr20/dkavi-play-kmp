@@ -32,7 +32,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.DrawableResource
 import pe.breaker.dkaviplay.domain.animations.AshParticle
-import pe.breaker.dkaviplay.presentation.animations.animations.battleLoser.components.ActionButtons
 import pe.breaker.dkaviplay.presentation.animations.animations.battleLoser.components.AshEffect
 import pe.breaker.dkaviplay.presentation.animations.animations.battleLoser.components.DefeatAvatar
 import pe.breaker.dkaviplay.presentation.animations.animations.battleLoser.components.WinnerRow
@@ -43,10 +42,8 @@ fun BattleLoserAnimation(
     loserName: String,
     winnerProfileUrl: String,
     loserProfileUrl: String,
-    winnerRankRes: DrawableResource,
     loserRankRes: DrawableResource,
     onShare: () -> Unit = {},
-    onContinue: () -> Unit = {}
 ) {
     val loserScale = remember { Animatable(1.1f) }
     val glitchOffset = remember { Animatable(0f) }
@@ -175,7 +172,7 @@ fun BattleLoserAnimation(
 
                     Spacer(modifier = Modifier.height(40.dp))
 
-                    ActionButtons(onShare, onContinue)
+//                    ActionButtons(onShare)
                 }
             }
             Spacer(modifier = Modifier.weight(0.15f))

@@ -105,6 +105,8 @@ class QuickPlayDetailScreen(private val sede: Sede, private val usuario: UserQui
                         onClick = { navigator.push(RegisterReservationScreen(sede , usuario))},
                         text = "Retar a partida"
                     )
+
+                    Spacer(modifier = Modifier.height(16.dp))
                 }
             }
 

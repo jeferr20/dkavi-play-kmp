@@ -18,73 +18,72 @@ class CheckSessionUseCase(
     private val sessionSyncManager: SessionSyncManager
 ) {
     suspend operator fun invoke(): SessionCheckResult {
+        // 1. Cargar estado de sesión local
         sessionManager.loadSession()
 
         val token = sessionManager.getToken()
         val userId = sessionManager.getUserUid()
         val internalId = sessionManager.getUserId()
-        val supabaseToken = sessionManager.getSupabaseToken()
-        val firebaseToken = sessionManager.getFirebaseToken()
 
-        if (token == null || userId == null || internalId == null) {
+        // Si no hay sesión local, forzamos Login
+        if (token.isNullOrBlank() || userId.isNullOrBlank() || internalId == null) {
             return SessionCheckResult.NoSession
         }
 
+        // 2. Si el token de la API está vencido, ejecutamos autoLogin
         if (isTokenExpired(token)) {
-            val isLoggedIn = authRepository.isLoggedIn()
-            if (!isLoggedIn) return SessionCheckResult.NoSession
-
             when (val result = authRepository.autoLogin(token)) {
                 is AutoLoginResult.InvalidToken -> return SessionCheckResult.NoSession
                 is AutoLoginResult.NetworkError -> return SessionCheckResult.NetworkError(result.message)
-                is AutoLoginResult.Success -> { /* Los nuevos tokens ya se guardaron en caché interna */ }
-            }
-        }
-
-        val tokenParaSupabase = sessionManager.getSupabaseToken()
-        tokenParaSupabase?.let {
-            try {
-                supabaseClient.auth.importSession(
-                    io.github.jan.supabase.auth.user.UserSession(
-                        accessToken = it,
-                        refreshToken = "",
-                        expiresIn = 3600,
-                        tokenType = "bearer",
-                        user = null
-                    )
-                )
-            } catch (e: Exception) {
-                when (authRepository.autoLogin(token)) {
-                    is AutoLoginResult.Success -> {
-                        val freshSupabaseToken = sessionManager.getSupabaseToken()
-
-                        freshSupabaseToken?.let { freshToken ->
-                            supabaseClient.auth.importSession(
-                                io.github.jan.supabase.auth.user.UserSession(
-                                    accessToken = freshToken,
-                                    refreshToken = "",
-                                    expiresIn = 3600,
-                                    tokenType = "bearer",
-                                    user = null
-                                )
-                            )
-                        }
-                    }
-                    else -> return SessionCheckResult.NoSession
+                is AutoLoginResult.Success -> {
+                    // autoLogin YA importó las sesiones en Supabase y Firebase dentro del Repository
                 }
             }
+        } else {
+            // 3. Si el token local AÚN ES VÁLIDO, importamos las sesiones guardadas en los SDKs
+            importExistingSdksSessions()
         }
 
-        val tokenParaFirebase = sessionManager.getFirebaseToken()
-        tokenParaFirebase?.let { firebaseAuth.signInWithCustomToken(it) }
-
+        // 4. Sincronización de datos iniciales del juego/app
         val syncExitoso = sessionSyncManager.awaitFirstSync()
-
         if (!syncExitoso) {
             return SessionCheckResult.NetworkError("No se pudieron cargar tus datos de usuario.")
         }
 
         sessionSyncManager.startSync()
         return SessionCheckResult.Authenticated(userId)
+    }
+
+    /**
+     * Importa las sesiones existentes en Supabase y Firebase solo cuando no fue necesario hacer autoLogin
+     */
+    private suspend fun importExistingSdksSessions() {
+        val tokenParaSupabase = sessionManager.getSupabaseToken()
+        val refreshParaSupabase = sessionManager.getSupabaseRefreshToken()
+
+        if (!tokenParaSupabase.isNullOrBlank()) {
+            try {
+                supabaseClient.auth.importSession(
+                    io.github.jan.supabase.auth.user.UserSession(
+                        accessToken = tokenParaSupabase,
+                        refreshToken = refreshParaSupabase ?: "",
+                        expiresIn = 3600,
+                        tokenType = "bearer",
+                        user = null
+                    )
+                )
+            } catch (e: Exception) {
+                println("⚠️ Error al importar sesión guardada en Supabase: ${e.message}")
+            }
+        }
+
+        val tokenParaFirebase = sessionManager.getFirebaseToken()
+        if (!tokenParaFirebase.isNullOrBlank()) {
+            try {
+                firebaseAuth.signInWithCustomToken(tokenParaFirebase)
+            } catch (e: Exception) {
+                println("⚠️ Error al autenticar Firebase: ${e.message}")
+            }
+        }
     }
 }

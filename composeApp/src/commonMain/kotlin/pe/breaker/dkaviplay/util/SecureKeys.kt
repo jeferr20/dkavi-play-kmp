@@ -6,4 +6,5 @@ object SecureKeys {
     const val USERID = "current_user_id"
     const val FIREBASETOKEN = "firebase_token"
     const val SUPABASETOKEN = "supabase_token"
+    const val SUPABASEREFRESHTOKEN = "supabase_refresh_token"
 }

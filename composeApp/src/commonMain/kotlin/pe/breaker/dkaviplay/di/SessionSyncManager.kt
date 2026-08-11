@@ -100,6 +100,7 @@ class SessionSyncManager(
     fun stopSync() {
         usuarioJob?.cancel()
         usuarioJob = null
+        lastUsuario = null
     }
 
     /**

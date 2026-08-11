@@ -4,7 +4,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class LogMonedaDTO(
-    val userUid: String,
     val cantidadMonedas: Int,
     val monto: Double,
     val sedeId: Int,

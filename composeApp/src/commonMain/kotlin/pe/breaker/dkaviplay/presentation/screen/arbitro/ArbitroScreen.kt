@@ -114,6 +114,16 @@ class ArbitroScreen : Screen {
                         onConfirm = { if(state.step == ArbitroStep.SCANNING) screenModel.resetError() else screenModel.resetErrorResultados()}
                     )
                 }
+
+                if (state.isSuccess) {
+                    StatusDialog(
+                        status = StatusUiType.SUCCESS,
+                        message = state.successMessage ?: "Resultado registrado correctamente",
+                        confirmButtonText = "Finalizar",
+                        onDismiss = { navigator.popUntilRoot() },
+                        onConfirm = { navigator.popUntilRoot() }
+                    )
+                }
             }
         }
     }

@@ -9,11 +9,11 @@ import pe.breaker.dkaviplay.domain.model.Reserva
 import pe.breaker.dkaviplay.domain.model.ReservaEstado
 import pe.breaker.dkaviplay.domain.model.TipoJuego
 import pe.breaker.dkaviplay.domain.repository.JuegoRepository
-import pe.breaker.dkaviplay.domain.repository.ReservaRepository
+import pe.breaker.dkaviplay.domain.usecase.reserva.GetReservationByIdUseCase
 
 class AcuerdoMutuoModel(
     private val reservaUid: String,
-    private val reservasRepository: ReservaRepository,
+    private val getReservationbyIdUseCase: GetReservationByIdUseCase,
     private val juegoRepository: JuegoRepository
 ) : StateScreenModel<AcuerdoMutuoState>(AcuerdoMutuoState()) {
 
@@ -26,8 +26,7 @@ class AcuerdoMutuoModel(
 
         screenModelScope.launch {
             mutableState.update { it.copy(isLoading = true, errorMessage = null) }
-
-            reservasRepository.getReservaById(reservaUid)
+            getReservationbyIdUseCase(reservaUid)
                 .onSuccess { reserva ->
                     if (reserva.estadoInt == ReservaEstado.FINALIZADO.id) {
                         mutableState.update {

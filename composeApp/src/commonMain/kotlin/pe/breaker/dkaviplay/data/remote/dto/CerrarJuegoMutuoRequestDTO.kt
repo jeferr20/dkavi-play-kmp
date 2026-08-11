@@ -4,6 +4,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class CerrarJuegoMutuoRequestDTO(
-    val reservaId: String,
-    val juegoId: String
+    val reservaId: Int,
+    val juegoId: Int
 )

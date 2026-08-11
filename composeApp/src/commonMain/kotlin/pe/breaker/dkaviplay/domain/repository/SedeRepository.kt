@@ -7,5 +7,5 @@ interface SedeRepository {
     fun getSedes(): Flow<Result<List<Sede>>>
     suspend fun getSedesByDepartamento(departamento: String, provincia: String): Result<List<Sede>>
     suspend fun getTarifaSede(sedeUid: String): Result<Double?>
-    fun getMesasSede(sedeUid: String): Flow<String>
+    suspend fun getMesasSede(sedeUid: String): String
 }

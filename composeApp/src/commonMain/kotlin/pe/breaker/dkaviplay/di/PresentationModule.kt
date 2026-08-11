@@ -45,13 +45,14 @@ val presentationModule = module {
     factory { RegisterUsuarioModel(get()) }
     factory { ArbitroModel(get(), get(), get()) }
     factory { ForgetPasswordModel(get(), get(), get()) }
-    factory { ReservasModel(get(), get(), get(), get(),get()) }
+    factory { ReservasModel(get(), get(), get(), get(),get(),get(),get()) }
 
-    factory { (reservaId: String) -> AceptarRetoModel(reservaId, get(), get(), get(), get()) }
+    factory { (reservaId: String) -> AceptarRetoModel(reservaId, get(), get(), get()) }
     factory { (reservaUid: String) -> AcuerdoMutuoModel(reservaUid, get(), get()) }
     factory { (tipoItem: TipoPremio) -> InventarioModel(tipoItem, get(), get()) }
     factory { (sedeUid: String) ->
         RegisterReservationScreenModel(
+            get(),
             get(),
             get(),
             get(),
@@ -62,7 +63,7 @@ val presentationModule = module {
     factory { (reservaId: String) -> ResultadoPartidaModel(reservaId, get(), get(), get()) }
     factory { (reservaId: String) -> RetoIniciadoModel(reservaId, get(), get()) }
     factory { (isLogged: Boolean,usuarioId: Int?) ->
-        RegisterDatosModel(isLogged, usuarioId,get(), get(), get(), get(), get())
+        RegisterDatosModel(isLogged, usuarioId,get(), get(), get(), get(), get(),get())
     }
     factory { MonedaModel(get(),get(),get(),get()) }
 }

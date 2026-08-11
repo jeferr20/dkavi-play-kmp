@@ -15,7 +15,6 @@ import pe.breaker.dkaviplay.presentation.components.form.FormTextField
 import pe.breaker.dkaviplay.presentation.screen.registerDatos.RegisterDatosModel
 import pe.breaker.dkaviplay.presentation.screen.registerDatos.RegisterDatosState
 import pe.breaker.dkaviplay.presentation.util.InputType
-import pe.breaker.dkaviplay.presentation.util.formatMillisToDate
 
 @Composable
 fun InfoContacto(
@@ -66,14 +65,8 @@ fun InfoContacto(
                 label = "Fecha de nacimiento",
                 value = state.fechaNacimiento ?: "",
                 onDateSelected = { newValue ->
-                    newValue?.let {
-                        val formatedFecha = formatMillisToDate(it)
-                        screenModel.onFieldChanged {
-                            copy(
-                                fechaNacimiento = formatedFecha,
-                                fechaNacimientoError = null
-                            )
-                        }
+                    newValue?.let { millis ->
+                        screenModel.onFechaNacimientoSelected(millis)
                     }
                 },
                 restringirFechaActual = false,

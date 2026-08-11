@@ -117,15 +117,12 @@ object MapTab : Tab {
                             },
                             onQuickPlayClick = {
                                 scope.launch {
-                                    // 1. Cerramos el sheet primero
                                     sheetState.hide()
                                     showSheet = false
                                     selectedSede = null
 
-                                    // 2. Pequeño delay para que la animación de cierre de iOS no choque con la navegación
                                     delay(100)
 
-                                    // 3. Navegamos al QuickPlay usando el rootNavigator
                                     navigator?.push(QuickPlayScreen(sede))
                                 }
                             },

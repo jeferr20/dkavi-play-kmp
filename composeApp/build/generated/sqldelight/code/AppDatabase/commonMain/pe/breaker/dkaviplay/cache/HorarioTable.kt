@@ -1,5 +1,8 @@
 package pe.breaker.dkaviplay.cache
 
+import kotlin.Long
+import kotlin.String
+
 public data class HorarioTable(
   public val id: Long,
   public val usuarioUid: Long,

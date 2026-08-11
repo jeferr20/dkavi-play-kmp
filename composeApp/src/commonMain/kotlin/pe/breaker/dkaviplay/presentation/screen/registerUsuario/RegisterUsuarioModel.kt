@@ -4,6 +4,7 @@ import cafe.adriel.voyager.core.model.StateScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import pe.breaker.dkaviplay.data.util.PasswordRequirements
 import pe.breaker.dkaviplay.domain.usecase.RegisterUseCase
 
 class RegisterUsuarioModel(
@@ -28,24 +29,30 @@ class RegisterUsuarioModel(
         val usuario = s.usuario.orEmpty()
         val password = s.password.orEmpty()
         val confirmPassword = s.confirmPassword.orEmpty()
+        val passwordRequirements = PasswordRequirements.from(password)
+
+        val usuarioErr = if (usuario.isBlank()) "El usuario es obligatorio" else null
+        val passwordErr = when {
+            password.isBlank() -> "La contraseña es obligatoria"
+            !passwordRequirements.isValid -> "La contraseña no cumple con los requisitos de seguridad"
+            else -> null
+        }
+        val confirmErr = when {
+            confirmPassword.isBlank() -> "La confirmación es obligatoria"
+            password != confirmPassword -> "Las contraseñas no coinciden"
+            else -> null
+        }
 
         updateState {
             copy(
-                usuarioError = if (usuario.isBlank()) "El correo es obligatorio" else null,
-                passwordError = if (password.isBlank()) "La contraseña es obligatoria" else null,
-                confirmPasswordError = if (confirmPassword.isBlank()) "La confirmación es obligatoria" else null,
+                usuarioError = usuarioErr,
+                passwordError = passwordErr,
+                confirmPasswordError = confirmErr,
                 errorMessage = null
             )
         }
 
-        if (usuario.isBlank() || password.isBlank() || confirmPassword.isBlank()) return
-
-        if (password != confirmPassword) {
-            updateState {
-                copy(confirmPasswordError = "Las contraseñas no coinciden")
-            }
-            return
-        }
+        if (usuarioErr != null || passwordErr != null || confirmErr != null) return
 
         screenModelScope.launch {
             updateState { copy(isLoading = true) }

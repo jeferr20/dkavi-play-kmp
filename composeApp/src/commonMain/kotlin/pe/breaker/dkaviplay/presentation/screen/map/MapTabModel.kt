@@ -43,7 +43,7 @@ class MapTabModel(
                 }
                 .collect { result ->
                     result.onSuccess { sedes ->
-                        val centroCalculado = if (sedes.isNotEmpty()) {
+                        val centroCalculado = state.value.mapCenter ?: if (sedes.isNotEmpty()) {
                             val avgLat = sedes.map { it.latitud }.average()
                             val avgLng = sedes.map { it.longitud }.average()
                             Pair(avgLat, avgLng)
@@ -76,11 +76,12 @@ class MapTabModel(
     fun listenToMesas(sedeUid: String) {
         mesasJob?.cancel()
         mesasJob = screenModelScope.launch {
-            sedeRepository.getMesasSede(sedeUid)
-                .catch { /* manejar error silencioso o loguear */ }
-                .collect { ocupacion ->
-                    mutableState.update { it.copy(ocupacionActual = ocupacion) }
-                }
+            try {
+                val ocupacion = sedeRepository.getMesasSede(sedeUid)
+                mutableState.update { it.copy(ocupacionActual = ocupacion) }
+            } catch (e: Exception) {
+                mutableState.update { it.copy(ocupacionActual = "0/0") }
+            }
         }
     }
 

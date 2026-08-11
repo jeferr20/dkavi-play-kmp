@@ -68,7 +68,7 @@ class Database(databaseDriverFactory: DatabaseDriverFactory) {
         dbQuery.removeUsuarioTable()
     }
 
-    internal fun clearInventarioable() {
+    internal fun clearInventarioTable() {
         dbQuery.removeInventarioTable()
     }
 

@@ -24,7 +24,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -87,12 +86,6 @@ class RegisterDatosScreen(
 
         BackHandler(enabled = true) {
             handleBackAction()
-        }
-
-        LaunchedEffect(state.successMessage) {
-            if (!state.successMessage.isNullOrEmpty() && !isLogged) {
-                navigator.replaceAll(LoginScreen())
-            }
         }
 
         Scaffold(
@@ -179,6 +172,23 @@ class RegisterDatosScreen(
                         }
                     )
                 }
+
+                if(!isLogged && state.successMessage?.isNotBlank() == true) {
+                    StatusDialog(
+                        status = StatusUiType.SUCCESS,
+                        message = state.successMessage!!,
+                        onDismiss = { screenModel.clearSuccessMessage() },
+                        confirmButtonText = "Aceptar",
+                        hideCancelar = true,
+                        onConfirm = {
+                            screenModel.clearSuccessMessage()
+                            screenModel.cerrarSesionYSalir {
+                                navigator.replaceAll(LoginScreen())
+                            }
+                        }
+                    )
+
+                }
                 if (showExitDialog) {
                     StatusDialog(
                         status = StatusUiType.WARNING,
@@ -187,8 +197,18 @@ class RegisterDatosScreen(
                         confirmButtonText = "Salir",
                         onConfirm = {
                             showExitDialog = false
-                            navigator.replaceAll(LoginScreen())
+                            screenModel.cerrarSesionYSalir {
+                                navigator.replaceAll(LoginScreen())
+                            }
                         }
+                    )
+                }
+
+                state.errorMessage?.let {
+                    StatusDialog(
+                        status = StatusUiType.ERROR,
+                        message = it,
+                        onDismiss = { screenModel.clearError() }
                     )
                 }
             }

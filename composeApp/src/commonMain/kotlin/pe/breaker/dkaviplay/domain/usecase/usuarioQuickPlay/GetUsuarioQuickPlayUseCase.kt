@@ -1,4 +1,4 @@
-package pe.breaker.dkaviplay.domain.usecase
+package pe.breaker.dkaviplay.domain.usecase.usuarioQuickPlay
 
 import pe.breaker.dkaviplay.domain.model.UserQuick
 import pe.breaker.dkaviplay.domain.repository.QuickPlayRepository

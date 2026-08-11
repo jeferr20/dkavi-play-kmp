@@ -61,10 +61,8 @@ class ProfileScreenModel(
         }
     }
 
-    fun logOut(){
-        screenModelScope.launch {
-            logOutUseCase()
-        }
+    suspend fun logOut() {
+        logOutUseCase()
     }
 
     fun deleteAccount(onSuccessAction: () -> Unit) {

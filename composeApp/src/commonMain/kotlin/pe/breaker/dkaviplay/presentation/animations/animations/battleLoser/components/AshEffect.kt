@@ -18,8 +18,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -86,7 +84,7 @@ fun WinnerRow(name: String, url: String) {
 }
 
 @Composable
-fun ActionButtons(onShare: () -> Unit, onContinue: () -> Unit) {
+fun ActionButtons(onShare: () -> Unit) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         OutlinedButton(
             onClick = onShare,
@@ -95,17 +93,6 @@ fun ActionButtons(onShare: () -> Unit, onContinue: () -> Unit) {
             shape = RoundedCornerShape(14.dp)
         ) {
             Text("COMPARTIR", color = Color.White, letterSpacing = 1.sp)
-        }
-
-        Spacer(modifier = Modifier.height(14.dp))
-
-        Button(
-            onClick = onContinue,
-            modifier = Modifier.fillMaxWidth(0.82f).height(54.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color.White),
-            shape = RoundedCornerShape(14.dp)
-        ) {
-            Text("CONTINUAR", color = Color.Black, fontWeight = FontWeight.ExtraBold)
         }
     }
 }

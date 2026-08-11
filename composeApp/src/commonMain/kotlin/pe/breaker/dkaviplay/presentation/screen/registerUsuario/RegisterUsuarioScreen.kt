@@ -1,5 +1,6 @@
 package pe.breaker.dkaviplay.presentation.screen.registerUsuario
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.EaseInOutSine
 import androidx.compose.animation.core.RepeatMode
@@ -7,6 +8,10 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -41,6 +46,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import pe.breaker.dkaviplay.data.util.PasswordRequirements
 import pe.breaker.dkaviplay.presentation.components.CustomAppbar
 import pe.breaker.dkaviplay.presentation.components.button.CustomButtonFilled
 import pe.breaker.dkaviplay.presentation.components.dialog.LoadingDialog
@@ -49,6 +55,7 @@ import pe.breaker.dkaviplay.presentation.components.form.FormTextField
 import pe.breaker.dkaviplay.presentation.screen.login.components.IconHeader
 import pe.breaker.dkaviplay.presentation.screen.registerDatos.RegisterDatosScreen
 import pe.breaker.dkaviplay.presentation.screen.registerUsuario.components.AlreadyAccount
+import pe.breaker.dkaviplay.presentation.screen.registerUsuario.components.PasswordRequirementsIndicator
 import pe.breaker.dkaviplay.presentation.util.InputType
 import pe.breaker.dkaviplay.presentation.util.StatusUiType
 
@@ -149,6 +156,21 @@ class RegisterUsuarioScreen : Screen {
                             inputType = InputType.PASSWORD,
                             error = state.passwordError
                         )
+
+                        val passwordReqs = remember(state.password) {
+                            PasswordRequirements.from(state.password ?: "")
+                        }
+
+                        AnimatedVisibility(
+                            visible = !(state.password.isNullOrEmpty()),
+                            enter = fadeIn() + expandVertically(),
+                            exit = fadeOut() + shrinkVertically()
+                        ) {
+                            PasswordRequirementsIndicator(
+                                requirements = passwordReqs,
+                                modifier = Modifier.padding(start = 4.dp, top = 4.dp, bottom = 4.dp)
+                            )
+                        }
 
                         FormTextField(
                             label = "Confirmar Contraseña",
