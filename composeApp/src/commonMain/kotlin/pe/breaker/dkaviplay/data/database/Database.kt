@@ -46,6 +46,7 @@ class Database(databaseDriverFactory: DatabaseDriverFactory) {
 
     internal fun insertInventarioTable(inventario: List<InventarioEntity>){
         dbQuery.transaction {
+            println("📂 [DB] Sincronizando inventario local. Cantidad: ${inventario.size}")
             dbQuery.removeInventarioTable()
 
             inventario.forEach { item ->

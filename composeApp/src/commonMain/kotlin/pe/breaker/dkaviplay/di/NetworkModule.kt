@@ -76,7 +76,7 @@ val networkModule = module {
                             val currentToken = sessionManager.getToken().orEmpty()
                             val requestToken = response.request.headers[HttpHeaders.Authorization]?.replace("Bearer ", "")
 
-                            if (currentToken.isNotEmpty() && currentToken != requestToken) {
+                            if ((currentToken.isNotEmpty()) && (currentToken != requestToken)) {
                                 return@withLock BearerTokens(currentToken, "")
                             }
 

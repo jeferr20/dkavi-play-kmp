@@ -117,7 +117,7 @@ class SessionSyncManager(
         if (rangoNew.nivel > rangoOld.nivel) {
             scope.launch {
                 val userUid = sessionManager.getUserUid()
-                if (rangoNew.recompensas.isNotEmpty() && userUid != null) {
+                if ((rangoNew.recompensas.isNotEmpty()) && (userUid != null)) {
                     println("Procesando ${rangoNew.recompensas.size} recompensas para el nuevo rango: ${rangoNew.categoria}")
                     usuarioRepository.otorgarRecompensas(userUid, rangoNew.recompensas)
                 }
@@ -146,7 +146,7 @@ class SessionSyncManager(
 
             if (gainedAmount > 0) {
                 scope.launch {
-                    PremiosRegistry.buscarPorId(newItem.articuloId)?.let { detalleBase ->
+                    PremiosRegistry.buscarPorId(newItem.articuloId.toInt())?.let { detalleBase ->
                         // 💡 IMPORTANTE: Emitimos el premio con la CANTIDAD GANADA real (diferencia), no el total
                         val premioGanado = detalleBase.copy(cantidad = gainedAmount)
                         _globalEvent.emit(GlobalEvent.ItemGained(premioGanado))

@@ -298,7 +298,7 @@ class AuthRepositoryImpl(
             val userUid = sessionManager.getUserUid()
             val internalId = sessionManager.getUserId()
 
-            !localToken.isNullOrBlank() && !userUid.isNullOrBlank() && internalId != null
+            (!localToken.isNullOrBlank()) && (!userUid.isNullOrBlank()) && (internalId != null)
         } catch (e: Exception) {
             println("Error verificando consistencia de estados de sesión: ${e.message}")
             false

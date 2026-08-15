@@ -1,8 +1,8 @@
 package pe.breaker.dkaviplay.data.entity
 
 data class HorarioEntity(
-    val id:Int,
-    val usuarioUid: Int,
+    val id: Long,
+    val usuarioUid: Long,
     val dia: Int,
     val horaInicio: String,
     val horaFin: String,

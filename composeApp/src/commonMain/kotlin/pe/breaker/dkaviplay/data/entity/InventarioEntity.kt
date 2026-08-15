@@ -4,8 +4,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class InventarioEntity(
-    val id: Int,
-    val usuarioUid: Int,
-    val articuloId: Int,
+    val id: Long,
+    val usuarioUid: Long,
+    val articuloId: Long,
     val cantidad: Int
 )

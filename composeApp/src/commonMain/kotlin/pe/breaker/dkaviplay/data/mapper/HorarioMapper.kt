@@ -9,8 +9,8 @@ import pe.breaker.dkaviplay.util.Dias
 
 fun HorarioEntity.toTable(): HorarioTable {
     return HorarioTable(
-        id = this.id.toLong(),
-        usuarioUid = this.usuarioUid.toLong(),
+        id = this.id,
+        usuarioUid = this.usuarioUid,
         dia = this.dia.toLong(),
         horaInicio = this.horaInicio,
         horaFin = this.horaFin,
@@ -38,8 +38,8 @@ fun DiaHorarioState.toDTO() : RequestHorarioDTO{
 
 fun UsuarioHorarioDTO.toEntity() : HorarioEntity{
     return HorarioEntity(
-        id = this.id.toInt(),
-        usuarioUid = this.userMovilId?.toInt() ?: 0,
+        id = this.id,
+        usuarioUid = this.userMovilId ?: 0L,
         dia = this.dia ?: 0,
         horaInicio = this.horaInicio ?: "",
         horaFin = this.horaFin ?: "",
