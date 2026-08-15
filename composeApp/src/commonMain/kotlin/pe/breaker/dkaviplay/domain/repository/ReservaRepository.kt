@@ -18,4 +18,5 @@ interface ReservaRepository {
         reservaUid: String
     ): Result<String>
     suspend fun verificarHoraReserva(reservaId: String): Result<ValidarHoraReservaDTO>
+    fun clearCache()
 }

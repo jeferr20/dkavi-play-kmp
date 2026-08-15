@@ -24,6 +24,16 @@ class AceptarRetoModel(
             mutableState.update { it.copy(isLoading = true) }
             getReservationbyIdUseCase(reservaId)
                 .onSuccess { reserva ->
+                    if (reserva.estadoInt != 1) {
+                        mutableState.update {
+                            it.copy(
+                                isLoading = false,
+                                shouldRedirectToMain = true
+                            )
+                        }
+                        return@launch
+                    }
+
                     getUsuarioQuickPlayUseCase(reserva.creadorUid)
                         .onSuccess { retador ->
                             mutableState.update {

@@ -10,5 +10,6 @@ data class AceptarRetoState (
     val isLoading: Boolean = false,
     val isSuccess: Boolean = false,
     val successMessage: String? = null,
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
+    val shouldRedirectToMain: Boolean = false
 )

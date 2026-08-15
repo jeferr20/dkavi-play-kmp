@@ -30,6 +30,9 @@ import pe.breaker.dkaviplay.di.UserSessionManager
 import pe.breaker.dkaviplay.domain.model.LoginResult
 import pe.breaker.dkaviplay.domain.model.UserSession
 import pe.breaker.dkaviplay.domain.repository.AuthRepository
+import pe.breaker.dkaviplay.domain.repository.ReservaRepository
+import pe.breaker.dkaviplay.presentation.navigation.GlobalNavigationBus
+import pe.breaker.dkaviplay.util.GlobalUiManager
 import pe.breaker.dkaviplay.util.toFirebaseData
 import kotlin.time.Clock
 
@@ -307,17 +310,36 @@ class AuthRepositoryImpl(
         val syncManager: SessionSyncManager = getKoin().get()
         syncManager.stopSync()
 
-        // 2. Limpiar base de datos local y almacenamiento seguro (Con manejo de red seguro dentro)
+        // 2. Limpiar cache de repositorios (Evita que el nuevo usuario vea datos del anterior por SharedFlows con replay)
+        try {
+            val reservaRepository: ReservaRepository = getKoin().get()
+            reservaRepository.clearCache()
+        } catch (e: Exception) {
+            println("Error al limpiar cache de reservas: ${e.message}")
+        }
+
+        // 3. Reiniciar UI Global (Colas de premios y estados de diálogos pendientes)
+        try {
+            val globalUiManager: GlobalUiManager = getKoin().get()
+            globalUiManager.reset()
+        } catch (e: Exception) {
+            println("Error al reiniciar GlobalUiManager: ${e.message}")
+        }
+
+        // 4. Limpiar Bus de navegación global
+        GlobalNavigationBus.clear()
+
+        // 5. Limpiar base de datos local y almacenamiento seguro (KSafe)
         sessionManager.clearSession()
 
-        // 3. Cerrar sesión en Firebase de forma segura
+        // 6. Cerrar sesión en Firebase de forma segura
         try {
             firebaseAuth.signOut()
         } catch (e: Exception) {
             println("Error al cerrar sesión en Firebase: ${e.message}")
         }
 
-        // 4. Cerrar sesión en Supabase de forma segura (Previene caídas por falta de red)
+        // 7. Cerrar sesión en Supabase de forma segura
         try {
             supabaseClient.auth.clearSession()
         } catch (e: Exception) {

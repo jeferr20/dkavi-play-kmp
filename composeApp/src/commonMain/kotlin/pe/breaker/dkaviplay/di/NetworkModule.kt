@@ -50,7 +50,7 @@ val networkModule = module {
 
     single { Database(get<DatabaseDriverFactory>()) }
 
-    single {
+    factory {
         provideHttpClient().config {
             install(WebSockets)
 
@@ -113,9 +113,16 @@ val networkModule = module {
                 }
             }
 
-            // Headers globales estáticos para toda la aplicación
+            // Headers globales dinámicos para toda la aplicación
             defaultRequest {
                 header("x-api-key", ConstatesCloud.APIKEY)
+                
+                // 💡 Fuerza a que cada petición consulte el token actual en RAM
+                val sessionManager = get<UserSessionManager>()
+                val token = sessionManager.getToken()
+                if (!token.isNullOrBlank()) {
+                    header(HttpHeaders.Authorization, "Bearer $token")
+                }
             }
 
             install(HttpTimeout) {

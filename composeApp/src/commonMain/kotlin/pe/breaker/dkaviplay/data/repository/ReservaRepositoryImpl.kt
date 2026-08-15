@@ -16,6 +16,7 @@ import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.channels.awaitClose
@@ -237,6 +238,11 @@ class ReservaRepositoryImpl(
             println("Error verificando hora: ${e.message}")
             Result.failure(e)
         }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    override fun clearCache() {
+        _reservasSharedFlow.resetReplayCache()
     }
 
     private suspend fun <T> safeSupabaseCall(block: suspend () -> T): T {

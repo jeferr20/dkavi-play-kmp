@@ -36,21 +36,21 @@ val dataModule = module {
     single { AppConfigManager(get()) }
     single<DateTimeFormatter> { DateTimeFormatterImpl() }
 
-    single<AuthRepository> { AuthRepositoryImpl(get(), get(), get(), get(), get(),get()) }
-    single<UsuarioRepository> { UsuarioRepositoryImpl(get(), get()) }
-    single<SedeRepository> { SedeRepositoryImpl(get(), get(), get()) }
-    single<QuickPlayRepository> { QuickPlayRepositoryImpl(get(), get(), get()) }
+    factory<AuthRepository> { AuthRepositoryImpl(get(), get(), get(), get(), get(),get()) }
+    factory<UsuarioRepository> { UsuarioRepositoryImpl(get(), get()) }
+    factory<SedeRepository> { SedeRepositoryImpl(get(), get(), get()) }
+    factory<QuickPlayRepository> { QuickPlayRepositoryImpl(get(), get(), get()) }
     single<UbigeoRepository> { UbigeoRepositoryImpl(get()) }
-    single<JuegoRepository> { JuegoRepositoryImpl(get(), get()) }
-    single<ReservaRepository> { ReservaRepositoryImpl(get(), get(), get(), get()) }
+    factory<JuegoRepository> { JuegoRepositoryImpl(get(), get()) }
+    factory<ReservaRepository> { ReservaRepositoryImpl(get(), get(), get(), get()) }
     single<TimeRepository> { TimeRepositoryImpl(get()) }
     single<AppConfigRepository> { AppConfigRepositoryImpl(get(), get()) }
-    single<MesaRepository> { MesaRepositoryImpl(get(), get(), get()) }
+    factory<MesaRepository> { MesaRepositoryImpl(get(), get(), get()) }
     single<NotificationRepository> {
         NotificationRepositoryImpl(
             firebaseMessaging = get(),
             get()
         )
     }
-    single<MonedaRepository>{ MonedaRepositoryImpl(get(),get(),get(),get())}
+    factory<MonedaRepository>{ MonedaRepositoryImpl(get(),get(),get(),get())}
 }

@@ -60,6 +60,12 @@ class GlobalUiManager(
         processNextEvent()
     }
 
+    fun reset() {
+        uiState = UiFlowState.Idle
+        rewardQueue.clear()
+        levelUpPendiente = null
+    }
+
     private fun processNextEvent() {
         uiState = when {
             levelUpPendiente != null -> {
