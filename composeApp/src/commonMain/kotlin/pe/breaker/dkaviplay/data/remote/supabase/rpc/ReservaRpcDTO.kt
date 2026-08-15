@@ -33,7 +33,7 @@ data class ReservaRpcDTO(
     val fechaInicio: String,
 
     @SerialName("fecha_fin")
-    val fechaFin: String,
+    val fechaFin: String? = null,
 
     @SerialName("monto_total")
     val montoTotal: Double = 0.0,

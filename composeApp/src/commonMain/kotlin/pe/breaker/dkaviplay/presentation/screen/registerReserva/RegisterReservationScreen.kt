@@ -1,5 +1,6 @@
 package pe.breaker.dkaviplay.presentation.screen.registerReserva
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,6 +13,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -22,6 +25,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -47,6 +51,7 @@ import pe.breaker.dkaviplay.presentation.screen.registerReserva.components.Mesas
 import pe.breaker.dkaviplay.presentation.screen.registerReserva.components.ReservationStatusOverlay
 import pe.breaker.dkaviplay.presentation.screen.registerReserva.components.ReservationTimeSection
 import pe.breaker.dkaviplay.presentation.screen.registerReserva.components.ResumenPrecioReserva
+import pe.breaker.dkaviplay.presentation.theme.colorPrimary
 
 class RegisterReservationScreen(val sede: Sede, private val usuario: UserQuick) : Screen {
     @Composable
@@ -62,8 +67,11 @@ class RegisterReservationScreen(val sede: Sede, private val usuario: UserQuick) 
         var pickingForStart by remember { mutableStateOf(true) }
 
         val hasError = state.errorMessage != null
-        val isFormComplete =
+        val isFormComplete = if (state.isImmediate) {
+            state.fInicio != null && state.hInicio != null
+        } else {
             state.fInicio != null && state.hInicio != null && state.fSalida != null && state.hSalida != null
+        }
 
         LaunchedEffect(usuario.userUid) {
             screenModel.onUsuarioRetadoSelected(usuario)
@@ -110,24 +118,69 @@ class RegisterReservationScreen(val sede: Sede, private val usuario: UserQuick) 
 
                         Spacer(modifier = Modifier.height(24.dp))
 
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { screenModel.onImmediateToggled(!state.isImmediate) },
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Checkbox(
+                                checked = state.isImmediate,
+                                onCheckedChange = { checked -> screenModel.onImmediateToggled(checked) },
+                                colors = CheckboxDefaults.colors(
+                                    checkedColor = colorPrimary,
+                                    uncheckedColor = Color.Gray,
+                                    checkmarkColor = Color.Black
+                                )
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = "Reto Inmediato (Comenzar ahora)",
+                                color = Color.White,
+                                style = MaterialTheme.typography.bodyLarge
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(24.dp))
+
                         // Sección: Hora Inicio
                         ReservationTimeSection(
                             title = "Hora de Inicio",
                             fechaText = state.fInicio ?: "Fecha",
                             horaText = state.hInicio ?: "Hora",
-                            onDateClick = { pickingForStart = true; showDatePicker = true },
-                            onTimeClick = { pickingForStart = true; showTimePicker = true }
+                            onDateClick = {
+                                if (!state.isImmediate) {
+                                    pickingForStart = true
+                                    showDatePicker = true
+                                }
+                            },
+                            onTimeClick = {
+                                if (!state.isImmediate) {
+                                    pickingForStart = true
+                                    showTimePicker = true
+                                }
+                            }
                         )
 
                         Spacer(modifier = Modifier.height(20.dp))
 
                         // Sección: Hora Salida
                         ReservationTimeSection(
-                            title = "Hora de Salida",
+                            title = "Hora de Salida (Opcional en Reto Inmediato)",
                             fechaText = state.fSalida ?: "Fecha",
                             horaText = state.hSalida ?: "Hora",
-                            onDateClick = { pickingForStart = false; showDatePicker = true },
-                            onTimeClick = { pickingForStart = false; showTimePicker = true }
+                            onDateClick = {
+                                if (!state.isImmediate) {
+                                    pickingForStart = false
+                                    showDatePicker = true
+                                }
+                            },
+                            onTimeClick = {
+                                if (!state.isImmediate) {
+                                    pickingForStart = false
+                                    showTimePicker = true
+                                }
+                            }
                         )
 
                         Spacer(modifier = Modifier.height(24.dp))

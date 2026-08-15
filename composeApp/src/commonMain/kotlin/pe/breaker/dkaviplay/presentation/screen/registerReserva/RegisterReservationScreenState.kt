@@ -13,6 +13,7 @@ data class RegisterReservationScreenState(
     val fSalida: String? = null,
     val usuarioRetadoUid: String? = null,
     val usuarioRetado: String? = null,
+    val isImmediate: Boolean = false,
 
     val tarifario: Double? = null,
     val usuario: String? = null,

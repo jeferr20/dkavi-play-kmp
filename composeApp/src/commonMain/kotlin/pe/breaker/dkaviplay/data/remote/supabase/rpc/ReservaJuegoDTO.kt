@@ -30,7 +30,7 @@ data class ReservaJuegoDTO(
     val estadoId: Int,
 
     @SerialName("fecha_fin")
-    val fechaFin: String,
+    val fechaFin: String? = null,
 
     @SerialName("sede_logo")
     val sedeLogo: String,

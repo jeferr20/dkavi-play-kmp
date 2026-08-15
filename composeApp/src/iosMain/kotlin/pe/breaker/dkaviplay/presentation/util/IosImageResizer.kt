@@ -8,8 +8,8 @@ import platform.posix.memcpy
 
 class IosImageResizer : ImageResizer {
     @OptIn(ExperimentalForeignApi::class)
-    override suspend fun compressAndResize(uri: String): ByteArray? {
-        val image = UIImage.imageWithContentsOfFile(uri) ?: return null
+    override suspend fun compressAndResize(uriString: String): ByteArray? {
+        val image = UIImage.imageWithContentsOfFile(uriString) ?: return null
 
         // iOS no escribe WebP de forma nativa fácilmente (UIImageWriteToSavedPhotosAlbum no ayuda aquí)
         // Lo común es convertir a JPEG con compresión alta para simular el ahorro de WebP

@@ -21,21 +21,19 @@ CREATE TABLE UsuarioTable(
 );
 
 CREATE TABLE InventarioTable(
-    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    id INTEGER NOT NULL PRIMARY KEY,
     usuarioUid INTEGER NOT NULL,
     itemId INTEGER NOT NULL,
-    cantidad INTEGER NOT NULL,
-    FOREIGN KEY(usuarioUid) REFERENCES UsuarioTable(usuarioUid)
+    cantidad INTEGER NOT NULL
 );
 
 CREATE TABLE HorarioTable(
-    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    id INTEGER NOT NULL PRIMARY KEY,
     usuarioUid INTEGER NOT NULL,
     dia INTEGER NOT NULL,
     horaInicio TEXT NOT NULL,
     horaFin TEXT NOT NULL,
-    habilitado INTEGER NOT NULL,
-    FOREIGN KEY(usuarioUid) REFERENCES UsuarioTable(usuarioUid)
+    habilitado INTEGER NOT NULL
 );
 
 insertUsuarioTable:

@@ -5,7 +5,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import pe.breaker.dkaviplay.di.SessionSyncManager
 import pe.breaker.dkaviplay.domain.model.GlobalEvent
@@ -18,7 +17,8 @@ class GlobalUiManager(
     var uiState by mutableStateOf<UiFlowState>(UiFlowState.Idle)
         private set
 
-    private var premioPendiente: DetallePremio? = null
+    private val rewardQueue = mutableListOf<DetallePremio>()
+    private var levelUpPendiente: pe.breaker.dkaviplay.domain.model.rango.Rango? = null
 
     init {
         observeGlobalEvents()
@@ -35,50 +35,42 @@ class GlobalUiManager(
     private fun reduce(event: GlobalEvent) {
         when (event) {
             is GlobalEvent.LevelUp -> {
-                uiState = UiFlowState.ShowingLevelUp(event.nuevoRango)
+                if (uiState is UiFlowState.Idle) {
+                    uiState = UiFlowState.ShowingLevelUp(event.nuevoRango)
+                } else {
+                    levelUpPendiente = event.nuevoRango
+                }
             }
 
             is GlobalEvent.ItemGained -> {
-                when (uiState) {
-
-                    is UiFlowState.ShowingLevelUp -> {
-                        premioPendiente = event.premio
-                    }
-
-                    is UiFlowState.WaitingReward -> {
-                        uiState = UiFlowState.ShowingReward(event.premio)
-                    }
-
-                    else -> {
-                        uiState = UiFlowState.ShowingReward(event.premio)
-                    }
+                if (uiState is UiFlowState.Idle) {
+                    uiState = UiFlowState.ShowingReward(event.premio)
+                } else {
+                    rewardQueue.add(event.premio)
                 }
             }
         }
     }
 
     fun onLevelUpDismiss() {
-        val pending = premioPendiente
-        premioPendiente = null
-
-        uiState = if (pending != null) {
-            UiFlowState.ShowingReward(pending)
-        } else {
-            startWaitingReward()
-            UiFlowState.WaitingReward
-        }
-    }
-
-    private fun startWaitingReward() {
-        screenModelScope.launch {
-            delay(10000)
-            if (uiState is UiFlowState.WaitingReward) {
-                uiState = UiFlowState.Idle
-            }
-        }
+        processNextEvent()
     }
 
     fun dismissReward() {
-        uiState = UiFlowState.Idle
+        processNextEvent()
+    }
+
+    private fun processNextEvent() {
+        uiState = when {
+            levelUpPendiente != null -> {
+                val rango = levelUpPendiente!!
+                levelUpPendiente = null
+                UiFlowState.ShowingLevelUp(rango)
+            }
+            rewardQueue.isNotEmpty() -> {
+                UiFlowState.ShowingReward(rewardQueue.removeAt(0))
+            }
+            else -> UiFlowState.Idle
+        }
     }
 }

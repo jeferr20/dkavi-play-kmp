@@ -87,9 +87,11 @@ class ReservasModel(
 
         val filtradas = when (currentFilter) {
             ReservaFilter.TODAS -> allReservas
+
             ReservaFilter.ACTUALES -> allReservas.filter { reserva ->
                 val finInstant = dateTimeFormatter.parseIsoToInstant(reserva.fechaFin)
-                finInstant != null && finInstant > now
+                // 💡 Si no tiene fechaFin (finInstant == null), asumimos que está ACTIVA/ABIERTA
+                finInstant == null || finInstant > now
             }.sortedWith(
                 compareByDescending<Reserva> {
                     it.esperandoConfirmacion && it.userPendienteUid == uid
@@ -100,6 +102,7 @@ class ReservasModel(
 
             ReservaFilter.HISTORIAL -> allReservas.filter { reserva ->
                 val finInstant = dateTimeFormatter.parseIsoToInstant(reserva.fechaFin)
+                // 💡 Solo entra al historial si TIENE fechaFin Y esta ya pasó
                 finInstant != null && finInstant <= now
             }.sortedByDescending {
                 dateTimeFormatter.parseIsoToInstant(it.fechaInicio)

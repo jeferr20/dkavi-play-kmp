@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 data class RegisterReservaRequestDTO(
     val sedeUid: Int,
     val fechaHoraInicio: String,
-    val fechaHoraFin: String,
+    val fechaHoraFin: String? = null,
     val montoTotal: Double,
     val user1: String,
     val uuidUser2: String,

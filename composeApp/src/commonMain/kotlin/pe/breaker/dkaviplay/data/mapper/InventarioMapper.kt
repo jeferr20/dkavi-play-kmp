@@ -6,7 +6,7 @@ import pe.breaker.dkaviplay.data.remote.supabase.InventarioDTO
 
 fun InventarioEntity.toTable(): InventarioTable {
     return InventarioTable(
-        id = 0L,
+        id = this.id.toLong(),
         usuarioUid = this.usuarioUid.toLong(),
         itemId = this.articuloId.toLong(),
         cantidad = this.cantidad.toLong()
@@ -15,6 +15,7 @@ fun InventarioEntity.toTable(): InventarioTable {
 
 fun InventarioDTO.toEntity(): InventarioEntity {
     return InventarioEntity(
+        id = this.id.toInt(),
         usuarioUid = this.userMovilId.toInt(),
         articuloId = this.articulo.toInt(),
         cantidad = this.cantidad

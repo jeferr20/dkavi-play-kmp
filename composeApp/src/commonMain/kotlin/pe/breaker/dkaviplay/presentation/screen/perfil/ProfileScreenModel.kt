@@ -3,9 +3,11 @@ package pe.breaker.dkaviplay.presentation.screen.perfil
 import cafe.adriel.voyager.core.model.StateScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import io.github.ismoy.imagepickerkmp.domain.models.GalleryPhotoResult
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import pe.breaker.dkaviplay.di.UserSessionManager
 import pe.breaker.dkaviplay.domain.usecase.DeleteAccountUseCase
 import pe.breaker.dkaviplay.domain.usecase.LogOutUseCase
@@ -42,22 +44,40 @@ class ProfileScreenModel(
 
     fun uploadImage(photo: GalleryPhotoResult) {
         screenModelScope.launch {
-            mutableState.update { it.copy(isLoading = true) }
+            // Marcamos inicio de carga
+            mutableState.update { it.copy(isLoading = true, errorMessage = null, successMessage = null) }
 
-            val bytes = imageResizer.compressAndResize(photo.uri)
-            if (bytes != null) {
-                uploadProfileImageUseCase(bytes)
-                    .onSuccess { url ->
-                        mutableState.update {
-                            it.copy(isLoading = false, urlImagenPerfil = url, successMessage = "Imagen actualizada")
-                        }
-                    }
-                    .onFailure { error ->
-                        mutableState.update { it.copy(isLoading = false, errorMessage = error.message) }
-                    }
-            } else {
-                mutableState.update { it.copy(isLoading = false, errorMessage = "Error al procesar imagen") }
+            // Procesamos imagen fuera del hilo UI/Principal
+            val bytes = withContext(Dispatchers.Default) {
+                imageResizer.compressAndResize(photo.uri)
             }
+
+            if (bytes == null) {
+                mutableState.update {
+                    it.copy(isLoading = false, errorMessage = "Error al procesar la imagen")
+                }
+                return@launch
+            }
+
+            // Ejecutamos UseCase
+            uploadProfileImageUseCase(bytes)
+                .onSuccess { url ->
+                    mutableState.update {
+                        it.copy(
+                            isLoading = false,
+                            urlImagenPerfil = url,
+                            successMessage = "Imagen actualizada correctamente"
+                        )
+                    }
+                }
+                .onFailure { error ->
+                    mutableState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = error.message ?: "Error desconocido al subir"
+                        )
+                    }
+                }
         }
     }
 

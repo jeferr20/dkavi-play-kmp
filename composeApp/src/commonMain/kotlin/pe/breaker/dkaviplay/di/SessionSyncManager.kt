@@ -88,6 +88,10 @@ class SessionSyncManager(
                 if (anterior != null) {
                     handleLevelChange(anterior, nuevo)
                     handleInventoryChange(anterior, nuevo)
+                } else {
+                    // 💡 Si es la primera vez que recibimos datos en startSync,
+                    // también comparamos con lo que había en RAM (por si el primer sync falló o fue parcial)
+                    lastUsuario?.let { handleInventoryChange(it, nuevo) }
                 }
                 lastUsuario = nuevo
             }
@@ -143,6 +147,7 @@ class SessionSyncManager(
             if (gainedAmount > 0) {
                 scope.launch {
                     PremiosRegistry.buscarPorId(newItem.articuloId)?.let { detalleBase ->
+                        // 💡 IMPORTANTE: Emitimos el premio con la CANTIDAD GANADA real (diferencia), no el total
                         val premioGanado = detalleBase.copy(cantidad = gainedAmount)
                         _globalEvent.emit(GlobalEvent.ItemGained(premioGanado))
                     }

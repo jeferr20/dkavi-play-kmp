@@ -218,7 +218,7 @@ class AuthRepositoryImpl(
     }
 
     override suspend fun uploadProfileImage(byteArray: ByteArray): Result<String> {
-        return try {
+        return runCatching {
             val userUidAuth = sessionManager.getUserUid() // uuid_auth (String)
                 ?: return Result.failure(Exception("No se encontró el UID de autenticación"))
 
@@ -239,17 +239,15 @@ class AuthRepositoryImpl(
                     filter { eq("uuid_auth", userUidAuth) }
                 }
 
-            try {
+            runCatching {
                 firestore.collection("UserMovil")
                     .document(userUidAuth)
                     .update(mapOf("urlImagen" to urlPublica))
-            } catch (e: Exception) {
+            }.onFailure { e ->
                 println("⚠️ Advertencia: No se pudo replicar la URL en Firestore: ${e.message}")
             }
-            Result.success(urlPublica)
-        } catch (e: Exception) {
-            println("Error en uploadProfileImage: ${e.message}")
-            Result.failure(e)
+
+            urlPublica
         }
     }
 

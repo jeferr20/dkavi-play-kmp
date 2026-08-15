@@ -152,12 +152,13 @@ fun ReservaItem(
                         value = dateTimeFormatter.formatToFullDateTime(reserva.fechaInicio),
                         icon = Icons.Default.CalendarToday
                     )
-
-                    InfoReservaCol(
-                        label = "FIN",
-                        value = dateTimeFormatter.formatToFullDateTime(reserva.fechaFin),
-                        icon = Icons.Default.AccessTime
-                    )
+                    if(reserva.fechaFin.isNotEmpty()){
+                        InfoReservaCol(
+                            label = "FIN",
+                            value = dateTimeFormatter.formatToFullDateTime(reserva.fechaFin),
+                            icon = Icons.Default.AccessTime
+                        )
+                    }
                 }
 
                 Row(

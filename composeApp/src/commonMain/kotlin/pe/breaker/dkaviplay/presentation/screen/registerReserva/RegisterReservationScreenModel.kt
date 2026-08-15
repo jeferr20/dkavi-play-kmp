@@ -5,6 +5,7 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import pe.breaker.dkaviplay.data.remote.dto.RegisterReservaRequestDTO
 import pe.breaker.dkaviplay.di.UserSessionManager
 import pe.breaker.dkaviplay.domain.model.Mesa
@@ -26,8 +27,6 @@ class RegisterReservationScreenModel(
     private val dateTimeFormatter: DateTimeFormatter,
     private val sedeUid: String?
 ) : StateScreenModel<RegisterReservationScreenState>(RegisterReservationScreenState()){
-
-    private val peruTimeZone = TimeZone.of("America/Lima")
 
     init {
         cargarTarifa()
@@ -106,45 +105,80 @@ class RegisterReservationScreenModel(
         }
     }
 
+    fun onImmediateToggled(enabled: Boolean) {
+        mutableState.update { state ->
+            if (enabled) {
+                val timeZone = TimeZone.currentSystemDefault()
+                val nowLocal = Clock.System.now().toLocalDateTime(timeZone)
+
+                // 1. Formatear la hora local HH:mm (ej: "19:38")
+                val timeString = "${nowLocal.hour.toString().padStart(2, '0')}:${nowLocal.minute.toString().padStart(2, '0')}"
+
+                // 2. Formatear la fecha DIRECTAMENTE desde los componentes locales (dd/MM/yyyy)
+                val day = nowLocal.dayOfMonth.toString().padStart(2, '0')
+                val month = nowLocal.monthNumber.toString().padStart(2, '0')
+                val year = nowLocal.year
+
+                val dateString = "$day/$month/$year" // Genera directamente "11/08/2026"
+
+                state.copy(
+                    isImmediate = true,
+                    fInicio = dateString,
+                    hInicio = timeString,
+                    fSalida = null,
+                    hSalida = null
+                )
+            } else {
+                state.copy(isImmediate = false)
+            }
+        }
+        validateAndCalculate()
+    }
+
     private fun validateAndCalculate() {
         val s = state.value
 
-        if (s.fInicio != null && s.hInicio != null && s.fSalida != null && s.hSalida != null) {
-            try {
-                val inicioInstant = dateTimeFormatter.parseToInstant(s.fInicio, s.hInicio)
+        // 1. Validar que al menos Fecha y Hora de Inicio estén seleccionadas
+        if (s.fInicio == null || s.hInicio == null) return
+
+        try {
+            val inicioInstant = dateTimeFormatter.parseToInstant(s.fInicio, s.hInicio)
+            val ahoraInstant = Clock.System.now()
+
+            // 2. ¿La fecha/hora de inicio es en el pasado? (Tolera 1 min)
+            if (inicioInstant < (ahoraInstant - 1.minutes)) {
+                mutableState.update { it.copy(errorMessage = "La fecha de inicio no puede ser pasada.") }
+                return
+            }
+
+            // 3. Si ingresó Fecha y Hora de Salida, validamos rango y duración
+            if (s.fSalida != null && s.hSalida != null) {
                 val finInstant = dateTimeFormatter.parseToInstant(s.fSalida, s.hSalida)
-                val ahoraInstant = Clock.System.now()
                 val duracion = finInstant - inicioInstant
 
-                // 1. ¿Es en el pasado? (Margen de 1 min de tolerancia)
-                if (inicioInstant < (ahoraInstant - 1.minutes)) {
-                    mutableState.update { it.copy(errorMessage = "La fecha de inicio no puede ser pasada.") }
-                    return
-                }
-
-                // 2. ¿Orden cronológico?
+                // ¿Orden cronológico?
                 if (finInstant <= inicioInstant) {
                     mutableState.update { it.copy(errorMessage = "La salida debe ser después del inicio.") }
                     return
                 }
 
-                // 3. ¿Mínimo 30 minutos?
+                // ¿Mínimo 30 minutos?
                 if (duracion < 30.minutes) {
                     mutableState.update { it.copy(errorMessage = "La reserva mínima es de 30 min.") }
                     return
                 }
 
-                // 4. ¿Máximo 18 horas?
+                // ¿Máximo 18 horas?
                 if (duracion > 18.hours) {
                     mutableState.update { it.copy(errorMessage = "La reserva máxima es de 18 horas.") }
                     return
                 }
-
-                mutableState.update { it.copy(errorMessage = null) }
-
-            } catch (e: Exception) {
-                mutableState.update { it.copy(errorMessage = "Formato de fecha inválido") }
             }
+
+            mutableState.update { it.copy(errorMessage = null) }
+
+        } catch (e: Exception) {
+            mutableState.update { it.copy(errorMessage = "Formato de fecha inválido") }
         }
     }
 
@@ -154,6 +188,11 @@ class RegisterReservationScreenModel(
 
         if (usuario == null) {
             mutableState.update { it.copy(errorMessage = "Sesión expirada.") }
+            return
+        }
+
+        if (s.fInicio == null || s.hInicio == null) {
+            mutableState.update { it.copy(errorMessage = "Selecciona la hora de inicio.") }
             return
         }
 
@@ -167,10 +206,16 @@ class RegisterReservationScreenModel(
                     s.selectedMesa?.mesaUid
                 }
 
+                val fechaHoraFinFinal = if (!s.fSalida.isNullOrBlank() && !s.hSalida.isNullOrBlank()) {
+                    dateTimeFormatter.toIsoStringWithOffset(s.fSalida, s.hSalida)
+                } else {
+                    null
+                }
+
                 val request = RegisterReservaRequestDTO(
                     sedeUid = sedeUid?.toInt() ?: 0,
-                    fechaHoraInicio = dateTimeFormatter.toIsoStringWithOffset(s.fInicio!!, s.hInicio!!),
-                    fechaHoraFin = dateTimeFormatter.toIsoStringWithOffset(s.fSalida!!, s.hSalida!!),
+                    fechaHoraInicio = dateTimeFormatter.toIsoStringWithOffset(s.fInicio, s.hInicio),
+                    fechaHoraFin = fechaHoraFinFinal,
                     montoTotal = s.tarifario ?: 0.0,
                     user1 = usuario.usuario,
                     mesaUid = mesaUidFinal,
