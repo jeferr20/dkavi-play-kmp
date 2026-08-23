@@ -14,6 +14,7 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -24,11 +25,17 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.VolumeMute
+import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -37,6 +44,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -88,22 +96,22 @@ fun BattleWinnerAnimation(
 
     val lifecycleOwner = LocalLifecycleOwner.current
 
+    var isMuted by rememberSaveable { mutableStateOf(false) }
+
+    LaunchedEffect(isMuted) {
+        if (isMuted) {
+            audioFactory.stopBattleMusic()
+        } else {
+            audioFactory.playBattleMusic()
+        }
+    }
+
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
-            when (event) {
-                Lifecycle.Event.ON_PAUSE -> {
-                    audioFactory.stopBattleMusic()
-                }
-
-                Lifecycle.Event.ON_STOP -> {
-                    audioFactory.stopBattleMusic()
-                }
-
-                Lifecycle.Event.ON_RESUME -> {
-                    audioFactory.playBattleMusic()
-                }
-
-                else -> {}
+            if (event == Lifecycle.Event.ON_PAUSE || event == Lifecycle.Event.ON_STOP) {
+                audioFactory.stopBattleMusic()
+            } else if (event == Lifecycle.Event.ON_RESUME && !isMuted) {
+                audioFactory.playBattleMusic()
             }
         }
 
@@ -154,6 +162,26 @@ fun BattleWinnerAnimation(
         val screenHeight = maxHeight
 
         ConfettiCanvas(show = showResults)
+
+        IconButton(
+            onClick = { isMuted = !isMuted },
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .statusBarsPadding()
+                .padding(top = 12.dp, end = 16.dp)
+                .zIndex(10f)
+                .background(
+                    color = Color.Black.copy(alpha = 0.5f),
+                    shape = CircleShape
+                )
+                .border(1.dp, Color.White.copy(alpha = 0.3f), CircleShape)
+        ) {
+            Icon(
+                imageVector = if (isMuted) Icons.Default.VolumeMute else Icons.Default.VolumeUp,
+                contentDescription = if (isMuted) "Activar sonido" else "Silenciar sonido",
+                tint = Color.White
+            )
+        }
 
         // --- COLUMNA PRINCIPAL DINÁMICA ---
         Column(

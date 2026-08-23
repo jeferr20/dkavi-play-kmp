@@ -34,6 +34,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -62,6 +63,10 @@ import pe.breaker.dkaviplay.presentation.components.button.CustomButtonFilled
 import pe.breaker.dkaviplay.presentation.theme.colorBlackSurface
 import pe.breaker.dkaviplay.presentation.theme.colorPrimary
 import kotlin.math.PI
+import androidx.compose.material.icons.filled.VolumeMute
+import androidx.compose.material.icons.filled.VolumeUp
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -102,22 +107,22 @@ fun BattleChallengeAnimation(
 
     val lifecycleOwner = LocalLifecycleOwner.current
 
+    var isMuted by rememberSaveable { mutableStateOf(false) }
+
+    LaunchedEffect(isMuted) {
+        if (isMuted) {
+            audioFactory.stopBattleMusic()
+        } else {
+            audioFactory.playBattleMusic()
+        }
+    }
+
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
-            when (event) {
-                Lifecycle.Event.ON_PAUSE -> {
-                    audioFactory.stopBattleMusic()
-                }
-
-                Lifecycle.Event.ON_STOP -> {
-                    audioFactory.stopBattleMusic()
-                }
-
-                Lifecycle.Event.ON_RESUME -> {
-                    audioFactory.playBattleMusic()
-                }
-
-                else -> {}
+            if (event == Lifecycle.Event.ON_PAUSE || event == Lifecycle.Event.ON_STOP) {
+                audioFactory.stopBattleMusic()
+            } else if (event == Lifecycle.Event.ON_RESUME && !isMuted) {
+                audioFactory.playBattleMusic()
             }
         }
 
@@ -251,6 +256,25 @@ fun BattleChallengeAnimation(
                     letterSpacing = 1.sp
                 )
             }
+        }
+
+        IconButton(
+            onClick = { isMuted = !isMuted },
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(top = maxHeight * 0.025f, end = 16.dp)
+                .zIndex(6f)
+                .background(
+                    color = Color.Black.copy(alpha = 0.5f),
+                    shape = CircleShape
+                )
+                .border(1.dp, Color.White.copy(alpha = 0.3f), CircleShape)
+        ) {
+            Icon(
+                imageVector = if (isMuted) Icons.Default.VolumeMute else Icons.Default.VolumeUp,
+                contentDescription = if (isMuted) "Activar sonido" else "Silenciar sonido",
+                tint = Color.White
+            )
         }
 
         // ⚡ Sparks
