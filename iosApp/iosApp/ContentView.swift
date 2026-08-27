@@ -1,6 +1,6 @@
 import UIKit
 import SwiftUI
-import ComposeApp
+import composeApp
 
 struct ComposeView: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> UIViewController {
@@ -26,3 +26,4 @@ struct ContentView: View {
         }
     }
 }
+

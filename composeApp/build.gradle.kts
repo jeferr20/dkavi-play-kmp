@@ -7,7 +7,6 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
-    alias(libs.plugins.cocoapods)
     alias(libs.plugins.sqldelight)
     alias(libs.plugins.serialization)
     alias(libs.plugins.google.services)
@@ -45,41 +44,16 @@ kotlin {
         }
     }
 
-    iosX64()
-    iosArm64()
-    iosSimulatorArm64()
-
-//    iosX64()
-//    iosArm64()
-//    iosSimulatorArm64()
-
-    cocoapods{
-        summary = "Some description for the Shared Module"
-        homepage = "Link to the Shared Module homepage"
-        version = "1.0"
-        ios.deploymentTarget = "15.4"
-        name = "composeApp"
-
-        podfile = project.file("../iosApp/Podfile")
-
-        framework {
-            baseName = "ComposeApp"
+    listOf(
+        iosX64(),
+        iosArm64(),
+        iosSimulatorArm64()
+    ).forEach { iosTarget ->
+        iosTarget.binaries.framework {
+            baseName = "composeApp"
             isStatic = true
+            linkerOpts.add("-lsqlite3")
         }
-
-        extraSpecAttributes["libraries"] = "'sqlite3'"
-        extraSpecAttributes["pod_target_xcconfig"] = "{ 'OTHER_LDFLAGS' => '-lsqlite3' }"
-
-        pod("GoogleMaps") {
-            version = "8.4.0"
-            extraOpts += listOf("-compiler-option", "-fmodules")
-        }
-        pod("FirebaseCore"){ linkOnly = true }
-        pod("FirebaseAuth"){ linkOnly = true }
-        pod("FirebaseFirestore"){ linkOnly = true }
-        pod("FirebaseRemoteConfig"){ linkOnly = true }
-        pod("FirebaseStorage"){ linkOnly = true }
-        pod("FirebaseMessaging"){ linkOnly = true }
     }
 
     sourceSets {

@@ -1,13 +1,11 @@
 import SwiftUI
-import GoogleMaps
 import FirebaseCore
-import ComposeApp
+import composeApp
 
 class AppDelegate: NSObject, UIApplicationDelegate {
     func application(_ application: UIApplication,
                      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
         FirebaseApp.configure()
-        GMSServices.provideAPIKey(AppConfigGlobal.shared.MAPS_API_KEY)
         
         DispatchQueue.main.async {
             HelperKt.doInitKoin()

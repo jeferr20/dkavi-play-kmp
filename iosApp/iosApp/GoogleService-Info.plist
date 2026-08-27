@@ -1,30 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
-<dict>
-    <key>API_KEY</key>
-    <string>AIzaSyAcAS_4uUPjWqxG26rRvUkFNPOGPFLx1Lk</string>
-    <key>GCM_SENDER_ID</key>
-    <string>652502928409</string>
-    <key>PLIST_VERSION</key>
-    <string>1</string>
-    <key>BUNDLE_ID</key>
-    <string>pe.breaker.dkaviplay.jpj</string>
-    <key>PROJECT_ID</key>
-    <string>poolstreet-100jj001</string>
-    <key>STORAGE_BUCKET</key>
-    <string>poolstreet-100jj001.firebasestorage.app</string>
-    <key>IS_ADS_ENABLED</key>
-    <false></false>
-    <key>IS_ANALYTICS_ENABLED</key>
-    <false></false>
-    <key>IS_APPINVITE_ENABLED</key>
-    <true></true>
-    <key>IS_GCM_ENABLED</key>
-    <true></true>
-    <key>IS_SIGNIN_ENABLED</key>
-    <true></true>
-    <key>GOOGLE_APP_ID</key>
-    <string>1:652502928409:ios:3f90cfad01f044fd8e6e88</string>
-</dict>
+    <dict>
+        <key>API_KEY</key>
+        <string>AIzaSyAIvU1qCoyfcbwqG5sCkKlfPKwpm62DA3c</string>
+        <key>GCM_SENDER_ID</key>
+        <string>408676820262</string>
+        <key>PLIST_VERSION</key>
+        <string>1</string>
+        <key>BUNDLE_ID</key>
+        <string>pe.breaker.dkaviplay.jpj</string>
+        <key>PROJECT_ID</key>
+        <string>dkaviplay-390b9</string>
+        <key>STORAGE_BUCKET</key>
+        <string>dkaviplay-390b9.firebasestorage.app</string>
+        <key>IS_ADS_ENABLED</key>
+        <false></false>
+        <key>IS_ANALYTICS_ENABLED</key>
+        <false></false>
+        <key>IS_APPINVITE_ENABLED</key>
+        <true></true>
+        <key>IS_GCM_ENABLED</key>
+        <true></true>
+        <key>IS_SIGNIN_ENABLED</key>
+        <true></true>
+        <key>GOOGLE_APP_ID</key>
+        <string>1:408676820262:ios:1dafb5d7677862ca44cde7</string>
+    </dict>
 </plist>

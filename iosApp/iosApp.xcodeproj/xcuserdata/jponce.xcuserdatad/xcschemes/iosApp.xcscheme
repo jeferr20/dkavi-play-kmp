@@ -4,6 +4,24 @@
    <BuildAction
       parallelizeBuildables = "YES"
       buildImplicitDependencies = "YES">
+      <PreActions>
+         <ExecutionAction
+            ActionType = "Xcode.IDEStandardExecutionActionsCore.ExecutionActionType.ShellScriptAction">
+            <ActionContent
+               title = "Run Script"
+               scriptText = "# Type a script or drag a script file from your workspace to insert its path.&#10;MARKER_FILE=&quot;${SRCROOT}/../composeApp/build/cocoapods/.last_platform&quot;&#10;CURRENT_PLATFORM=&quot;${PLATFORM_NAME}&quot;&#10;&#10;if [ -f &quot;$MARKER_FILE&quot; ]; then&#10;    LAST_PLATFORM=$(cat &quot;$MARKER_FILE&quot;)&#10;    if [ &quot;$LAST_PLATFORM&quot; != &quot;$CURRENT_PLATFORM&quot; ]; then&#10;        echo &quot;warning: Cambio de plataforma detectado ($LAST_PLATFORM -&gt; $CURRENT_PLATFORM). Limpiando framework de composeApp.&quot;&#10;        rm -rf &quot;${SRCROOT}/../composeApp/build/cocoapods/framework&quot;&#10;    fi&#10;fi&#10;&#10;mkdir -p &quot;$(dirname &quot;$MARKER_FILE&quot;)&quot;&#10;echo &quot;$CURRENT_PLATFORM&quot; &gt; &quot;$MARKER_FILE&quot;&#10;">
+               <EnvironmentBuildable>
+                  <BuildableReference
+                     BuildableIdentifier = "primary"
+                     BlueprintIdentifier = "CEAE07BDBFAF80F749945216"
+                     BuildableName = "Dkavi Play.app"
+                     BlueprintName = "iosApp"
+                     ReferencedContainer = "container:iosApp.xcodeproj">
+                  </BuildableReference>
+               </EnvironmentBuildable>
+            </ActionContent>
+         </ExecutionAction>
+      </PreActions>
       <BuildActionEntries>
          <BuildActionEntry
             buildForTesting = "YES"

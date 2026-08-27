@@ -6,7 +6,7 @@ Pod::Spec.new do |spec|
     spec.authors                  = ''
     spec.license                  = ''
     spec.summary                  = 'Some description for the Shared Module'
-    spec.vendored_frameworks      = 'build/cocoapods/framework/ComposeApp.framework'
+    spec.vendored_frameworks      = 'build/cocoapods/framework/composeApp.framework'
     spec.ios.deployment_target    = '15.4'
     spec.dependency 'FirebaseAuth'
     spec.dependency 'FirebaseCore'
@@ -15,9 +15,9 @@ Pod::Spec.new do |spec|
     spec.dependency 'FirebaseRemoteConfig'
     spec.dependency 'FirebaseStorage'
     spec.dependency 'GoogleMaps', '8.4.0'
-    if !Dir.exist?('build/cocoapods/framework/ComposeApp.framework') || Dir.empty?('build/cocoapods/framework/ComposeApp.framework')
+    if !Dir.exist?('build/cocoapods/framework/composeApp.framework') || Dir.empty?('build/cocoapods/framework/composeApp.framework')
         raise "
-        Kotlin framework 'ComposeApp' doesn't exist yet, so a proper Xcode project can't be generated.
+        Kotlin framework 'composeApp' doesn't exist yet, so a proper Xcode project can't be generated.
         'pod install' should be executed after running ':generateDummyFramework' Gradle task:
             ./gradlew :composeApp:generateDummyFramework
         Alternatively, proper pod installation is performed during Gradle sync in the IDE (if Podfile location is set)"
@@ -44,7 +44,7 @@ Pod::Spec.new do |spec|
             SCRIPT
         }
     ]
-    spec.resources = ['build\compose\cocoapods\compose-resources']
+    spec.resources = ['build/compose/cocoapods/compose-resources']
     spec.libraries = 'sqlite3'
-    spec.pod_target_xcconfig = { 'OTHER_LDFLAGS' => '-lsqlite3' }
+    spec.pod_target_xcconfig = { 'OTHER_LDFLAGS' => '-lsqlite3', 'KOTLIN_PROJECT_PATH' => ':composeApp', 'PRODUCT_MODULE_NAME' => 'composeApp' }
 end
