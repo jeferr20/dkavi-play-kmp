@@ -25,8 +25,14 @@ class CheckSessionUseCase(
         val userId = sessionManager.getUserUid()
         val internalId = sessionManager.getUserId()
 
+        println("DEBUG: Iniciando CheckSessionUseCase")
+        println("DEBUG: Token presente: ${!token.isNullOrBlank()}")
+        println("DEBUG: UserUID presente: ${!userId.isNullOrBlank()}")
+        println("DEBUG: InternalID: $internalId")
+
         // Si no hay sesión local, forzamos Login
         if (token.isNullOrBlank() || userId.isNullOrBlank() || internalId == null) {
+            println("DEBUG: Sesión local incompleta. Abortando.")
             return SessionCheckResult.NoSession
         }
 

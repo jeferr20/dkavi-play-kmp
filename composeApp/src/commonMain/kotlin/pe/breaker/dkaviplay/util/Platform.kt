@@ -4,6 +4,7 @@ interface Platform {
     val name: String
     val isAndroid: Boolean
     val isIos: Boolean
+    val isSimulator: Boolean
 }
 
 expect fun getPlatform(): Platform

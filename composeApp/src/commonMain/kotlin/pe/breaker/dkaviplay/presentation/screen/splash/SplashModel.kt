@@ -39,6 +39,7 @@ class SplashModel(
 
             } catch (e: Exception) {
                 println("❌ Error crítico en SplashScreen: ${e.message}")
+                e.printStackTrace()
                 clearAndGoLogin()
             }
         }

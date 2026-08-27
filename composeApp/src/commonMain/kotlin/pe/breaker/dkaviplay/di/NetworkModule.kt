@@ -39,7 +39,8 @@ val networkModule = module {
 
     single {
         SecureStorage(
-            vault = get(named("vault"))
+            vault = get(named("vault")),
+            settings = get()
         )
     }
 

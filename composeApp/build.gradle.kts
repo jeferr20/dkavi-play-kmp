@@ -73,6 +73,7 @@ kotlin {
 
                 implementation(libs.ktor.client.okhttp)
                 implementation(libs.ktor.client.android)
+                implementation(libs.ktor.cio)
 
                 implementation(libs.android.driver)
 
@@ -110,7 +111,6 @@ kotlin {
             implementation(libs.ktor.serialization.json)
             implementation(libs.ktor.client.auth)
             implementation(libs.ktor.logging)
-            implementation(libs.ktor.cio)
             implementation(libs.ktor.websockets)
 
             implementation(libs.sqldelight.coroutines)

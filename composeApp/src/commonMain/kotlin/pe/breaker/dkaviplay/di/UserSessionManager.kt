@@ -29,12 +29,26 @@ class UserSessionManager(
      * Carga de forma asíncrona los tokens almacenados en el almacenamiento seguro.
      */
     suspend fun loadSession() {
-        cachedToken = secureStorage.get(SecureKeys.TOKEN)
-        cachedUid = secureStorage.get(SecureKeys.USERUID)
-        cachedId = secureStorage.get(SecureKeys.USERID)?.toInt()
-        cachedSupabaseToken = secureStorage.get(SecureKeys.SUPABASETOKEN)
-        cachedSupabaseRefreshToken = secureStorage.get(SecureKeys.SUPABASEREFRESHTOKEN)
-        cachedFirebaseToken = secureStorage.get(SecureKeys.FIREBASETOKEN)
+        try {
+            val token = secureStorage.get(SecureKeys.TOKEN)
+            val uid = secureStorage.get(SecureKeys.USERUID)
+            val idStr = secureStorage.get(SecureKeys.USERID)
+
+            // 💡 CRÍTICO: Si el storage devuelve nulo, pero ya tenemos datos en RAM
+            // NO los sobrescribimos con nulo. Esto evita perder la sesión si el storage
+            // tiene un retardo en iOS (Keychain latency).
+            if (token != null) cachedToken = token
+            if (uid != null) cachedUid = uid
+            if (idStr != null) cachedId = idStr.toIntOrNull()
+
+            cachedSupabaseToken = secureStorage.get(SecureKeys.SUPABASETOKEN) ?: cachedSupabaseToken
+            cachedSupabaseRefreshToken = secureStorage.get(SecureKeys.SUPABASEREFRESHTOKEN) ?: cachedSupabaseRefreshToken
+            cachedFirebaseToken = secureStorage.get(SecureKeys.FIREBASETOKEN) ?: cachedFirebaseToken
+
+            println("DEBUG: loadSession - Token en RAM final: ${!cachedToken.isNullOrBlank()}")
+        } catch (e: Exception) {
+            println("❌ ERROR en UserSessionManager.loadSession: ${e.message}")
+        }
     }
 
     fun getToken(): String? = cachedToken
@@ -71,13 +85,19 @@ class UserSessionManager(
         cachedSupabaseToken = supabaseToken
         cachedSupabaseRefreshToken = supabaseRefreshToken
 
-        // 2. Actualizar almacenamiento seguro (Sobrescribir o borrar si es null)
-        saveOrClear(SecureKeys.TOKEN, token)
-        saveOrClear(SecureKeys.USERUID, uid)
-        saveOrClear(SecureKeys.USERID, userId?.toString())
-        saveOrClear(SecureKeys.FIREBASETOKEN, firebaseToken)
-        saveOrClear(SecureKeys.SUPABASETOKEN, supabaseToken)
-        saveOrClear(SecureKeys.SUPABASEREFRESHTOKEN, supabaseRefreshToken)
+        // 2. Actualizar almacenamiento seguro
+        try {
+            saveOrClear(SecureKeys.TOKEN, token)
+            saveOrClear(SecureKeys.USERUID, uid)
+            saveOrClear(SecureKeys.USERID, userId?.toString())
+            saveOrClear(SecureKeys.FIREBASETOKEN, firebaseToken)
+            saveOrClear(SecureKeys.SUPABASETOKEN, supabaseToken)
+            saveOrClear(SecureKeys.SUPABASEREFRESHTOKEN, supabaseRefreshToken)
+            println("DEBUG: saveSession completado físicamente")
+        } catch (e: Exception) {
+            println("❌ ERROR en UserSessionManager.saveSession: ${e.message}")
+            e.printStackTrace()
+        }
     }
 
     /**
@@ -119,7 +139,11 @@ class UserSessionManager(
 
     private suspend fun saveOrClear(key: String, value: String?) {
         if (value != null) {
-            secureStorage.save(key, value)
+            val result = secureStorage.save(key, value)
+            if (result.isFailure) {
+                println("⚠️ ERROR persistiendo llave $key en SecureStorage: ${result.exceptionOrNull()?.message}")
+                throw result.exceptionOrNull() ?: Exception("Error desconocido persistiendo $key")
+            }
         } else {
             secureStorage.delete(key)
         }

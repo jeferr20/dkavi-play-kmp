@@ -7,7 +7,6 @@ import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.functions.Functions
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.realtime.Realtime
-import io.ktor.client.engine.cio.CIO
 import org.koin.dsl.module
 import pe.breaker.dkaviplay.data.util.ConstatesCloud.SUPABASE_ANON_KEY
 import pe.breaker.dkaviplay.data.util.ConstatesCloud.SUPABASE_URL
@@ -18,7 +17,7 @@ val supabaseModule = module {
             supabaseUrl = SUPABASE_URL,
             supabaseKey = SUPABASE_ANON_KEY
         ) {
-            httpEngine = CIO.create()
+            httpEngine = getEngine().create()
             install(Auth){
                 alwaysAutoRefresh = true
                 sessionManager = SettingsSessionManager()

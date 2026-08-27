@@ -9,6 +9,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.transitions.SlideTransition
+import org.koin.compose.KoinContext
 import org.koin.compose.koinInject
 import pe.breaker.dkaviplay.di.AppConfigManager
 import pe.breaker.dkaviplay.di.UserSessionManager
@@ -18,18 +19,20 @@ import pe.breaker.dkaviplay.util.AppStateHandler
 @Composable
 @Preview
 fun App() {
-    val appConfigManager = koinInject<AppConfigManager>()
-    val sessionManager = koinInject<UserSessionManager>()
+    KoinContext {
+        val appConfigManager = koinInject<AppConfigManager>()
+        val sessionManager = koinInject<UserSessionManager>()
 
-    MaterialTheme {
-        Surface(
-            modifier = Modifier.fillMaxSize(),
-            color =  Color.Black
-        ){
-            AppStateHandler(appConfigManager,sessionManager){
-                Navigator(screen = SplashScreen()) { navigator ->
-                    SlideTransition(navigator) { screen ->
-                        screen.Content()
+        MaterialTheme {
+            Surface(
+                modifier = Modifier.fillMaxSize(),
+                color =  Color.Black
+            ){
+                AppStateHandler(appConfigManager,sessionManager){
+                    Navigator(screen = SplashScreen()) { navigator ->
+                        SlideTransition(navigator) { screen ->
+                            screen.Content()
+                        }
                     }
                 }
             }
